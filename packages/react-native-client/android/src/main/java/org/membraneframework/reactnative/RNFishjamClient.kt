@@ -9,7 +9,6 @@ import com.fishjamdev.client.Config
 import com.fishjamdev.client.FishjamClient
 import com.fishjamdev.client.FishjamClientListener
 import com.fishjamdev.client.Peer
-import com.fishjamdev.client.TrackContext
 import com.twilio.audioswitch.AudioDevice
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.Promise
@@ -29,6 +28,7 @@ import org.membraneframework.rtc.media.VideoParameters
 import org.membraneframework.rtc.media.VideoTrack
 import org.membraneframework.rtc.models.RTCInboundStats
 import org.membraneframework.rtc.models.RTCOutboundStats
+import org.membraneframework.rtc.models.TrackContext
 import org.membraneframework.rtc.models.TrackData
 import org.membraneframework.rtc.utils.Metadata
 import org.webrtc.Logging
@@ -760,8 +760,8 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
   }
 
   private fun addOrUpdateTrack(ctx: TrackContext) {
-    val endpoint = endpoints[ctx.peer.id]
-      ?: throw IllegalArgumentException("endpoint with id ${ctx.peer.id} not found")
+    val endpoint = endpoints[ctx.endpoint.id]
+      ?: throw IllegalArgumentException("endpoint with id ${ctx.endpoint.id} not found")
 
     when (ctx.track) {
       is RemoteVideoTrack -> {
@@ -805,8 +805,8 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
 
   override fun onTrackRemoved(ctx: TrackContext) {
     CoroutineScope(Dispatchers.Main).launch {
-      val endpoint = endpoints[ctx.peer.id]
-        ?: throw IllegalArgumentException("endpoint with id ${ctx.peer.id} not found")
+      val endpoint = endpoints[ctx.endpoint.id]
+        ?: throw IllegalArgumentException("endpoint with id ${ctx.endpoint.id} not found")
 
       when (ctx.track) {
         is RemoteVideoTrack -> endpoint.removeTrack(ctx.track as RemoteVideoTrack)
