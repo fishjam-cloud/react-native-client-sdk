@@ -1,0 +1,23 @@
+name: Run lint & tests
+on: [push]
+
+jobs:
+  lint:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install deps 📡
+        run: brew install swift-format xcbeautify
+
+      - name: Run formatter 🎨
+        run: swift-format format -i -r ./**/**/*.swift --configuration swift-format-config.json
+
+      - name: Run lint 👀
+        run: swift-format lint -r -s ./**/**/*.swift --configuration swift-format-config.json
+
+      - name: Generate mocks 🫥
+        run: swift package update Mockingbird && ./gen-mocks.sh
+
+      - name: Run tests 💀
+        run: set -o pipefail && xcodebuild -scheme FishjamClientTests test -destination "platform=iOS Simulator,name=iPhone 14,OS=latest" | xcbeautify
