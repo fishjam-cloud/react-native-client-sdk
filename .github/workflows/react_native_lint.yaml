@@ -22,3 +22,12 @@ jobs:
         run: yarn lint:check
       - name: Prettier
         run: yarn format:check
+
+      - name: Download ktlint
+        run: |
+         curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.1.1/ktlint
+         chmod a+x ktlint
+         sudo mv ktlint /usr/local/bin/
+      - name: Run linter for android native
+        run: ktlint **/*.kt
+        working-directory: ./packages/react-native-client/android
