@@ -13,7 +13,7 @@ class AudioSwitchManager(private val context: Context) {
       AudioDevice.BluetoothHeadset::class.java,
       AudioDevice.WiredHeadset::class.java,
       AudioDevice.Speakerphone::class.java,
-      AudioDevice.Earpiece::class.java,
+      AudioDevice.Earpiece::class.java
     )
 
   // AudioSwitch is not threadsafe, so all calls should be done on the main thread.

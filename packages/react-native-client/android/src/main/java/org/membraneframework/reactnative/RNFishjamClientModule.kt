@@ -84,7 +84,7 @@ class RNFishjamClientModule : Module() {
         "EndpointsUpdate",
         "AudioDeviceUpdate",
         "SendMediaEvent",
-        "BandwidthEstimation",
+        "BandwidthEstimation"
       )
 
       val rnFishjamClient =

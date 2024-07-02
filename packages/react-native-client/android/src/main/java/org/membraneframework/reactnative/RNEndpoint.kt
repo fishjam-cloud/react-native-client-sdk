@@ -12,12 +12,12 @@ data class RNEndpoint(
   val type: String?,
   val videoTracks: HashMap<String, VideoTrack> = hashMapOf(),
   val audioTracks: HashMap<String, AudioTrack> = hashMapOf(),
-  val tracksData: HashMap<String, TrackData> = hashMapOf(),
+  val tracksData: HashMap<String, TrackData> = hashMapOf()
 ) {
   fun addOrUpdateTrack(
     videoTrack: VideoTrack,
     metadata: Metadata,
-    simulcastConfig: SimulcastConfig?,
+    simulcastConfig: SimulcastConfig?
   ) {
     val trackData = this.tracksData[videoTrack.id()]
     val newTrackData = TrackData(simulcastConfig = simulcastConfig ?: trackData?.simulcastConfig, metadata = metadata)
@@ -27,7 +27,7 @@ data class RNEndpoint(
 
   fun addOrUpdateTrack(
     audioTrack: AudioTrack,
-    metadata: Metadata,
+    metadata: Metadata
   ) {
     val trackData = this.tracksData[audioTrack.id()]
     val newTrackData = TrackData(simulcastConfig = trackData?.simulcastConfig, metadata = metadata)

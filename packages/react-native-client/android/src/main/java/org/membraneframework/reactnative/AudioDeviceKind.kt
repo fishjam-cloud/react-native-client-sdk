@@ -6,7 +6,7 @@ enum class AudioDeviceKind(val typeName: String, val audioDeviceClass: Class<out
   BLUETOOTH("bluetooth", AudioDevice.BluetoothHeadset::class.java),
   WIRED_HEADSET("headset", AudioDevice.WiredHeadset::class.java),
   SPEAKER("speaker", AudioDevice.Speakerphone::class.java),
-  EARPIECE("earpiece", AudioDevice.Earpiece::class.java),
+  EARPIECE("earpiece", AudioDevice.Earpiece::class.java)
   ;
 
   companion object {
