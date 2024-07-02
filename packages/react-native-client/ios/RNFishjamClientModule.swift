@@ -74,21 +74,13 @@ public class RNFishjamClientModule: Module {
             self.sendEvent(eventName, data)
         }
 
-        AsyncFunction("connect") { (url: String, peerToken: String, promise: Promise) in
+        AsyncFunction("connect") { (url: String, peerToken: String, peerMetadata: [String: Any], promise: Promise) in
             try rnFishjamClient.create()
-            rnFishjamClient.connect(url: url, peerToken: peerToken, promise: promise)
-        }
-
-        AsyncFunction("joinRoom") { (peerMetadata: [String: Any], promise: Promise) in
-            rnFishjamClient.joinRoom(peerMetadata: peerMetadata, promise: promise)
+            rnFishjamClient.connect(url: url, peerToken: peerToken, peerMetadata: peerMetadata, promise: promise)
         }
 
         AsyncFunction("leaveRoom") {
             rnFishjamClient.leaveRoom()
-        }
-
-        AsyncFunction("cleanUp") {
-            rnFishjamClient.cleanUp()
         }
 
         AsyncFunction("startCamera") { (config: CameraConfig) in

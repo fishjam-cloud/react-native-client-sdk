@@ -1144,7 +1144,8 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
-  - FishjamClient/Broadcast
+  - FishjamClient (from `https://github.com/fishjam-dev/ios-client-sdk.git`, commit `9d22ecaf75cc563a24212c13e15cd83a3f76ac0f`)
+  - FishjamClient/Broadcast (from `https://github.com/fishjam-dev/ios-client-sdk.git`, commit `9d22ecaf75cc563a24212c13e15cd83a3f76ac0f`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
@@ -1238,6 +1239,9 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
     :path: "../../../node_modules/react-native/React/FBReactNativeSpec"
+  FishjamClient:
+    :commit: 9d22ecaf75cc563a24212c13e15cd83a3f76ac0f
+    :git: https://github.com/fishjam-dev/ios-client-sdk.git
   glog:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
@@ -1340,6 +1344,11 @@ EXTERNAL SOURCES:
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
 
+CHECKOUT OPTIONS:
+  FishjamClient:
+    :commit: 9d22ecaf75cc563a24212c13e15cd83a3f76ac0f
+    :git: https://github.com/fishjam-dev/ios-client-sdk.git
+
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
   DoubleConversion: fea03f2699887d960129cc54bba7e52542b6f953
@@ -1353,7 +1362,7 @@ SPEC CHECKSUMS:
   ExpoModulesCore: 4a8928a228569301ac4fc4a1e846713e05754d05
   FBLazyVector: 84f6edbe225f38aebd9deaf1540a4160b1f087d7
   FBReactNativeSpec: 75c20d8ec82467d86fc15e5cb41c7501258a884f
-  FishjamClient: b811a3384a56839bed9553ad0fee1cd4b3422d3d
+  FishjamClient: c1cf10484a705500c9fac352b75a4c1b8cec3cf2
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: b2669ce35fc4ac14f523b307aff8896799829fe2
@@ -1418,4 +1427,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 0376e85da25bcfda7c0095d7c9d174ee924ff49d
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.14.3

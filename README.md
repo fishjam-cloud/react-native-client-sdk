@@ -232,54 +232,32 @@ room client. To run the app:
 
 # Usage
 
-> [!IMPORTANT] Since version 7.4.0, you need to call function
-> `initializeWebRTC()` once in your app before using any other functionality.
-
-Start with connecting to the membrane webrtc server. Use `useWebRTC()` hook to
-manage connection:
-
-```ts
-const { connect, disconnect, error } = useWebRTC();
-```
-
 Connect to the server and join the room using the `connect` function. Use user
-metadata to pass things like usernames etc. to the server. You can also pass
-connection params that will be sent to the socket when establishing the
-connection tries.
+metadata to pass things like usernames etc. to the server.
 
 ```ts
 const startServerConnection = () => {
   try {
-    await connect('https://example.com', "Annie's room", {
-      endpointMetadata: {
-        displayName: 'Annie',
+    await connect(
+      "http://server_address:5002/socket/peer/websocket",
+      "peer_token",
+      {
+        displayName: "Annie",
       },
-      connectionParams: {
-        token: 'TOKEN',
-      },
-    });
+    );
   } catch (e) {
-    console.log('error!');
+    console.log("error!");
   }
 };
 ```
 
-Remember to gracefully disconnect from the server using the `disconnect()`
+Remember to gracefully disconnect from the server using the `leaveRoom()`
 function:
 
 ```ts
 const stopServerConnection = () => {
-  await disconnect();
+  await leaveRoom();
 };
-```
-
-Also handle errors properly, for example when internet connection fails or
-server is down:
-
-```ts
-useEffect(() => {
-  if (error) console.log('error: ', e);
-}, [error]);
 ```
 
 Start the device's camera and microphone using `useCamera()` and
@@ -293,25 +271,25 @@ const { startMicrophone } = useMicrophone();
 
 await startCamera({
   quality: VideoQuality.HD_169,
-  videoTrackMetadata: { active: true, type: 'camera' },
+  videoTrackMetadata: { active: true, type: "camera" },
 });
-await startMicrophone({ audioTrackMetadata: { active: true, type: 'audio' } });
+await startMicrophone({ audioTrackMetadata: { active: true, type: "audio" } });
 ```
 
 For more options and functions to control the camera and microphone see the API
 documentation.
 
-If you have the connection set up, then use `useEndpoints()` hook to track the
-other endpoints in the room. One of the endpoints will be a local participant
-(the one who's using the device). When endpoints is added or removed because an
-user joins or leaves the room, the endpoints will be updated automatically.
+If you have the connection set up, then use `usePeers()` hook to track the
+other peers in the room. One of the peers will be a local participant
+(the one who's using the device). When peers is added or removed because an
+user joins or leaves the room, the peers will be updated automatically.
 Simply call the hook like this:
 
 ```ts
-const endpoints = useEndpoints();
+const peers = usePeers();
 ```
 
-When you have the endpoints all that's left is to render their video tracks. Use
+When you have the peers all that's left is to render their video tracks. Use
 `<VideoRendererView />` component like this:
 
 ```ts
@@ -375,27 +353,27 @@ And add foreground service:
 Then to start the foreground service:
 
 ```ts
-import notifee, { AndroidImportance } from '@notifee/react-native';
+import notifee, { AndroidImportance } from "@notifee/react-native";
 
 const startForegroundService = async () => {
-  if (Platform.OS === 'android') {
+  if (Platform.OS === "android") {
     const channelId = await notifee.createChannel({
-      id: 'video_call',
-      name: 'Video call',
+      id: "video_call",
+      name: "Video call",
       lights: false,
       vibration: false,
       importance: AndroidImportance.DEFAULT,
     });
 
     await notifee.displayNotification({
-      title: 'Your video call is ongoing',
-      body: 'Tap to return to the call.',
+      title: "Your video call is ongoing",
+      body: "Tap to return to the call.",
       android: {
         channelId,
         asForegroundService: true,
         ongoing: true,
         pressAction: {
-          id: 'default',
+          id: "default",
         },
       },
     });

@@ -53,7 +53,6 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
   private val globalToLocalTrackId = HashMap<String, String>()
 
   private var connectPromise: Promise? = null
-  private var joinPromise: Promise? = null
   private var screencastPromise: Promise? = null
 
   var videoSimulcastConfig: SimulcastConfig = SimulcastConfig()
@@ -220,22 +219,18 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
 
   override fun onAuthSuccess() {
     CoroutineScope(Dispatchers.Main).launch {
-      connectPromise?.resolve()
-      connectPromise = null
+      joinRoom()
     }
   }
 
-  fun connect(url: String, peerToken: String, promise: Promise) {
+  fun connect(url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise) {
     ensureCreated()
     connectPromise = promise
+    localUserMetadata = peerMetadata
     fishjamClient?.connect(Config(url, peerToken))
   }
 
-  fun joinRoom(peerMetadata: Metadata = mapOf(), promise: Promise) {
-    ensureCreated()
-    ensureEndpoints()
-    joinPromise = promise
-    localUserMetadata = peerMetadata
+  private fun joinRoom() {
     val id = localEndpointId ?: return
     val endpoint = endpoints[id] ?: return
     endpoints[id] = endpoint.copy(metadata = localUserMetadata)
@@ -243,15 +238,6 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
   }
 
   fun leaveRoom() {
-    ensureCreated()
-    if (isScreencastOn) {
-      stopScreencast()
-    }
-    fishjamClient?.leave()
-    endpoints.clear()
-  }
-
-  fun cleanUp() {
     ensureCreated()
     if (isScreencastOn) {
       stopScreencast()
@@ -746,16 +732,16 @@ class RNFishjamClient(val sendEvent: (name: String, data: Map<String, Any?>) -> 
         endpoints[it.id] =
           RNEndpoint(it.id, it.metadata ?: mapOf(), it.type, tracksData = HashMap(it.tracks))
       }
-      joinPromise?.resolve(null)
-      joinPromise = null
+      connectPromise?.resolve(null)
+      connectPromise = null
       emitEndpoints()
     }
   }
 
   override fun onJoinError(metadata: Any) {
     CoroutineScope(Dispatchers.Main).launch {
-      joinPromise?.reject(CodedException("Join error: $metadata"))
-      joinPromise = null
+      connectPromise?.reject(CodedException("Join error: $metadata"))
+      connectPromise = null
     }
   }
 

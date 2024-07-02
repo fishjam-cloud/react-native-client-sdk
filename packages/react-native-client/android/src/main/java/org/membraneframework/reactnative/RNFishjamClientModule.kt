@@ -99,38 +99,25 @@ class RNFishjamClientModule : Module() {
     }
 
     OnActivityDestroys {
-      rnFishjamClient.cleanUp()
+      rnFishjamClient.leaveRoom()
     }
 
     OnActivityResult { _, result ->
       rnFishjamClient.onActivityResult(result.requestCode, result.resultCode, result.data)
     }
 
-    AsyncFunction("connect") { url: String, peerToken: String, promise: Promise ->
+    AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
       CoroutineScope(Dispatchers.Main).launch {
         rnFishjamClient.create()
-        rnFishjamClient.connect(url, peerToken, promise)
+        rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
       }
     }
 
-    AsyncFunction("joinRoom") { peerMetadata: Map<String, Any>, promise: Promise ->
-      CoroutineScope(Dispatchers.Main).launch {
-        rnFishjamClient.joinRoom(peerMetadata, promise)
-      }
-    }
-
-    AsyncFunction("leaveRoom") { ->
-      CoroutineScope(Dispatchers.Main).launch {
+    AsyncFunction("leaveRoom") Coroutine { ->
+      withContext(Dispatchers.Main) {
         rnFishjamClient.leaveRoom()
       }
     }
-
-    AsyncFunction("cleanUp") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.cleanUp()
-      }
-    }
-
 
     AsyncFunction("startCamera") Coroutine { config: CameraConfig ->
       withContext(Dispatchers.Main) {
