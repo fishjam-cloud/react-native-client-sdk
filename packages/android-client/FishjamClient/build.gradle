@@ -1,20 +1,19 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    // id "org.jetbrains.dokka"
+    id "org.jetbrains.dokka"
     id "com.google.protobuf" version "0.9.4"
     id 'maven-publish'
-
     id "kotlin-android"
 }
 
- ext {
-        compose_version = '1.2.0-alpha04'
-        compose_compiler_version = '1.1.0-rc02'
-        kotlin_version = '1.8.0'
-        java_version = JavaVersion.VERSION_17
-        dokka_version = '1.7.20'
-    }
+ext {
+      compose_version = '1.2.0-alpha04'
+      compose_compiler_version = '1.1.0-rc02'
+      kotlin_version = '1.8.0'
+      java_version = JavaVersion.VERSION_17
+      dokka_version = '1.8.10'
+}
 
 android {
     namespace 'com.fishjamdev.client'
@@ -59,23 +58,23 @@ afterEvaluate {
             }
         }
     }
-    // tasks.named("dokkaHtml") {
-    //     pluginsMapConfiguration.set([
-    //             "org.jetbrains.dokka.base.DokkaBase": """{
-    //             "footerMessage": "$customFooterMessage"
-    //         }"""
-    //     ])
-    // }
+    tasks.named("dokkaHtml") {
+        pluginsMapConfiguration.set([
+                "org.jetbrains.dokka.base.DokkaBase": """{
+                "footerMessage": "$customFooterMessage"
+            }"""
+        ])
+    }
 }
 
-// tasks.named("dokkaHtml") {
-//     moduleName.set("FishjamClient")
-//     dokkaSourceSets {
-//         named("main") {
-//             includes.from("module.md")
-//         }
-//     }
-// }
+tasks.named("dokkaHtml") {
+    moduleName.set("FishjamClient")
+    dokkaSourceSets {
+        named("main") {
+            includes.from("module.md")
+        }
+    }
+}
 
 tasks.withType(Test) {
     testLogging {
