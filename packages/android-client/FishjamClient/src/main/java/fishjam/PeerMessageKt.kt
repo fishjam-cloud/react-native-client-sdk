@@ -3,13 +3,11 @@
 
 // Generated files should ignore deprecation warnings
 @file:Suppress("DEPRECATION")
-
-package fishjam
+package fishjam;
 
 @kotlin.jvm.JvmName("-initializepeerMessage")
 public inline fun peerMessage(block: fishjam.PeerMessageKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage =
   fishjam.PeerMessageKt.Dsl._create(fishjam.PeerNotifications.PeerMessage.newBuilder()).apply { block() }._build()
-
 /**
  * ```
  * Defines any type of message sent between FJ and a peer
@@ -39,19 +37,16 @@ public object PeerMessageKt {
     public var authenticated: fishjam.PeerNotifications.PeerMessage.Authenticated
       @JvmName("getAuthenticated")
       get() = _builder.getAuthenticated()
-
       @JvmName("setAuthenticated")
       set(value) {
         _builder.setAuthenticated(value)
       }
-
     /**
      * `.fishjam.PeerMessage.Authenticated authenticated = 1;`
      */
     public fun clearAuthenticated() {
       _builder.clearAuthenticated()
     }
-
     /**
      * `.fishjam.PeerMessage.Authenticated authenticated = 1;`
      * @return Whether the authenticated field is set.
@@ -66,19 +61,16 @@ public object PeerMessageKt {
     public var authRequest: fishjam.PeerNotifications.PeerMessage.AuthRequest
       @JvmName("getAuthRequest")
       get() = _builder.getAuthRequest()
-
       @JvmName("setAuthRequest")
       set(value) {
         _builder.setAuthRequest(value)
       }
-
     /**
      * `.fishjam.PeerMessage.AuthRequest auth_request = 2;`
      */
     public fun clearAuthRequest() {
       _builder.clearAuthRequest()
     }
-
     /**
      * `.fishjam.PeerMessage.AuthRequest auth_request = 2;`
      * @return Whether the authRequest field is set.
@@ -93,19 +85,16 @@ public object PeerMessageKt {
     public var mediaEvent: fishjam.PeerNotifications.PeerMessage.MediaEvent
       @JvmName("getMediaEvent")
       get() = _builder.getMediaEvent()
-
       @JvmName("setMediaEvent")
       set(value) {
         _builder.setMediaEvent(value)
       }
-
     /**
      * `.fishjam.PeerMessage.MediaEvent media_event = 3;`
      */
     public fun clearMediaEvent() {
       _builder.clearMediaEvent()
     }
-
     /**
      * `.fishjam.PeerMessage.MediaEvent media_event = 3;`
      * @return Whether the mediaEvent field is set.
@@ -113,7 +102,6 @@ public object PeerMessageKt {
     public fun hasMediaEvent(): kotlin.Boolean {
       return _builder.hasMediaEvent()
     }
-
     public val contentCase: fishjam.PeerNotifications.PeerMessage.ContentCase
       @JvmName("getContentCase")
       get() = _builder.getContentCase()
@@ -122,15 +110,9 @@ public object PeerMessageKt {
       _builder.clearContent()
     }
   }
-
   @kotlin.jvm.JvmName("-initializeauthenticated")
-  public inline fun authenticated(
-    block: fishjam.PeerMessageKt.AuthenticatedKt.Dsl.() -> kotlin.Unit
-  ): fishjam.PeerNotifications.PeerMessage.Authenticated =
-    fishjam.PeerMessageKt.AuthenticatedKt.Dsl._create(fishjam.PeerNotifications.PeerMessage.Authenticated.newBuilder()).apply {
-      block()
-    }._build()
-
+  public inline fun authenticated(block: fishjam.PeerMessageKt.AuthenticatedKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.Authenticated =
+    fishjam.PeerMessageKt.AuthenticatedKt.Dsl._create(fishjam.PeerNotifications.PeerMessage.Authenticated.newBuilder()).apply { block() }._build()
   /**
    * ```
    * Response sent by FJ, confirming successfull authentication
@@ -155,15 +137,9 @@ public object PeerMessageKt {
       internal fun _build(): fishjam.PeerNotifications.PeerMessage.Authenticated = _builder.build()
     }
   }
-
   @kotlin.jvm.JvmName("-initializeauthRequest")
-  public inline fun authRequest(
-    block: fishjam.PeerMessageKt.AuthRequestKt.Dsl.() -> kotlin.Unit
-  ): fishjam.PeerNotifications.PeerMessage.AuthRequest =
-    fishjam.PeerMessageKt.AuthRequestKt.Dsl._create(
-      fishjam.PeerNotifications.PeerMessage.AuthRequest.newBuilder()
-    ).apply { block() }._build()
-
+  public inline fun authRequest(block: fishjam.PeerMessageKt.AuthRequestKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.AuthRequest =
+    fishjam.PeerMessageKt.AuthRequestKt.Dsl._create(fishjam.PeerNotifications.PeerMessage.AuthRequest.newBuilder()).apply { block() }._build()
   /**
    * ```
    * Request sent by peer, to authenticate to FJ server
@@ -193,12 +169,10 @@ public object PeerMessageKt {
       public var token: kotlin.String
         @JvmName("getToken")
         get() = _builder.getToken()
-
         @JvmName("setToken")
         set(value) {
           _builder.setToken(value)
         }
-
       /**
        * `string token = 1;`
        */
@@ -207,13 +181,9 @@ public object PeerMessageKt {
       }
     }
   }
-
   @kotlin.jvm.JvmName("-initializemediaEvent")
-  public inline fun mediaEvent(
-    block: fishjam.PeerMessageKt.MediaEventKt.Dsl.() -> kotlin.Unit
-  ): fishjam.PeerNotifications.PeerMessage.MediaEvent =
+  public inline fun mediaEvent(block: fishjam.PeerMessageKt.MediaEventKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.MediaEvent =
     fishjam.PeerMessageKt.MediaEventKt.Dsl._create(fishjam.PeerNotifications.PeerMessage.MediaEvent.newBuilder()).apply { block() }._build()
-
   /**
    * ```
    * Any type of WebRTC messages passed betweend FJ and peer
@@ -243,12 +213,10 @@ public object PeerMessageKt {
       public var data: kotlin.String
         @JvmName("getData")
         get() = _builder.getData()
-
         @JvmName("setData")
         set(value) {
           _builder.setData(value)
         }
-
       /**
        * `string data = 1;`
        */
@@ -258,28 +226,20 @@ public object PeerMessageKt {
     }
   }
 }
+@kotlin.jvm.JvmSynthetic
+public inline fun fishjam.PeerNotifications.PeerMessage.copy(block: `fishjam`.PeerMessageKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage =
+  `fishjam`.PeerMessageKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-public inline fun fishjam.PeerNotifications.PeerMessage.copy(
-  block: `fishjam`.PeerMessageKt.Dsl.() -> kotlin.Unit
-): fishjam.PeerNotifications.PeerMessage = `fishjam`.PeerMessageKt.Dsl._create(this.toBuilder()).apply { block() }._build()
-
-@kotlin.jvm.JvmSynthetic
-public inline fun fishjam.PeerNotifications.PeerMessage.Authenticated.copy(
-  block: `fishjam`.PeerMessageKt.AuthenticatedKt.Dsl.() -> kotlin.Unit
-): fishjam.PeerNotifications.PeerMessage.Authenticated =
+public inline fun fishjam.PeerNotifications.PeerMessage.Authenticated.copy(block: `fishjam`.PeerMessageKt.AuthenticatedKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.Authenticated =
   `fishjam`.PeerMessageKt.AuthenticatedKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-public inline fun fishjam.PeerNotifications.PeerMessage.AuthRequest.copy(
-  block: `fishjam`.PeerMessageKt.AuthRequestKt.Dsl.() -> kotlin.Unit
-): fishjam.PeerNotifications.PeerMessage.AuthRequest =
+public inline fun fishjam.PeerNotifications.PeerMessage.AuthRequest.copy(block: `fishjam`.PeerMessageKt.AuthRequestKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.AuthRequest =
   `fishjam`.PeerMessageKt.AuthRequestKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 @kotlin.jvm.JvmSynthetic
-public inline fun fishjam.PeerNotifications.PeerMessage.MediaEvent.copy(
-  block: `fishjam`.PeerMessageKt.MediaEventKt.Dsl.() -> kotlin.Unit
-): fishjam.PeerNotifications.PeerMessage.MediaEvent =
+public inline fun fishjam.PeerNotifications.PeerMessage.MediaEvent.copy(block: `fishjam`.PeerMessageKt.MediaEventKt.Dsl.() -> kotlin.Unit): fishjam.PeerNotifications.PeerMessage.MediaEvent =
   `fishjam`.PeerMessageKt.MediaEventKt.Dsl._create(this.toBuilder()).apply { block() }._build()
 
 public val fishjam.PeerNotifications.PeerMessageOrBuilder.authenticatedOrNull: fishjam.PeerNotifications.PeerMessage.Authenticated?
@@ -290,3 +250,4 @@ public val fishjam.PeerNotifications.PeerMessageOrBuilder.authRequestOrNull: fis
 
 public val fishjam.PeerNotifications.PeerMessageOrBuilder.mediaEventOrNull: fishjam.PeerNotifications.PeerMessage.MediaEvent?
   get() = if (hasMediaEvent()) getMediaEvent() else null
+
