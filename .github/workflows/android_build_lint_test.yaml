@@ -1,5 +1,5 @@
 
-name: Build & lint
+name: Android Build & lint
 on:
   push:
 

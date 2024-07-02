@@ -1,4 +1,4 @@
-name: Lint & Types
+name: React-Native Lint & Types
 on:
   pull_request:
 jobs:
