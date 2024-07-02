@@ -18,9 +18,7 @@ jobs:
 
       - name: Build Docs
         run: ./gradlew dokkaHtml
-        with:
-          path: |
-            /home/runner/work/react-native-client-sdk/packages/android-client
+        working-directory: ./packages/android-client
 
       - name: Deploy
         uses: s0/git-publish-subdir-action@develop
@@ -29,6 +27,4 @@ jobs:
           BRANCH: gh-pages
           FOLDER: FishjamClient/build/dokka/html
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          path: |
-            /home/runner/work/react-native-client-sdk/packages/android-client
+        working-directory: ./packages/android-client

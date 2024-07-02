@@ -1,6 +1,8 @@
 name: Android Build & lint
+
 on:
   pull_request:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,22 +15,23 @@ jobs:
           distribution: zulu
 
       - name: Download ktlint
-        run: curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.1.1/ktlint && chmod a+x ktlint && sudo mv ktlint /usr/local/bin/
+        run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.1.1/ktlint
+          chmod a+x ktlint
+          sudo mv ktlint /usr/local/bin/
+
+      - name: Grant Execute Permissions
+        run: chmod +x gradlew
+        working-directory: ./packages/android-client
 
       - name: Run linter
         run: ktlint **/*.kt
-        with:
-          path: |
-            /home/runner/work/react-native-client-sdk/packages/android-client
+        working-directory: ./packages/android-client
 
       - name: Build
         run: ./gradlew assembleRelease
-        with:
-          path: |
-            /home/runner/work/react-native-client-sdk/packages/android-client
+        working-directory: ./packages/android-client
 
       - name: Test
         run: ./gradlew :FishjamClient:testDebugUnitTest
-        with:
-          path: |
-            /home/runner/work/react-native-client-sdk/packages/android-client
+        working-directory: ./packages/android-client
