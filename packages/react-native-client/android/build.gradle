@@ -78,8 +78,8 @@ repositories {
 dependencies {
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
-  if (findProject(':android-fishjam-client-sdk')) {
-    implementation project(':android-fishjam-client-sdk')
+  if (findProject(':android-client')) {
+    implementation project(':android-client')
   } else {
     implementation "com.github.karkakol:react-native-client-sdk:6b68dac5bb74a9ec4c91b1eee624b8c0e473c214"
   }

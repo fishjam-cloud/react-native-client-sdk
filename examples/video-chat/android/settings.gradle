@@ -5,5 +5,5 @@ includeBuild('../../../node_modules/@react-native/gradle-plugin')
 
 apply from: new File(["node", "--print", "require.resolve('expo/package.json')"].execute(null, rootDir).text.trim(), "../scripts/autolinking.gradle")
 useExpoModules()
-include ':android-fishjam-client-sdk'
-project(':android-fishjam-client-sdk').projectDir = new File('../../../packages/android-client-sdk/FishjamClient/')
+include ':android-client'
+project(':android-client').projectDir = new File('../../../packages/android-client/FishjamClient/')

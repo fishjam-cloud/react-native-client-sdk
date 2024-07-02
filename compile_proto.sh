@@ -15,6 +15,6 @@ protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./package
 printf "DONE for react native\n\n"
 
 printf "Compiling: file $file for android\n"
-protoc -I=./protos --java_out=packages/android-client-sdk/FishjamClient/src/main/java/ --kotlin_out=packages/android-client-sdk/FishjamClient/src/main/java/ $file
+protoc -I=./protos --java_out=packages/android-client/FishjamClient/src/main/java/ --kotlin_out=packages/android-client/FishjamClient/src/main/java/ $file
 printf "DONE for android\n\n"
 
