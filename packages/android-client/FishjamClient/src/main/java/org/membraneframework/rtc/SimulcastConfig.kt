@@ -9,20 +9,20 @@ import com.google.gson.annotations.SerializedName
  * `"l"` - original encoding scaled down by 4
  */
 enum class TrackEncoding(val rid: String) {
-    @SerializedName("l")
-    L("l"),
+  @SerializedName("l")
+  L("l"),
 
-    @SerializedName("m")
-    M("m"),
+  @SerializedName("m")
+  M("m"),
 
-    @SerializedName("h")
-    H("h");
+  @SerializedName("h")
+  H("h");
 
-    companion object {
-        fun fromString(s: String): TrackEncoding? {
-            return values().find { it.rid == s }
-        }
+  companion object {
+    fun fromString(s: String): TrackEncoding? {
+      return values().find { it.rid == s }
     }
+  }
 }
 
 /**
@@ -33,15 +33,15 @@ enum class TrackEncoding(val rid: String) {
  * are the original track resolution scaled down by 2 and 4 respectively.
  */
 data class SimulcastConfig(
-    /**
-     * Whether to simulcast track or not.
-     */
-    val enabled: Boolean = false,
-    /**
-     * List of initially active encodings.
-     *
-     * Encoding that is not present in this list might still be
-     * enabled using {@link enableTrackEncoding}.
-     */
-    val activeEncodings: List<TrackEncoding> = listOf()
+  /**
+   * Whether to simulcast track or not.
+   */
+  val enabled: Boolean = false,
+  /**
+   * List of initially active encodings.
+   *
+   * Encoding that is not present in this list might still be
+   * enabled using {@link enableTrackEncoding}.
+   */
+  val activeEncodings: List<TrackEncoding> = listOf()
 )

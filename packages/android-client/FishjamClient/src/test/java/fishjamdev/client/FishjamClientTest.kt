@@ -17,95 +17,95 @@ import org.membraneframework.rtc.MembraneRTC
 import org.membraneframework.rtc.MembraneRTCListener
 
 class FishjamClientTest {
-    private val context = mockk<Context>()
-    private val webrtcListener = slot<MembraneRTCListener>()
-    private val webrtcClient = mockk<MembraneRTC>(relaxed = true)
+  private val context = mockk<Context>()
+  private val webrtcListener = slot<MembraneRTCListener>()
+  private val webrtcClient = mockk<MembraneRTC>(relaxed = true)
 
-    private lateinit var websocketMock: WebsocketMock
-    private lateinit var fishjamClientListener: FishjamClientListener
-    private lateinit var client: FishjamClient
+  private lateinit var websocketMock: WebsocketMock
+  private lateinit var fishjamClientListener: FishjamClientListener
+  private lateinit var client: FishjamClient
 
-    private val url = "ws://localhost:4000/socket/peer/websocket"
-    private val token = "auth"
-    private val authRequest =
-        PeerNotifications.PeerMessage
-            .newBuilder()
-            .setAuthRequest(PeerNotifications.PeerMessage.AuthRequest.newBuilder().setToken(token))
-            .build()
+  private val url = "ws://localhost:4000/socket/peer/websocket"
+  private val token = "auth"
+  private val authRequest =
+    PeerNotifications.PeerMessage
+      .newBuilder()
+      .setAuthRequest(PeerNotifications.PeerMessage.AuthRequest.newBuilder().setToken(token))
+      .build()
 
-    private val authenticated =
-        PeerNotifications.PeerMessage
-            .newBuilder()
-            .setAuthenticated(PeerNotifications.PeerMessage.Authenticated.newBuilder())
-            .build()
+  private val authenticated =
+    PeerNotifications.PeerMessage
+      .newBuilder()
+      .setAuthenticated(PeerNotifications.PeerMessage.Authenticated.newBuilder())
+      .build()
 
-    init {
-        mockkObject(MembraneRTC)
-        every { MembraneRTC.create(context, capture(webrtcListener), any()) } returns webrtcClient
-    }
+  init {
+    mockkObject(MembraneRTC)
+    every { MembraneRTC.create(context, capture(webrtcListener), any()) } returns webrtcClient
+  }
 
-    @Before fun initMocksAndConnect() {
-        websocketMock = WebsocketMock()
-        fishjamClientListener = mockk(relaxed = true)
-        client = FishjamClient(context, fishjamClientListener)
+  @Before fun initMocksAndConnect() {
+    websocketMock = WebsocketMock()
+    fishjamClientListener = mockk(relaxed = true)
+    client = FishjamClient(context, fishjamClientListener)
 
-        client.connect(Config(websocketUrl = url, token = token))
-        websocketMock.open()
-        verify { fishjamClientListener.onSocketOpen() }
-        websocketMock.expect(authRequest)
-    }
+    client.connect(Config(websocketUrl = url, token = token))
+    websocketMock.open()
+    verify { fishjamClientListener.onSocketOpen() }
+    websocketMock.expect(authRequest)
+  }
 
-    @Test fun authenticates() {
-        websocketMock.sendToClient(authenticated)
-        verify { fishjamClientListener.onAuthSuccess() }
-    }
+  @Test fun authenticates() {
+    websocketMock.sendToClient(authenticated)
+    verify { fishjamClientListener.onAuthSuccess() }
+  }
 
-    @Test fun cleansUp() {
-        client.cleanUp()
-        verify { webrtcClient.disconnect() }
-        websocketMock.expectClosed()
-        verify { fishjamClientListener.onDisconnected() }
-    }
+  @Test fun cleansUp() {
+    client.cleanUp()
+    verify { webrtcClient.disconnect() }
+    websocketMock.expectClosed()
+    verify { fishjamClientListener.onDisconnected() }
+  }
 
-    @Test fun receivesAndSendsMediaEvents() {
-        val sdpOfferMediaEvent =
-            PeerNotifications.PeerMessage
-                .newBuilder()
-                .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("sdpOffer"))
-                .build()
+  @Test fun receivesAndSendsMediaEvents() {
+    val sdpOfferMediaEvent =
+      PeerNotifications.PeerMessage
+        .newBuilder()
+        .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("sdpOffer"))
+        .build()
 
-        val joinMediaEvent =
-            PeerNotifications.PeerMessage
-                .newBuilder()
-                .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("join"))
-                .build()
+    val joinMediaEvent =
+      PeerNotifications.PeerMessage
+        .newBuilder()
+        .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("join"))
+        .build()
 
-        websocketMock.sendToClient(authenticated)
+    websocketMock.sendToClient(authenticated)
 
-        verify { fishjamClientListener.onAuthSuccess() }
+    verify { fishjamClientListener.onAuthSuccess() }
 
-        webrtcListener.captured.onSendMediaEvent("join")
+    webrtcListener.captured.onSendMediaEvent("join")
 
-        websocketMock.expect(joinMediaEvent)
+    websocketMock.expect(joinMediaEvent)
 
-        websocketMock.sendToClient(sdpOfferMediaEvent)
+    websocketMock.sendToClient(sdpOfferMediaEvent)
 
-        verify { webrtcClient.receiveMediaEvent("sdpOffer") }
-    }
+    verify { webrtcClient.receiveMediaEvent("sdpOffer") }
+  }
 
-    @Test fun callsOnSocketError() {
-        websocketMock.error()
-        verify { fishjamClientListener.onSocketError(any(), any()) }
-    }
+  @Test fun callsOnSocketError() {
+    websocketMock.error()
+    verify { fishjamClientListener.onSocketError(any(), any()) }
+  }
 
-    @Test fun callsOnSocketClosed() {
-        websocketMock.close()
-        verify { fishjamClientListener.onSocketClose(any(), any()) }
-    }
+  @Test fun callsOnSocketClosed() {
+    websocketMock.close()
+    verify { fishjamClientListener.onSocketClose(any(), any()) }
+  }
 
-    @After fun confirmVerified() {
-        confirmVerified(fishjamClientListener)
-        confirmVerified(webrtcClient)
-        websocketMock.confirmVerified()
-    }
+  @After fun confirmVerified() {
+    confirmVerified(fishjamClientListener)
+    confirmVerified(webrtcClient)
+    websocketMock.confirmVerified()
+  }
 }

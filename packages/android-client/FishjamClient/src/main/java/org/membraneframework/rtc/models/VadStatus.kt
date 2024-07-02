@@ -7,12 +7,12 @@ package org.membraneframework.rtc.models
  * - SILENCE - lack of voice activity has been detected
  */
 enum class VadStatus(val value: String) {
-    SPEECH("speech"),
-    SILENCE("silence");
+  SPEECH("speech"),
+  SILENCE("silence");
 
-    companion object {
-        fun fromString(s: String): VadStatus? {
-            return values().find { it.value == s }
-        }
+  companion object {
+    fun fromString(s: String): VadStatus? {
+      return values().find { it.value == s }
     }
+  }
 }

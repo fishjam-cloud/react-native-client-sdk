@@ -6,11 +6,11 @@ import org.membraneframework.rtc.media.RemoteTrack
 import org.membraneframework.rtc.utils.Metadata
 
 fun interface OnEncodingChangedListener {
-    fun onEncodingChanged(trackContext: TrackContext)
+  fun onEncodingChanged(trackContext: TrackContext)
 }
 
 fun interface OnVoiceActivityChangedListener {
-    fun onVoiceActivityChanged(trackContext: TrackContext)
+  fun onVoiceActivityChanged(trackContext: TrackContext)
 }
 
 /**
@@ -23,69 +23,69 @@ fun interface OnVoiceActivityChangedListener {
  *
  */
 class TrackContext(
-    track: RemoteTrack?,
-    val endpoint: Endpoint,
-    val trackId: String,
-    metadata: Metadata = mapOf(),
-    simulcastConfig: SimulcastConfig?
+  track: RemoteTrack?,
+  val endpoint: Endpoint,
+  val trackId: String,
+  metadata: Metadata = mapOf(),
+  simulcastConfig: SimulcastConfig?
 ) {
-    private var onTrackEncodingChangeListener: (OnEncodingChangedListener)? = null
-    private var onVadNotificationListener: (OnVoiceActivityChangedListener)? = null
+  private var onTrackEncodingChangeListener: (OnEncodingChangedListener)? = null
+  private var onVadNotificationListener: (OnVoiceActivityChangedListener)? = null
 
-    var track: RemoteTrack? = track
-        internal set
-    var metadata: Metadata = metadata
-        internal set
+  var track: RemoteTrack? = track
+    internal set
+  var metadata: Metadata = metadata
+    internal set
 
-    var simulcastConfig: SimulcastConfig? = simulcastConfig
-        internal set
+  var simulcastConfig: SimulcastConfig? = simulcastConfig
+    internal set
 
-    var vadStatus: VadStatus = VadStatus.SILENCE
-        internal set(value) {
-            field = value
-            onVadNotificationListener?.let { onVadNotificationListener?.onVoiceActivityChanged(this) }
-        }
-
-    /**
-     *  Encoding that is currently received. Only present for remote tracks.
-     */
-    var encoding: TrackEncoding? = null
-        private set
-
-    /**
-     * The reason of currently selected encoding. Only present for remote tracks.
-     */
-    var encodingReason: EncodingReason? = null
-        private set
-
-    internal fun setEncoding(
-        encoding: TrackEncoding,
-        encodingReason: EncodingReason
-    ) {
-        this.encoding = encoding
-        this.encodingReason = encodingReason
-        onTrackEncodingChangeListener?.let { onTrackEncodingChangeListener?.onEncodingChanged(this) }
+  var vadStatus: VadStatus = VadStatus.SILENCE
+    internal set(value) {
+      field = value
+      onVadNotificationListener?.let { onVadNotificationListener?.onVoiceActivityChanged(this) }
     }
 
-    /**
-     * Sets listener that is called each time track encoding has changed.
-     *
-     * Track encoding can change in the following cases:
-     * - when user requested a change
-     * - when sender stopped sending some encoding (because of bandwidth change)
-     * - when receiver doesn't have enough bandwidth
-     * Some of those reasons are indicated in TrackContext.encodingReason
-     */
-    fun setOnEncodingChangedListener(listener: OnEncodingChangedListener?) {
-        listener?.onEncodingChanged(this)
-        onTrackEncodingChangeListener = listener
-    }
+  /**
+   *  Encoding that is currently received. Only present for remote tracks.
+   */
+  var encoding: TrackEncoding? = null
+    private set
 
-    /**
-     * Sets listener that is called every time an update about voice activity is received from the server.
-     */
-    fun setOnVoiceActivityChangedListener(listener: OnVoiceActivityChangedListener?) {
-        listener?.onVoiceActivityChanged(this)
-        onVadNotificationListener = listener
-    }
+  /**
+   * The reason of currently selected encoding. Only present for remote tracks.
+   */
+  var encodingReason: EncodingReason? = null
+    private set
+
+  internal fun setEncoding(
+    encoding: TrackEncoding,
+    encodingReason: EncodingReason
+  ) {
+    this.encoding = encoding
+    this.encodingReason = encodingReason
+    onTrackEncodingChangeListener?.let { onTrackEncodingChangeListener?.onEncodingChanged(this) }
+  }
+
+  /**
+   * Sets listener that is called each time track encoding has changed.
+   *
+   * Track encoding can change in the following cases:
+   * - when user requested a change
+   * - when sender stopped sending some encoding (because of bandwidth change)
+   * - when receiver doesn't have enough bandwidth
+   * Some of those reasons are indicated in TrackContext.encodingReason
+   */
+  fun setOnEncodingChangedListener(listener: OnEncodingChangedListener?) {
+    listener?.onEncodingChanged(this)
+    onTrackEncodingChangeListener = listener
+  }
+
+  /**
+   * Sets listener that is called every time an update about voice activity is received from the server.
+   */
+  fun setOnVoiceActivityChangedListener(listener: OnVoiceActivityChangedListener?) {
+    listener?.onVoiceActivityChanged(this)
+    onVadNotificationListener = listener
+  }
 }

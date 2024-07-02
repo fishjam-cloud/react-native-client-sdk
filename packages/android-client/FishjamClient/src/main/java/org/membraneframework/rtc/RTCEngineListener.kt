@@ -7,66 +7,66 @@ import org.membraneframework.rtc.utils.Metadata
 import org.membraneframework.rtc.utils.SerializedMediaEvent
 
 internal interface RTCEngineListener {
-    fun onConnected(
-        endpointID: String,
-        otherEndpoints: List<Endpoint>
-    )
+  fun onConnected(
+    endpointID: String,
+    otherEndpoints: List<Endpoint>
+  )
 
-    fun onSendMediaEvent(event: SerializedMediaEvent)
+  fun onSendMediaEvent(event: SerializedMediaEvent)
 
-    fun onEndpointAdded(endpoint: Endpoint)
+  fun onEndpointAdded(endpoint: Endpoint)
 
-    fun onEndpointRemoved(endpointId: String)
+  fun onEndpointRemoved(endpointId: String)
 
-    fun onEndpointUpdated(
-        endpointId: String,
-        endpointMetadata: Metadata? = mapOf()
-    )
+  fun onEndpointUpdated(
+    endpointId: String,
+    endpointMetadata: Metadata? = mapOf()
+  )
 
-    fun onOfferData(
-        integratedTurnServers: List<OfferData.TurnServer>,
-        tracksTypes: Map<String, Int>
-    )
+  fun onOfferData(
+    integratedTurnServers: List<OfferData.TurnServer>,
+    tracksTypes: Map<String, Int>
+  )
 
-    fun onSdpAnswer(
-        type: String,
-        sdp: String,
-        midToTrackId: Map<String, String>
-    )
+  fun onSdpAnswer(
+    type: String,
+    sdp: String,
+    midToTrackId: Map<String, String>
+  )
 
-    fun onRemoteCandidate(
-        candidate: String,
-        sdpMLineIndex: Int,
-        sdpMid: String?
-    )
+  fun onRemoteCandidate(
+    candidate: String,
+    sdpMLineIndex: Int,
+    sdpMid: String?
+  )
 
-    fun onTracksAdded(
-        endpointId: String,
-        tracks: Map<String, TrackData>
-    )
+  fun onTracksAdded(
+    endpointId: String,
+    tracks: Map<String, TrackData>
+  )
 
-    fun onTracksRemoved(
-        endpointId: String,
-        trackIds: List<String>
-    )
+  fun onTracksRemoved(
+    endpointId: String,
+    trackIds: List<String>
+  )
 
-    fun onTrackUpdated(
-        endpointId: String,
-        trackId: String,
-        metadata: Metadata? = mapOf()
-    )
+  fun onTrackUpdated(
+    endpointId: String,
+    trackId: String,
+    metadata: Metadata? = mapOf()
+  )
 
-    fun onTrackEncodingChanged(
-        endpointId: String,
-        trackId: String,
-        encoding: String,
-        encodingReason: String
-    )
+  fun onTrackEncodingChanged(
+    endpointId: String,
+    trackId: String,
+    encoding: String,
+    encodingReason: String
+  )
 
-    fun onVadNotification(
-        trackId: String,
-        status: String
-    )
+  fun onVadNotification(
+    trackId: String,
+    status: String
+  )
 
-    fun onBandwidthEstimation(estimation: Long)
+  fun onBandwidthEstimation(estimation: Long)
 }

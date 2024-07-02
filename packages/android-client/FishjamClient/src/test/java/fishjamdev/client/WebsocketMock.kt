@@ -13,42 +13,42 @@ import okio.ByteString.Companion.toByteString
 import java.lang.Error
 
 class WebsocketMock {
-    private val websocketMock = mockk<WebSocket>(relaxed = true)
-    private val clientListener = slot<WebSocketListener>()
+  private val websocketMock = mockk<WebSocket>(relaxed = true)
+  private val clientListener = slot<WebSocketListener>()
 
-    init {
-        mockkConstructor(OkHttpClient::class)
+  init {
+    mockkConstructor(OkHttpClient::class)
 
-        every { anyConstructed<OkHttpClient>().newWebSocket(any(), capture(clientListener)) } returns websocketMock
-    }
+    every { anyConstructed<OkHttpClient>().newWebSocket(any(), capture(clientListener)) } returns websocketMock
+  }
 
-    fun open() {
-        clientListener.captured.onOpen(websocketMock, mockk())
-    }
+  fun open() {
+    clientListener.captured.onOpen(websocketMock, mockk())
+  }
 
-    fun expectClosed() {
-        verify { websocketMock.close(1000, null) }
-    }
+  fun expectClosed() {
+    verify { websocketMock.close(1000, null) }
+  }
 
-    fun expect(message: GeneratedMessage) {
-        val messageBytes = message.toByteArray().toByteString()
-        verify(exactly = 1) { websocketMock.send(match<okio.ByteString> { it == messageBytes }) }
-    }
+  fun expect(message: GeneratedMessage) {
+    val messageBytes = message.toByteArray().toByteString()
+    verify(exactly = 1) { websocketMock.send(match<okio.ByteString> { it == messageBytes }) }
+  }
 
-    fun sendToClient(message: GeneratedMessage) {
-        val messageBytes = message.toByteArray().toByteString()
-        clientListener.captured.onMessage(websocketMock, messageBytes)
-    }
+  fun sendToClient(message: GeneratedMessage) {
+    val messageBytes = message.toByteArray().toByteString()
+    clientListener.captured.onMessage(websocketMock, messageBytes)
+  }
 
-    fun close() {
-        clientListener.captured.onClosed(websocketMock, 1000, "Closed")
-    }
+  fun close() {
+    clientListener.captured.onClosed(websocketMock, 1000, "Closed")
+  }
 
-    fun error() {
-        clientListener.captured.onFailure(websocketMock, Error("Super important error"), mockk())
-    }
+  fun error() {
+    clientListener.captured.onFailure(websocketMock, Error("Super important error"), mockk())
+  }
 
-    fun confirmVerified() {
-        io.mockk.confirmVerified(websocketMock)
-    }
+  fun confirmVerified() {
+    io.mockk.confirmVerified(websocketMock)
+  }
 }

@@ -5,5 +5,5 @@ package org.membraneframework.rtc
  * @property encoderOptions The encoder options used to encode video
  */
 data class CreateOptions(
-    val encoderOptions: EncoderOptions = EncoderOptions()
+  val encoderOptions: EncoderOptions = EncoderOptions()
 )
