@@ -1,5 +1,5 @@
 import {
-  cleanUp,
+  leaveRoom,
   usePeers,
   useScreencast,
   ScreencastQuality,
@@ -70,7 +70,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
   const { toggleScreencast, isScreencastOn } = useScreencast();
 
   const onDisconnectPress = useCallback(() => {
-    cleanUp();
+    leaveRoom();
     navigation.navigate('Home');
   }, [navigation]);
 

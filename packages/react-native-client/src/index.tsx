@@ -5,7 +5,6 @@ import { useEndpoints } from './hooks/useEndpoints';
 export { useAudioSettings } from './hooks/useAudioSettings';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
 export { useCamera } from './hooks/useCamera';
-export { useEndpoints } from './hooks/useEndpoints';
 export { useMicrophone } from './hooks/useMicrophone';
 export { useRTCStatistics } from './hooks/useRTCStatistics';
 export { useScreencast } from './hooks/useScreencast';
