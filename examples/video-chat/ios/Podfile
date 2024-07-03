@@ -5,10 +5,8 @@ require Pod::Executable.execute_command('node', ['-p',
     "react-native/scripts/react_native_pods.rb",
     {paths: [process.argv[1]]},
   )', __dir__]).strip
-
 platform :ios, '13.4'
 prepare_react_native_project!
-
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
 # because `react-native-flipper` depends on (FlipperKit,...) that will be excluded
 #
@@ -18,13 +16,11 @@ prepare_react_native_project!
 #   dependencies: {
 #     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
 # ```
-
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
   Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
   use_frameworks! :linkage => linkage.to_sym
 end
-
 target 'FishjamExample' do
   use_expo_modules!
   post_integrate do |installer|
@@ -35,8 +31,6 @@ target 'FishjamExample' do
     end
   end
   config = use_native_modules!
-
-
   use_react_native!(
     :path => config[:reactNativePath],
     # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -45,11 +39,9 @@ target 'FishjamExample' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
   target 'FishjamExampleTests' do
     inherit! :complete
   end
-
   post_install do |installer|
     react_native_post_install(
       installer,
@@ -57,11 +49,8 @@ target 'FishjamExample' do
       :mac_catalyst_enabled => false
     )
   end
-  pod 'FishjamClient', :git => 'https://github.com/fishjam-dev/ios-client-sdk.git', :commit => '9d22ecaf75cc563a24212c13e15cd83a3f76ac0f'
+  pod 'FishjamClient', :path => '../../../packages/ios-client/'
 end
-
-
-
 target 'ScreenBroadcast' do
-  pod 'FishjamClient/Broadcast', :git => 'https://github.com/fishjam-dev/ios-client-sdk.git', :commit => '9d22ecaf75cc563a24212c13e15cd83a3f76ac0f'
+  pod 'FishjamClient/Broadcast', :path => '../../../packages/ios-client/'
 end
