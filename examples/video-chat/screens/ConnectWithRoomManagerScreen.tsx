@@ -71,7 +71,7 @@ const ConnectScreen = ({ navigation }: Props) => {
         userName,
       );
 
-      await connect(fishjamUrl, token);
+      await connect(fishjamUrl, token, { name: 'RN mobile' });
 
       navigation.navigate('Preview', { userName });
     } catch (e) {

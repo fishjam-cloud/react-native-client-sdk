@@ -376,10 +376,12 @@ export type VideoRendererProps = {
 
 export type RNFishjamClient = {
   appContext?: any;
-  connect: (url: string, peerToken: string) => Promise<void>;
-  joinRoom: (peerMetadata: Metadata) => Promise<void>;
+  connect: (
+    url: string,
+    peerToken: string,
+    peerMetadata: Metadata,
+  ) => Promise<void>;
   leaveRoom: () => Promise<void>;
-  cleanUp: () => Promise<void>;
   startCamera: <MetadataType extends Metadata>(
     config: Partial<CameraConfig<MetadataType>>,
   ) => Promise<void>;

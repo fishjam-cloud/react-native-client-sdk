@@ -78,8 +78,8 @@ repositories {
 dependencies {
   implementation project(':expo-modules-core')
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${getKotlinVersion()}"
-  if (findProject(':android-client')) {
-    implementation project(':android-client')
+  if (findProject(':fishjam-cloud-android-client')) {
+    implementation project(':fishjam-cloud-android-client')
   } else {
 //   todo when released, changed repo name etc then update
     implementation 'com.github.fishjam-cloud:android-client-sdk:0.4.0'

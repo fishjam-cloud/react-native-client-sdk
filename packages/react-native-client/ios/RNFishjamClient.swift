@@ -78,7 +78,6 @@ class RNFishjamClient: FishjamClientListener {
     var globalToLocalTrackId: [String: String] = [:]
 
     var connectPromise: Promise? = nil
-    var joinPromise: Promise? = nil
 
     var videoSimulcastConfig: SimulcastConfig = SimulcastConfig()
     var localUserMetadata: Metadata = .init()
@@ -270,10 +269,7 @@ class RNFishjamClient: FishjamClientListener {
     }
 
     func onAuthSuccess() {
-        if let connectPromise = connectPromise {
-            connectPromise.resolve(nil)
-        }
-        connectPromise = nil
+        joinRoom()
     }
 
     func onAuthError() {
@@ -296,36 +292,34 @@ class RNFishjamClient: FishjamClientListener {
         }
 
         emitEndpoints()
-        if let joinPromise = joinPromise {
-            joinPromise.resolve(nil)
+        if let connectPromise = connectPromise {
+            connectPromise.resolve(nil)
         }
-        joinPromise = nil
+        connectPromise = nil
     }
 
     func onJoinError(metadata: Any) {
-        if let joinPromise = joinPromise {
-            joinPromise.reject("E_MEMBRANE_CONNECT", "Failed to join room")
+        if let connectPromise = connectPromise {
+            connectPromise.reject("E_MEMBRANE_CONNECT", "Failed to join room")
         }
-        joinPromise = nil
+        connectPromise = nil
     }
 
-    func connect(url: String, peerToken: String, promise: Promise) {
+    func connect(url: String, peerToken: String, peerMetadata: [String: Any], promise: Promise) {
         connectPromise = promise
+        localUserMetadata = peerMetadata.toMetadata()
         fishjamClient?.connect(config: Config(websocketUrl: url, token: peerToken))
     }
 
-    func joinRoom(peerMetadata: [String: Any], promise: Promise) {
-        joinPromise = promise
-        localUserMetadata = peerMetadata.toMetadata()
-
+    func joinRoom() {
         guard let localEndpointId = localEndpointId,
             var endpoint = MembraneRoom.sharedInstance.endpoints[localEndpointId]
         else {
             return
         }
 
-        endpoint.metadata = peerMetadata.toMetadata()
-        fishjamClient?.join(peerMetadata: peerMetadata.toMetadata())
+        endpoint.metadata = localUserMetadata
+        fishjamClient?.join(peerMetadata: localUserMetadata)
     }
 
     func leaveRoom() {

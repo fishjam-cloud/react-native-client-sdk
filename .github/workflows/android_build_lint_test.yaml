@@ -2,6 +2,8 @@ name: Android Build & lint
 
 on:
   pull_request:
+    paths:
+      - packages/android-client/**
 
 jobs:
   build:
