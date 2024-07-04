@@ -1,4 +1,4 @@
-name: e2e_android
+name: React-Native e2e android
 on:
   push:
     branches:

@@ -1,4 +1,4 @@
-name: Deploy Docs
+name: React-Native Deploy Docs
 on:
   workflow_dispatch:
   push:

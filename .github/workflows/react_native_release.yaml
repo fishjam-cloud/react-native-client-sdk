@@ -1,5 +1,5 @@
 # For details see: https://superface.ai/blog/npm-publish-gh-actions-changelog
-name: Release package
+name: React-Native Release package
 
 on:
   workflow_dispatch:

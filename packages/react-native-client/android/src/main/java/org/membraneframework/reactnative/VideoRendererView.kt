@@ -10,64 +10,66 @@ import org.membraneframework.rtc.media.VideoTrack
 import org.membraneframework.rtc.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon
 
-class VideoRendererView(context: Context, appContext: AppContext) : ExpoView(context, appContext),
-    RNFishjamClient.OnTrackUpdateListener {
-    var isInitialized = false
-    var activeVideoTrack: VideoTrack? = null
-    var trackId: String? = null
+class VideoRendererView(context: Context, appContext: AppContext) :
+  ExpoView(context, appContext),
+  RNFishjamClient.OnTrackUpdateListener {
+  var isInitialized = false
+  var activeVideoTrack: VideoTrack? = null
+  var trackId: String? = null
 
-    private val videoView = VideoTextureViewRenderer(context).also {
-        addView(it)
-        RNFishjamClient.onTracksUpdateListeners.add(this)
+  private val videoView =
+    VideoTextureViewRenderer(context).also {
+      addView(it)
+      RNFishjamClient.onTracksUpdateListeners.add(this)
     }
 
-    private fun setupTrack(videoTrack: VideoTrack) {
-        if (activeVideoTrack == videoTrack) return
+  private fun setupTrack(videoTrack: VideoTrack) {
+    if (activeVideoTrack == videoTrack) return
 
-        activeVideoTrack?.removeRenderer(videoView)
-        videoTrack.addRenderer(videoView)
-        activeVideoTrack = videoTrack
+    activeVideoTrack?.removeRenderer(videoView)
+    videoTrack.addRenderer(videoView)
+    activeVideoTrack = videoTrack
+  }
+
+  private fun update() {
+    CoroutineScope(Dispatchers.Main).launch {
+      val endpoint = RNFishjamClient.endpoints.values.firstOrNull { it.videoTracks[trackId] != null }
+      val videoTrack = endpoint?.videoTracks?.get(trackId) ?: return@launch
+      if (!isInitialized) {
+        isInitialized = true
+        videoView.init(videoTrack.eglContext, null)
+      }
+      setupTrack(videoTrack)
     }
+  }
 
-    private fun update() {
-        CoroutineScope(Dispatchers.Main).launch {
-            val endpoint = RNFishjamClient.endpoints.values.firstOrNull { it.videoTracks[trackId] != null }
-            val videoTrack = endpoint?.videoTracks?.get(trackId) ?: return@launch
-            if(!isInitialized) {
-                isInitialized = true
-                videoView.init(videoTrack.eglContext, null)
-            }
-            setupTrack(videoTrack)
-        }
-    }
+  fun init(trackId: String) {
+    this.trackId = trackId
+    update()
+  }
 
-    fun init(trackId: String) {
-        this.trackId = trackId
-        update()
-    }
+  fun dispose() {
+    activeVideoTrack?.removeRenderer(videoView)
+    videoView.release()
+    RNFishjamClient.onTracksUpdateListeners.remove(this)
+  }
 
-    fun dispose() {
-        activeVideoTrack?.removeRenderer(videoView)
-        videoView.release()
-        RNFishjamClient.onTracksUpdateListeners.remove(this)
-    }
+  override fun onTracksUpdate() {
+    update()
+  }
 
-    override fun onTracksUpdate() {
-        update()
-    }
+  fun setVideoLayout(videoLayout: String) {
+    val scalingType =
+      when (videoLayout) {
+        "FILL" -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
+        "FIT" -> RendererCommon.ScalingType.SCALE_ASPECT_FIT
+        else -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
+      }
+    videoView.setScalingType(scalingType)
+    videoView.setEnableHardwareScaler(true)
+  }
 
-    fun setVideoLayout(videoLayout: String) {
-        val scalingType = when (videoLayout) {
-            "FILL" -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-            "FIT" -> RendererCommon.ScalingType.SCALE_ASPECT_FIT
-            else -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-        }
-        videoView.setScalingType(scalingType)
-        videoView.setEnableHardwareScaler(true)
-    }
-
-    fun setMirrorVideo(mirrorVideo: Boolean) {
-        videoView.setMirror(mirrorVideo)
-    }
-
+  fun setMirrorVideo(mirrorVideo: Boolean) {
+    videoView.setMirror(mirrorVideo)
+  }
 }
