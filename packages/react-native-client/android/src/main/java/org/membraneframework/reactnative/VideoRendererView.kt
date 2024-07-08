@@ -35,7 +35,10 @@ class VideoRendererView(
 
   private fun update() {
     CoroutineScope(Dispatchers.Main).launch {
-      val endpoint = RNFishjamClient.endpoints.values.firstOrNull { it.videoTracks[trackId] != null }
+      val endpoint =
+        RNFishjamClient.endpoints.values.firstOrNull {
+          it.videoTracks[trackId] != null
+        }
       val videoTrack = endpoint?.videoTracks?.get(trackId) ?: return@launch
       if (!isInitialized) {
         isInitialized = true

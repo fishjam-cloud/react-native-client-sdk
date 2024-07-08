@@ -20,7 +20,11 @@ data class RNEndpoint(
     simulcastConfig: SimulcastConfig?
   ) {
     val trackData = this.tracksData[videoTrack.id()]
-    val newTrackData = TrackData(simulcastConfig = simulcastConfig ?: trackData?.simulcastConfig, metadata = metadata)
+    val newTrackData =
+      TrackData(
+        simulcastConfig = simulcastConfig ?: trackData?.simulcastConfig,
+        metadata = metadata
+      )
     this.tracksData[videoTrack.id()] = newTrackData
     this.videoTracks[videoTrack.id()] = videoTrack
   }

@@ -29,16 +29,24 @@ class VideoPreviewView(
   private fun initialize() {
     if (isInitialized) return
     isInitialized = true
-    PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions())
+    PeerConnectionFactory.initialize(
+      PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions()
+    )
     val eglBase = EglBase.create()
     this.eglBase = eglBase
     val peerConnectionFactory = PeerConnectionFactory.builder().createPeerConnectionFactory()
     this.peerConnectionFactory = peerConnectionFactory
 
     localVideoTrack =
-      LocalVideoTrack.create(context, peerConnectionFactory, eglBase, VideoParameters.presetFHD169).also {
-        it.start()
-      }
+      LocalVideoTrack
+        .create(
+          context,
+          peerConnectionFactory,
+          eglBase,
+          VideoParameters.presetFHD169
+        ).also {
+          it.start()
+        }
     videoView.init(eglBase.eglBaseContext, null)
     localVideoTrack?.addRenderer(videoView)
   }

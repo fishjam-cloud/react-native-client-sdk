@@ -129,7 +129,13 @@ class RNFishjamClient(
     return TrackBandwidthLimit.BandwidthLimit(maxBandwidthInt)
   }
 
-  private fun getGlobalTrackId(localTrackId: String): String? = globalToLocalTrackId.filterValues { it == localTrackId }.keys.firstOrNull()
+  private fun getGlobalTrackId(localTrackId: String): String? =
+    globalToLocalTrackId
+      .filterValues {
+        it ==
+          localTrackId
+      }.keys
+      .firstOrNull()
 
   private fun initLocalEndpoint() {
     val uuid = UUID.randomUUID().toString()
@@ -214,7 +220,9 @@ class RNFishjamClient(
 
   private fun ensureEndpoints() {
     if (localEndpointId == null || endpoints.size == 0) {
-      throw CodedException("No endpoints available. Ensure the connection is established or endpoints are present.")
+      throw CodedException(
+        "No endpoints available. Ensure the connection is established or endpoints are present."
+      )
     }
   }
 
@@ -400,7 +408,9 @@ class RNFishjamClient(
       val currentActivity = appContext?.currentActivity ?: throw ActivityNotFoundException()
 
       val mediaProjectionManager =
-        appContext?.reactContext!!.getSystemService(AppCompatActivity.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        appContext?.reactContext!!.getSystemService(
+          AppCompatActivity.MEDIA_PROJECTION_SERVICE
+        ) as MediaProjectionManager
       val intent = mediaProjectionManager.createScreenCaptureIntent()
       currentActivity.startActivityForResult(intent, SCREENCAST_REQUEST)
     } else {
@@ -627,10 +637,15 @@ class RNFishjamClient(
   fun changeWebRTCLoggingSeverity(severity: String) {
     when (severity) {
       "verbose" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_VERBOSE)
+
       "info" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_INFO)
+
       "error" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_ERROR)
+
       "warning" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_WARNING)
+
       "none" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_NONE)
+
       else -> {
         throw CodedException("Severity with name=$severity not found")
       }

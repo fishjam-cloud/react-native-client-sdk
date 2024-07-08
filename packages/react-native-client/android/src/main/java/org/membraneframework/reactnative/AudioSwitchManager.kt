@@ -21,7 +21,8 @@ class AudioSwitchManager(
   // AudioSwitch is not threadsafe, so all calls should be done on the main thread.
   private val handler: Handler = Handler(Looper.getMainLooper())
 
-  private var audioSwitch: AudioSwitch = AudioSwitch(context, loggingEnabled = true, preferredDeviceList = preferredDeviceList)
+  private var audioSwitch: AudioSwitch =
+    AudioSwitch(context, loggingEnabled = true, preferredDeviceList = preferredDeviceList)
 
   fun start(listener: AudioDeviceChangeListener) {
     handler.removeCallbacksAndMessages(null)

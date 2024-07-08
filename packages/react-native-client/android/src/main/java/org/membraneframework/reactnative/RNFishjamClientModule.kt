@@ -115,7 +115,7 @@ class RNFishjamClientModule : Module() {
         }
       }
 
-      AsyncFunction("leaveRoom") Coroutine {
+      AsyncFunction("leaveRoom") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.leaveRoom()
         }
@@ -137,7 +137,7 @@ class RNFishjamClientModule : Module() {
         return@Property rnFishjamClient.isMicrophoneOn
       }
 
-      AsyncFunction("toggleMicrophone") Coroutine {
+      AsyncFunction("toggleMicrophone") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.toggleMicrophone()
         }
@@ -147,13 +147,13 @@ class RNFishjamClientModule : Module() {
         return@Property rnFishjamClient.isCameraOn
       }
 
-      AsyncFunction("toggleCamera") Coroutine {
+      AsyncFunction("toggleCamera") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.toggleCamera()
         }
       }
 
-      AsyncFunction("flipCamera") Coroutine {
+      AsyncFunction("flipCamera") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.flipCamera()
         }
@@ -165,7 +165,7 @@ class RNFishjamClientModule : Module() {
         }
       }
 
-      AsyncFunction("getCaptureDevices") Coroutine {
+      AsyncFunction("getCaptureDevices") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.getCaptureDevices()
         }
@@ -181,7 +181,7 @@ class RNFishjamClientModule : Module() {
         return@Property rnFishjamClient.isScreencastOn
       }
 
-      AsyncFunction("getEndpoints") Coroutine {
+      AsyncFunction("getEndpoints") Coroutine { ->
         withContext(Dispatchers.Main) {
           rnFishjamClient.getEndpoints()
         }
