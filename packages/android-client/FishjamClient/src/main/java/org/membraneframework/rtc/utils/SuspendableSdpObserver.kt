@@ -9,7 +9,9 @@ import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal class SdpException(reason: String) : Exception(reason)
+internal class SdpException(
+  reason: String
+) : Exception(reason)
 
 internal class SuspendableSdpObserver : SdpObserver {
   private var createCont: Continuation<Result<SessionDescription>>? = null

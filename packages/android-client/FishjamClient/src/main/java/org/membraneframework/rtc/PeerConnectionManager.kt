@@ -269,7 +269,8 @@ internal class PeerConnectionManager(
             it.transport
           ).joinToString("")
 
-        PeerConnection.IceServer.builder(url)
+        PeerConnection.IceServer
+          .builder(url)
           .setUsername(it.username)
           .setPassword(it.password)
           .createIceServer()
@@ -289,16 +290,17 @@ internal class PeerConnectionManager(
     var lackingAudio = necessaryAudio
     var lackingVideo = necessaryVideo
 
-    pc.transceivers.filter {
-      it.direction == RtpTransceiver.RtpTransceiverDirection.RECV_ONLY
-    }.forEach {
-      val track = it.receiver.track() ?: return@forEach
+    pc.transceivers
+      .filter {
+        it.direction == RtpTransceiver.RtpTransceiverDirection.RECV_ONLY
+      }.forEach {
+        val track = it.receiver.track() ?: return@forEach
 
-      when (track.kind()) {
-        "audio" -> lackingAudio -= 1
-        "video" -> lackingVideo -= 1
+        when (track.kind()) {
+          "audio" -> lackingAudio -= 1
+          "video" -> lackingVideo -= 1
+        }
       }
-    }
 
     Timber.d("peerConnection adding $lackingAudio audio and $lackingVideo video lacking transceivers")
 

@@ -29,7 +29,8 @@ class LocalScreencastTrack(
   private val capturer: ScreenCapturerAndroid,
   val videoParameters: VideoParameters,
   callback: ProjectionCallback
-) : VideoTrack(mediaTrack, eglBase.eglBaseContext), LocalTrack {
+) : VideoTrack(mediaTrack, eglBase.eglBaseContext),
+  LocalTrack {
   private val screencastConnection = ScreencastServiceConnector(context)
   private val mutex = Mutex()
   private val coroutineScope: CoroutineScope =
@@ -75,9 +76,7 @@ class LocalScreencastTrack(
     }
   }
 
-  override fun enabled(): Boolean {
-    return videoTrack.enabled()
-  }
+  override fun enabled(): Boolean = videoTrack.enabled()
 
   override fun setEnabled(enabled: Boolean) {
     videoTrack.setEnabled(enabled)

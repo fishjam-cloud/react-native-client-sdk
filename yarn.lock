@@ -5511,6 +5511,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"android-client@workspace:packages/android-client":
+  version: 0.0.0-use.local
+  resolution: "android-client@workspace:packages/android-client"
+  languageName: unknown
+  linkType: soft
+
 "anser@npm:^1.4.9":
   version: 1.4.10
   resolution: "anser@npm:1.4.10"
@@ -10978,6 +10984,12 @@ __metadata:
   checksum: 10c0/5af133a917c0bcf65e84e7f23e779e7abc1cd49cb7fdc62d00d1de74b0d8c1b5ee74ac7766099fb3be1b05b26dfc67bab76a17030d2fe7ea2eef867434362dfc
   languageName: node
   linkType: hard
+
+"ios-client@workspace:packages/ios-client":
+  version: 0.0.0-use.local
+  resolution: "ios-client@workspace:packages/ios-client"
+  languageName: unknown
+  linkType: soft
 
 "ip-address@npm:^9.0.5":
   version: 9.0.5

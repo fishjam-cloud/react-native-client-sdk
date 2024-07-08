@@ -26,19 +26,20 @@ internal class PeerConnectionFactoryWrapper(
     )
 
     peerConnectionFactory =
-      PeerConnectionFactory.builder().setAudioDeviceModule(audioDeviceModule).setVideoEncoderFactory(
-        SimulcastVideoEncoderFactoryWrapper(
-          eglBase.eglBaseContext,
-          createOptions.encoderOptions
-        )
-      ).setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
+      PeerConnectionFactory
+        .builder()
+        .setAudioDeviceModule(audioDeviceModule)
+        .setVideoEncoderFactory(
+          SimulcastVideoEncoderFactoryWrapper(
+            eglBase.eglBaseContext,
+            createOptions.encoderOptions
+          )
+        ).setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
         .createPeerConnectionFactory()
   }
 
   fun createPeerConnection(
     rtcConfig: PeerConnection.RTCConfiguration,
     observer: PeerConnection.Observer
-  ): PeerConnection? {
-    return peerConnectionFactory.createPeerConnection(rtcConfig, observer)
-  }
+  ): PeerConnection? = peerConnectionFactory.createPeerConnection(rtcConfig, observer)
 }

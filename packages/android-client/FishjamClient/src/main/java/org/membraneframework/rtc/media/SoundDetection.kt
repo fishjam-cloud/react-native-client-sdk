@@ -143,9 +143,7 @@ class SoundDetection {
   private fun getMaxAmplitude(
     buffer: ShortArray,
     bytesRead: Int
-  ): Int {
-    return buffer.take(bytesRead).maxOfOrNull { abs(it.toInt()) } ?: 0
-  }
+  ): Int = buffer.take(bytesRead).maxOfOrNull { abs(it.toInt()) } ?: 0
 
   /**
    * Calculates the sound level value in decibels (dB) based on the given maxAmplitude.
@@ -171,9 +169,7 @@ class SoundDetection {
    * @param buffer The audio buffer to be filled.
    * @return The number of bytes read from the audio record.
    */
-  private fun readAudioData(buffer: ShortArray): Int {
-    return audioRecord?.read(buffer, 0, bufferSize) ?: 0
-  }
+  private fun readAudioData(buffer: ShortArray): Int = audioRecord?.read(buffer, 0, bufferSize) ?: 0
 
   /**
    * Starts the timer to periodically perform sound detection.

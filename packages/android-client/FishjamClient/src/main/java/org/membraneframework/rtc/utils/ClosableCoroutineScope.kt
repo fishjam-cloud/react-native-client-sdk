@@ -5,7 +5,10 @@ import kotlinx.coroutines.cancel
 import java.io.Closeable
 import kotlin.coroutines.CoroutineContext
 
-internal class ClosableCoroutineScope(context: CoroutineContext) : Closeable, CoroutineScope {
+internal class ClosableCoroutineScope(
+  context: CoroutineContext
+) : Closeable,
+  CoroutineScope {
   override val coroutineContext: CoroutineContext = context
 
   override fun close() {

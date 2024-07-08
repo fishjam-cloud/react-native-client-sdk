@@ -2,10 +2,11 @@ package org.membraneframework.rtc.media
 
 import org.membraneframework.rtc.SimulcastConfig
 
-data class Dimensions(val width: Int, val height: Int) {
-  fun flip(): Dimensions {
-    return Dimensions(width = this.height, height = this.width)
-  }
+data class Dimensions(
+  val width: Int,
+  val height: Int
+) {
+  fun flip(): Dimensions = Dimensions(width = this.height, height = this.width)
 }
 
 /**

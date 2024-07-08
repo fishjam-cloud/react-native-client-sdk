@@ -83,9 +83,7 @@ class MembraneRTC
       videoParameters: VideoParameters,
       metadata: Metadata,
       captureDeviceName: String? = null
-    ): LocalVideoTrack {
-      return client.createLocalVideoTrack(videoParameters, metadata, captureDeviceName)
-    }
+    ): LocalVideoTrack = client.createLocalVideoTrack(videoParameters, metadata, captureDeviceName)
 
     /**
      * Creates an audio track utilizing device's microphone.
@@ -95,9 +93,7 @@ class MembraneRTC
      * @param metadata the metadata that will be sent to the <strong>Membrane RTC Engine</strong> for media negotiation
      * @return an instance of the audio track
      */
-    fun createAudioTrack(metadata: Metadata): LocalAudioTrack {
-      return client.createLocalAudioTrack(metadata)
-    }
+    fun createAudioTrack(metadata: Metadata): LocalAudioTrack = client.createLocalAudioTrack(metadata)
 
     /**
      * Creates a screen track recording the entire device's screen.
@@ -115,9 +111,7 @@ class MembraneRTC
       videoParameters: VideoParameters,
       metadata: Metadata,
       onEnd: (() -> Unit)? = null
-    ): LocalScreencastTrack {
-      return client.createScreencastTrack(mediaProjectionPermission, videoParameters, metadata, onEnd)
-    }
+    ): LocalScreencastTrack = client.createScreencastTrack(mediaProjectionPermission, videoParameters, metadata, onEnd)
 
     /**
      * Removes an instance of local track from the client.
@@ -125,9 +119,7 @@ class MembraneRTC
      * @param trackId an id of a valid local track that has been created using the current client
      * @return a boolean whether the track has been successfully removed or not
      */
-    fun removeTrack(trackId: String): Boolean {
-      return client.removeTrack(trackId)
-    }
+    fun removeTrack(trackId: String): Boolean = client.removeTrack(trackId)
 
     /**
      * Sets track encoding that server should send to the client library.
@@ -238,9 +230,7 @@ class MembraneRTC
      * Returns current connection stats
      * @return a map containing statistics
      */
-    fun getStats(): Map<String, RTCStats> {
-      return client.getStats()
-    }
+    fun getStats(): Map<String, RTCStats> = client.getStats()
 
     companion object {
       /**

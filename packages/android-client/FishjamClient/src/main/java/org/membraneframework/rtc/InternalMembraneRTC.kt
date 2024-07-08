@@ -32,7 +32,8 @@ internal class InternalMembraneRTC(
   defaultDispatcher: CoroutineDispatcher,
   private val eglBase: EglBase,
   private val context: Context
-) : RTCEngineListener, PeerConnectionListener {
+) : RTCEngineListener,
+  PeerConnectionListener {
   private val rtcEngineCommunication = RTCEngineCommunication(this)
   private val peerConnectionFactoryWrapper =
     PeerConnectionFactoryWrapper(createOptions, RTCModule.audioDeviceModule(context), eglBase, context)
@@ -94,15 +95,16 @@ internal class InternalMembraneRTC(
     captureDeviceName: String? = null
   ): LocalVideoTrack {
     val videoTrack =
-      LocalVideoTrack.create(
-        context,
-        peerConnectionFactoryWrapper.peerConnectionFactory,
-        eglBase,
-        videoParameters,
-        captureDeviceName
-      ).also {
-        it.start()
-      }
+      LocalVideoTrack
+        .create(
+          context,
+          peerConnectionFactoryWrapper.peerConnectionFactory,
+          eglBase,
+          videoParameters,
+          captureDeviceName
+        ).also {
+          it.start()
+        }
 
     localTracks.add(videoTrack)
     localEndpoint = localEndpoint.withTrack(videoTrack.id(), metadata)
@@ -117,12 +119,13 @@ internal class InternalMembraneRTC(
 
   fun createLocalAudioTrack(metadata: Metadata = mapOf()): LocalAudioTrack {
     val audioTrack =
-      LocalAudioTrack.create(
-        context,
-        peerConnectionFactoryWrapper.peerConnectionFactory
-      ).also {
-        it.start()
-      }
+      LocalAudioTrack
+        .create(
+          context,
+          peerConnectionFactoryWrapper.peerConnectionFactory
+        ).also {
+          it.start()
+        }
 
     localTracks.add(audioTrack)
     localEndpoint = localEndpoint.withTrack(audioTrack.id(), metadata)
@@ -555,7 +558,5 @@ internal class InternalMembraneRTC(
     listener.onTrackReady(trackContext)
   }
 
-  fun getStats(): Map<String, RTCStats> {
-    return peerConnectionManager.getStats()
-  }
+  fun getStats(): Map<String, RTCStats> = peerConnectionManager.getStats()
 }

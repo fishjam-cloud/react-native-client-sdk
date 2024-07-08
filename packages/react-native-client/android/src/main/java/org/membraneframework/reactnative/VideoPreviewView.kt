@@ -10,7 +10,10 @@ import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.RendererCommon
 
-class VideoPreviewView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
+class VideoPreviewView(
+  context: Context,
+  appContext: AppContext
+) : ExpoView(context, appContext) {
   private var localVideoTrack: LocalVideoTrack? = null
   private var eglBase: EglBase? = null
   private var peerConnectionFactory: PeerConnectionFactory? = null

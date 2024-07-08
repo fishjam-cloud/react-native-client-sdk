@@ -17,7 +17,10 @@ data class Config(
   val token: String
 )
 
-class FishjamClient(appContext: Context, listener: FishjamClientListener) {
+class FishjamClient(
+  appContext: Context,
+  listener: FishjamClientListener
+) {
   private val client = FishjamClientInternal(appContext, listener)
 
   /**
@@ -72,9 +75,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
     videoParameters: VideoParameters,
     metadata: Metadata,
     captureDeviceName: String? = null
-  ): LocalVideoTrack {
-    return client.webrtcClient.createVideoTrack(videoParameters, metadata, captureDeviceName)
-  }
+  ): LocalVideoTrack = client.webrtcClient.createVideoTrack(videoParameters, metadata, captureDeviceName)
 
   /**
    * Creates an audio track utilizing device's microphone.
@@ -84,9 +85,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * @param metadata the metadata that will be sent to the <strong>Membrane RTC Engine</strong> for media negotiation
    * @return an instance of the audio track
    */
-  fun createAudioTrack(metadata: Metadata): LocalAudioTrack {
-    return client.webrtcClient.createAudioTrack(metadata)
-  }
+  fun createAudioTrack(metadata: Metadata): LocalAudioTrack = client.webrtcClient.createAudioTrack(metadata)
 
   /**
    * Creates a screen track recording the entire device's screen.
@@ -104,14 +103,13 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
     videoParameters: VideoParameters,
     metadata: Metadata,
     onEnd: (() -> Unit)? = null
-  ): LocalScreencastTrack {
-    return client.webrtcClient.createScreencastTrack(
+  ): LocalScreencastTrack =
+    client.webrtcClient.createScreencastTrack(
       mediaProjectionPermission,
       videoParameters,
       metadata,
       onEnd
     )
-  }
 
   /**
    * Removes an instance of local track from the client.
@@ -119,9 +117,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * @param trackId an id of a valid local track that has been created using the current client
    * @return a boolean whether the track has been successfully removed or not
    */
-  fun removeTrack(trackId: String): Boolean {
-    return client.webrtcClient.removeTrack(trackId)
-  }
+  fun removeTrack(trackId: String): Boolean = client.webrtcClient.removeTrack(trackId)
 
   /**
    * Sets track encoding that server should send to the client library.
@@ -232,7 +228,5 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * Returns current connection stats
    * @return a map containing statistics
    */
-  fun getStats(): Map<String, RTCStats> {
-    return client.webrtcClient.getStats()
-  }
+  fun getStats(): Map<String, RTCStats> = client.webrtcClient.getStats()
 }

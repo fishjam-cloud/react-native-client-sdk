@@ -122,8 +122,7 @@ class RNFishjamClient: FishjamClientListener {
     {
         if let maxBandwidth: Int = maxBandwidth.get() {
             return .BandwidthLimit(maxBandwidth)
-        }
-        else if let maxBandwidth: [String: Int] = maxBandwidth.get() {
+        } else if let maxBandwidth: [String: Int] = maxBandwidth.get() {
             return .SimulcastBandwidthLimit(maxBandwidth)
         }
         return .BandwidthLimit(0)
@@ -547,8 +546,7 @@ class RNFishjamClient: FishjamClientListener {
                     try addTrackToLocalEndpoint(
                         screencastTrack, screencastMetadata, simulcastConfig)
                     try setScreencastTrackState(isEnabled: true)
-                }
-                catch {
+                } catch {
                     os_log(
                         "Error starting screencast: %{public}s", log: log, type: .error,
                         String(describing: error))
@@ -564,8 +562,7 @@ class RNFishjamClient: FishjamClientListener {
                     try removeTrackFromLocalEndpoint(screencastTrack)
                     localScreencastTrack = nil
                     try setScreencastTrackState(isEnabled: false)
-                }
-                catch {
+                } catch {
                     os_log(
                         "Error stopping screencast: %{public}s", log: log, type: .error,
                         String(describing: error))
@@ -595,8 +592,7 @@ class RNFishjamClient: FishjamClientListener {
 
                 if isTrackLocal(trackId) {
                     simulcastConfig = p.tracksData[trackId]?.simulcastConfig
-                }
-                else {
+                } else {
                     simulcastConfig = tracksContexts[trackId]?.simulcastConfig
                 }
 
@@ -711,8 +707,7 @@ class RNFishjamClient: FishjamClientListener {
                 enabled: true,
                 activeEncodings: simulcastConfig.activeEncodings.filter { e in e != encoding }
             )
-        }
-        else {
+        } else {
             room.enableTrackEncoding(trackId: trackId, encoding: encoding)
             return SimulcastConfig(
                 enabled: true,
@@ -878,8 +873,7 @@ class RNFishjamClient: FishjamClientListener {
         stats?.forEach { pair in
             if let val = pair.value as? RTCOutboundStats {
                 res[pair.key] = getMapFromStatsObject(obj: val)
-            }
-            else {
+            } else {
                 res[pair.key] = getMapFromStatsObject(obj: pair.value as! RTCInboundStats)
             }
         }
