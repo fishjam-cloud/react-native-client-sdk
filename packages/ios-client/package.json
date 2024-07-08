@@ -1,6 +1,0 @@
-{
-  "devDependencies": {
-    "@release-it/bumper": "^4.0.0",
-    "release-it": "^15.5.0"
-  }
-}
