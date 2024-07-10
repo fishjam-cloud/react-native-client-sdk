@@ -20,6 +20,7 @@
     "prettier": "^3.2.5"
   },
   "scripts": {
+    "setup": "sh ./scripts/init.sh",
     "build": "yarn workspace @fishjam-dev/react-native-client run tsc",
     "tsc": "yarn workspaces foreach -A -p run tsc",
     "lint": "yarn workspaces foreach -A -p run lint",
