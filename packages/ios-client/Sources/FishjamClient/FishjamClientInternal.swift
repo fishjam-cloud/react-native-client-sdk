@@ -118,9 +118,9 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     }
 
     func onSendMediaEvent(event: SerializedMediaEvent) {
-        if (!isAuthenticated) {
-          print("Tried to send media event: \(event) before authentication")
-          return
+        if !isAuthenticated {
+            print("Tried to send media event: \(event) before authentication")
+            return
         }
         let mediaEvent =
             Fishjam_PeerMessage.with({

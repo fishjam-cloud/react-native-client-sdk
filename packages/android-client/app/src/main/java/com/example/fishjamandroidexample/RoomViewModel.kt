@@ -17,8 +17,9 @@ import org.membraneframework.rtc.media.RemoteVideoTrack
 import org.membraneframework.rtc.media.VideoParameters
 import org.membraneframework.rtc.models.TrackContext
 
-class RoomViewModel(application: Application) :
-  AndroidViewModel(application),
+class RoomViewModel(
+  application: Application
+) : AndroidViewModel(application),
   FishjamClientListener {
   private val client = FishjamClient(getApplication(), this)
 

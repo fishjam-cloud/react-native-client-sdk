@@ -41,7 +41,9 @@ class RoomActivity : ComponentActivity() {
   }
 
   @Parcelize
-  data class BundleArgs(val roomToken: String) : Parcelable
+  data class BundleArgs(
+    val roomToken: String
+  ) : Parcelable
 
   private val viewModel: RoomViewModel by viewModels()
 
@@ -128,8 +130,7 @@ class RoomActivity : ComponentActivity() {
             interactionSource = remember { MutableInteractionSource() }
           ) {
             onClick?.invoke()
-          }
-          .clip(RoundedCornerShape(10.dp))
+          }.clip(RoundedCornerShape(10.dp))
           .height(size.height.dp)
           .width(size.width.dp)
     ) {

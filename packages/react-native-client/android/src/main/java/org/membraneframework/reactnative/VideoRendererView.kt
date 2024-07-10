@@ -10,8 +10,10 @@ import org.membraneframework.rtc.media.VideoTrack
 import org.membraneframework.rtc.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon
 
-class VideoRendererView(context: Context, appContext: AppContext) :
-  ExpoView(context, appContext),
+class VideoRendererView(
+  context: Context,
+  appContext: AppContext
+) : ExpoView(context, appContext),
   RNFishjamClient.OnTrackUpdateListener {
   var isInitialized = false
   var activeVideoTrack: VideoTrack? = null
@@ -33,7 +35,10 @@ class VideoRendererView(context: Context, appContext: AppContext) :
 
   private fun update() {
     CoroutineScope(Dispatchers.Main).launch {
-      val endpoint = RNFishjamClient.endpoints.values.firstOrNull { it.videoTracks[trackId] != null }
+      val endpoint =
+        RNFishjamClient.endpoints.values.firstOrNull {
+          it.videoTracks[trackId] != null
+        }
       val videoTrack = endpoint?.videoTracks?.get(trackId) ?: return@launch
       if (!isInitialized) {
         isInitialized = true

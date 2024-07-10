@@ -13,14 +13,10 @@ import timber.log.Timber
 internal val gson = Gson()
 
 // convert a data class to a map
-internal fun <T> T.serializeToMap(): Map<String, Any?> {
-  return convert()
-}
+internal fun <T> T.serializeToMap(): Map<String, Any?> = convert()
 
 // convert a map to a data class
-internal inline fun <reified T> Map<String, Any?>.toDataClass(): T {
-  return convert()
-}
+internal inline fun <reified T> Map<String, Any?>.toDataClass(): T = convert()
 
 // convert an object of type I to type O
 internal inline fun <I, reified O> I.convert(): O {
@@ -30,13 +26,21 @@ internal inline fun <I, reified O> I.convert(): O {
 
 sealed class SendableEvent
 
-data class Connect(val type: String, val data: Data) : SendableEvent() {
-  data class Data(val metadata: Metadata?)
+data class Connect(
+  val type: String,
+  val data: Data
+) : SendableEvent() {
+  data class Data(
+    val metadata: Metadata?
+  )
 
   constructor(metadata: Metadata? = mapOf()) : this("connect", Data(metadata))
 }
 
-data class SdpOffer(val type: String, val data: Payload) : SendableEvent() {
+data class SdpOffer(
+  val type: String,
+  val data: Payload
+) : SendableEvent() {
   constructor(sdp: String, trackIdToTrackMetadata: Map<String, Metadata?>, midToTrackId: Map<String, String>) :
     this(
       "custom",
@@ -56,7 +60,10 @@ data class SdpOffer(val type: String, val data: Payload) : SendableEvent() {
     )
 }
 
-data class LocalCandidate(val type: String, val data: Payload) : SendableEvent() {
+data class LocalCandidate(
+  val type: String,
+  val data: Payload
+) : SendableEvent() {
   constructor(candidate: String, sdpMLineIndex: Int) :
     this(
       "custom",
@@ -71,7 +78,10 @@ data class LocalCandidate(val type: String, val data: Payload) : SendableEvent()
     )
 }
 
-data class RenegotiateTracks(val type: String, val data: Payload) : SendableEvent() {
+data class RenegotiateTracks(
+  val type: String,
+  val data: Payload
+) : SendableEvent() {
   constructor() :
     this(
       "custom",
@@ -81,7 +91,10 @@ data class RenegotiateTracks(val type: String, val data: Payload) : SendableEven
     )
 }
 
-data class SelectEncoding(val type: String, val data: Payload) : SendableEvent() {
+data class SelectEncoding(
+  val type: String,
+  val data: Payload
+) : SendableEvent() {
   constructor(trackId: String, encoding: String) :
     this(
       "custom",
@@ -96,14 +109,25 @@ data class SelectEncoding(val type: String, val data: Payload) : SendableEvent()
     )
 }
 
-data class UpdateEndpointMetadata(val type: String, val data: Data) : SendableEvent() {
-  data class Data(val metadata: Metadata?)
+data class UpdateEndpointMetadata(
+  val type: String,
+  val data: Data
+) : SendableEvent() {
+  data class Data(
+    val metadata: Metadata?
+  )
 
   constructor(metadata: Metadata? = mapOf()) : this("updateEndpointMetadata", Data(metadata))
 }
 
-data class UpdateTrackMetadata(val type: String, val data: Data) : SendableEvent() {
-  data class Data(val trackId: String, val trackMetadata: Metadata?)
+data class UpdateTrackMetadata(
+  val type: String,
+  val data: Data
+) : SendableEvent() {
+  data class Data(
+    val trackId: String,
+    val trackMetadata: Metadata?
+  )
 
   constructor(trackId: String, trackMetadata: Metadata = mapOf()) : this(
     "updateTrackMetadata",
@@ -111,7 +135,9 @@ data class UpdateTrackMetadata(val type: String, val data: Data) : SendableEvent
   )
 }
 
-data class Disconnect(val type: String) : SendableEvent() {
+data class Disconnect(
+  val type: String
+) : SendableEvent() {
   constructor() : this("disconnect")
 }
 
@@ -159,7 +185,9 @@ enum class ReceivableEventType {
   BandwidthEstimation
 }
 
-internal data class BaseReceivableEvent(val type: ReceivableEventType)
+internal data class BaseReceivableEvent(
+  val type: ReceivableEventType
+)
 
 sealed class ReceivableEvent {
   companion object {
@@ -227,11 +255,20 @@ sealed class ReceivableEvent {
   }
 }
 
-data class Connected(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val id: String, val otherEndpoints: List<Endpoint>)
+data class Connected(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val id: String,
+    val otherEndpoints: List<Endpoint>
+  )
 }
 
-data class EndpointAdded(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
+data class EndpointAdded(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
   data class Data(
     val id: String,
     val type: String,
@@ -240,15 +277,30 @@ data class EndpointAdded(val type: ReceivableEventType, val data: Data) : Receiv
   )
 }
 
-data class EndpointUpdated(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val id: String, val metadata: Metadata?)
+data class EndpointUpdated(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val id: String,
+    val metadata: Metadata?
+  )
 }
 
-data class EndpointRemoved(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val id: String, val reason: String)
+data class EndpointRemoved(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val id: String,
+    val reason: String
+  )
 }
 
-data class OfferData(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
+data class OfferData(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
   data class TurnServer(
     val username: String,
     val password: String,
@@ -257,46 +309,106 @@ data class OfferData(val type: ReceivableEventType, val data: Data) : Receivable
     val transport: String
   )
 
-  data class Data(val integratedTurnServers: List<TurnServer>, val tracksTypes: Map<String, Int>)
+  data class Data(
+    val integratedTurnServers: List<TurnServer>,
+    val tracksTypes: Map<String, Int>
+  )
 }
 
-data class TracksAdded(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
+data class TracksAdded(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
   data class Data(
     val endpointId: String,
     val tracks: Map<String, TrackData>
   )
 }
 
-data class TracksRemoved(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val endpointId: String, val trackIds: List<String>)
+data class TracksRemoved(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val endpointId: String,
+    val trackIds: List<String>
+  )
 }
 
-data class TrackUpdated(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val endpointId: String, val trackId: String, val metadata: Metadata?)
+data class TrackUpdated(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val endpointId: String,
+    val trackId: String,
+    val metadata: Metadata?
+  )
 }
 
-data class SdpAnswer(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val type: String, val sdp: String, val midToTrackId: Map<String, String>)
+data class SdpAnswer(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val type: String,
+    val sdp: String,
+    val midToTrackId: Map<String, String>
+  )
 }
 
-data class RemoteCandidate(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val candidate: String, val sdpMLineIndex: Int, val sdpMid: String?)
+data class RemoteCandidate(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val candidate: String,
+    val sdpMLineIndex: Int,
+    val sdpMid: String?
+  )
 }
 
-data class EncodingSwitched(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val endpointId: String, val trackId: String, val encoding: String, val reason: String)
+data class EncodingSwitched(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val endpointId: String,
+    val trackId: String,
+    val encoding: String,
+    val reason: String
+  )
 }
 
-data class VadNotification(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val trackId: String, val status: String)
+data class VadNotification(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val trackId: String,
+    val status: String
+  )
 }
 
-data class BandwidthEstimation(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val estimation: Double)
+data class BandwidthEstimation(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val estimation: Double
+  )
 }
 
-data class BaseCustomEvent(val type: ReceivableEventType, val data: Data) : ReceivableEvent() {
-  data class Data(val type: ReceivableEventType)
+data class BaseCustomEvent(
+  val type: ReceivableEventType,
+  val data: Data
+) : ReceivableEvent() {
+  data class Data(
+    val type: ReceivableEventType
+  )
 }
 
-class CustomEvent<Event : ReceivableEvent>(val type: ReceivableEventType, val data: Event)
+class CustomEvent<Event : ReceivableEvent>(
+  val type: ReceivableEventType,
+  val data: Event
+)

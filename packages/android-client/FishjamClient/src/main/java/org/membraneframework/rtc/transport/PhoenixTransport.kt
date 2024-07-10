@@ -10,14 +10,20 @@ import org.phoenixframework.Socket
 import timber.log.Timber
 
 sealed class PhoenixTransportError : Exception() {
-  data class Unauthorized(val reason: String) : PhoenixTransportError()
+  data class Unauthorized(
+    val reason: String
+  ) : PhoenixTransportError()
 
-  data class ConnectionError(val reason: String) : PhoenixTransportError()
+  data class ConnectionError(
+    val reason: String
+  ) : PhoenixTransportError()
 
-  data class Unexpected(val reason: String) : PhoenixTransportError()
+  data class Unexpected(
+    val reason: String
+  ) : PhoenixTransportError()
 
-  override fun toString(): String {
-    return when (this) {
+  override fun toString(): String =
+    when (this) {
       is Unauthorized ->
         "User is unauthorized to use the transport: ${this.reason}"
       is ConnectionError ->
@@ -25,7 +31,6 @@ sealed class PhoenixTransportError : Exception() {
       is Unexpected ->
         "Encountered unexpected error: ${this.reason}"
     }
-  }
 }
 
 /**
@@ -97,11 +102,11 @@ class PhoenixTransport(
 
     channel = socket!!.channel(topic, socketChannelParams)
 
-    channel?.join(timeout = 3000L)
+    channel
+      ?.join(timeout = 3000L)
       ?.receive("ok") { _ ->
         joinContinuation?.resumeWith(Result.success(Unit))
-      }
-      ?.receive("error") { _ ->
+      }?.receive("error") { _ ->
         joinContinuation?.resumeWith(
           Result.failure(PhoenixTransportError.Unauthorized("couldn't join phoenix channel"))
         )

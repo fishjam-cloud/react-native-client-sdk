@@ -4,15 +4,13 @@ import org.webrtc.EglBase
 import org.webrtc.MediaStreamTrack
 import org.webrtc.VideoSink
 
-open class VideoTrack(protected val videoTrack: org.webrtc.VideoTrack, val eglContext: EglBase.Context) :
-  MediaTrackProvider {
-  override fun id(): String {
-    return videoTrack.id()
-  }
+open class VideoTrack(
+  protected val videoTrack: org.webrtc.VideoTrack,
+  val eglContext: EglBase.Context
+) : MediaTrackProvider {
+  override fun id(): String = videoTrack.id()
 
-  override fun rtcTrack(): MediaStreamTrack {
-    return videoTrack
-  }
+  override fun rtcTrack(): MediaStreamTrack = videoTrack
 
   fun addRenderer(renderer: VideoSink) {
     this.videoTrack.addSink(renderer)

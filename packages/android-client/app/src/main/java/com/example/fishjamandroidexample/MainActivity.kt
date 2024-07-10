@@ -45,14 +45,15 @@ class MainActivity : ComponentActivity() {
   }
 
   private fun connect(token: String) {
-    Intent(this@MainActivity, RoomActivity::class.java).apply {
-      putExtra(
-        RoomActivity.ARGS,
-        RoomActivity.BundleArgs(token)
-      )
-    }.let {
-      startActivity(it)
-    }
+    Intent(this@MainActivity, RoomActivity::class.java)
+      .apply {
+        putExtra(
+          RoomActivity.ARGS,
+          RoomActivity.BundleArgs(token)
+        )
+      }.let {
+        startActivity(it)
+      }
   }
 
   @OptIn(ExperimentalMaterial3Api::class)

@@ -10,7 +10,10 @@ import org.webrtc.EglBase
 import org.webrtc.PeerConnectionFactory
 import org.webrtc.RendererCommon
 
-class VideoPreviewView(context: Context, appContext: AppContext) : ExpoView(context, appContext) {
+class VideoPreviewView(
+  context: Context,
+  appContext: AppContext
+) : ExpoView(context, appContext) {
   private var localVideoTrack: LocalVideoTrack? = null
   private var eglBase: EglBase? = null
   private var peerConnectionFactory: PeerConnectionFactory? = null
@@ -26,16 +29,24 @@ class VideoPreviewView(context: Context, appContext: AppContext) : ExpoView(cont
   private fun initialize() {
     if (isInitialized) return
     isInitialized = true
-    PeerConnectionFactory.initialize(PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions())
+    PeerConnectionFactory.initialize(
+      PeerConnectionFactory.InitializationOptions.builder(context).createInitializationOptions()
+    )
     val eglBase = EglBase.create()
     this.eglBase = eglBase
     val peerConnectionFactory = PeerConnectionFactory.builder().createPeerConnectionFactory()
     this.peerConnectionFactory = peerConnectionFactory
 
     localVideoTrack =
-      LocalVideoTrack.create(context, peerConnectionFactory, eglBase, VideoParameters.presetFHD169).also {
-        it.start()
-      }
+      LocalVideoTrack
+        .create(
+          context,
+          peerConnectionFactory,
+          eglBase,
+          VideoParameters.presetFHD169
+        ).also {
+          it.start()
+        }
     videoView.init(eglBase.eglBaseContext, null)
     localVideoTrack?.addRenderer(videoView)
   }

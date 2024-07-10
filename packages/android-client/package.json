@@ -1,0 +1,7 @@
+{
+  "name": "android-client",
+  "scripts": {
+    "lint": "ktlint -F **/*.kt",
+    "lint:check": "ktlint **/*.kt"
+  }
+}

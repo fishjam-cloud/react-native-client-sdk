@@ -7,10 +7,8 @@
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
-    "format": "prettier --write . --ignore-path ./.eslintignore",
-    "format:check": "prettier --check . --ignore-path ./.eslintignore",
-    "lint": "eslint . --ext .ts,.tsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx",
+    "lint": "sh ./scripts/lint.sh",
+    "lint:check": "sh ./scripts/lint_check.sh",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
@@ -108,7 +106,6 @@
   },
   "lint-staged": {
     "*.(js|ts|tsx)": [
-      "yarn format:check",
       "yarn lint:check"
     ]
   }

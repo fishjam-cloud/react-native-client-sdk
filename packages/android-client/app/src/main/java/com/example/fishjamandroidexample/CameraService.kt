@@ -32,7 +32,8 @@ class CameraService : Service() {
         notificationManager.createNotificationChannel(mChannel)
       }
       val notification =
-        NotificationCompat.Builder(this, channelID)
+        NotificationCompat
+          .Builder(this, channelID)
           .setContentTitle("Fishjam is running")
           .build()
       ServiceCompat.startForeground(
@@ -59,7 +60,5 @@ class CameraService : Service() {
     return START_STICKY
   }
 
-  override fun onBind(intent: Intent): IBinder? {
-    return null
-  }
+  override fun onBind(intent: Intent): IBinder? = null
 }

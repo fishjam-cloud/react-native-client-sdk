@@ -22,8 +22,7 @@ typealias Peer = Endpoint
 internal class FishjamClientInternal(
   appContext: Context,
   private val listener: FishjamClientListener
-) :
-  MembraneRTCListener {
+) : MembraneRTCListener {
   private var webSocket: WebSocket? = null
   val webrtcClient = MembraneRTC.create(appContext, this)
   private var isAuthenticated = false

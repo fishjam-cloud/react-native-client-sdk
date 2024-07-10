@@ -13,6 +13,4 @@ internal fun PeerConnection.addTransceiver(
   this.addTransceiver(mediaTrack, transceiverInit)
 }
 
-internal fun RtpParameters.getEncodings(): List<RtpParameters.Encoding> {
-  return this.encodings
-}
+internal fun RtpParameters.getEncodings(): List<RtpParameters.Encoding> = this.encodings

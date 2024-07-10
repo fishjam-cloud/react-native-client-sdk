@@ -48,8 +48,9 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
    * This results in HardwareVideoEncoderFactory being both the primary and fallback,
    * but there aren't any specific problems in doing so.
    */
-  private class FallbackFactory(private val hardwareVideoEncoderFactory: VideoEncoderFactory) :
-    VideoEncoderFactory {
+  private class FallbackFactory(
+    private val hardwareVideoEncoderFactory: VideoEncoderFactory
+  ) : VideoEncoderFactory {
     private val softwareVideoEncoderFactory: VideoEncoderFactory = SoftwareVideoEncoderFactory()
 
     override fun createEncoder(info: VideoCodecInfo): VideoEncoder? {
@@ -77,7 +78,9 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
    *   scales the frame prior to encoding.
    * - Always calls the encoder on the thread.
    */
-  private class StreamEncoderWrapper(private val encoder: VideoEncoder) : VideoEncoder {
+  private class StreamEncoderWrapper(
+    private val encoder: VideoEncoder
+  ) : VideoEncoder {
     val executor: ExecutorService = Executors.newSingleThreadExecutor()
     var streamSettings: VideoEncoder.Settings? = null
 
@@ -188,8 +191,9 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
     }
   }
 
-  private class StreamEncoderWrapperFactory(private val factory: VideoEncoderFactory) :
-    VideoEncoderFactory {
+  private class StreamEncoderWrapperFactory(
+    private val factory: VideoEncoderFactory
+  ) : VideoEncoderFactory {
     override fun createEncoder(videoCodecInfo: VideoCodecInfo?): VideoEncoder? {
       val encoder = factory.createEncoder(videoCodecInfo) ?: return null
       if (encoder is WrappedNativeVideoEncoder) {
@@ -198,9 +202,7 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
       return StreamEncoderWrapper(encoder)
     }
 
-    override fun getSupportedCodecs(): Array<VideoCodecInfo> {
-      return factory.supportedCodecs
-    }
+    override fun getSupportedCodecs(): Array<VideoCodecInfo> = factory.supportedCodecs
   }
 
   private val primary: VideoEncoderFactory
@@ -225,11 +227,7 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
       }
   }
 
-  override fun createEncoder(info: VideoCodecInfo?): VideoEncoder? {
-    return native.createEncoder(info)
-  }
+  override fun createEncoder(info: VideoCodecInfo?): VideoEncoder? = native.createEncoder(info)
 
-  override fun getSupportedCodecs(): Array<VideoCodecInfo> {
-    return native.supportedCodecs
-  }
+  override fun getSupportedCodecs(): Array<VideoCodecInfo> = native.supportedCodecs
 }

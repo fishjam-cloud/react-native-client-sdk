@@ -34,7 +34,8 @@ internal class ScreencastService : Service() {
           createNotificationChannel()
         }
 
-        NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+        NotificationCompat
+          .Builder(this, DEFAULT_CHANNEL_ID)
           .setPriority(NotificationCompat.PRIORITY_DEFAULT)
           .build()
       }

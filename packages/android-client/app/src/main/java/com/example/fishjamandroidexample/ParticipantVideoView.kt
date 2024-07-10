@@ -18,12 +18,11 @@ enum class VideoViewLayout {
   FILL
   ;
 
-  internal fun toScalingType(): RendererCommon.ScalingType {
-    return when (this) {
+  internal fun toScalingType(): RendererCommon.ScalingType =
+    when (this) {
       FIT -> RendererCommon.ScalingType.SCALE_ASPECT_FIT
       FILL -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
     }
-  }
 }
 
 @Composable

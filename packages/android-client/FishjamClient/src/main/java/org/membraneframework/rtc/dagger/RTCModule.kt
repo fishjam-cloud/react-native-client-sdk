@@ -7,9 +7,7 @@ import org.webrtc.audio.JavaAudioDeviceModule
 import timber.log.Timber
 
 internal object RTCModule {
-  fun eglBase(): EglBase {
-    return EglBase.create()
-  }
+  fun eglBase(): EglBase = EglBase.create()
 
   fun audioDeviceModule(appContext: Context): AudioDeviceModule {
     val audioRecordErrorCallback =
@@ -72,7 +70,8 @@ internal object RTCModule {
         }
       }
 
-    return JavaAudioDeviceModule.builder(appContext)
+    return JavaAudioDeviceModule
+      .builder(appContext)
       .setUseHardwareAcousticEchoCanceler(true)
       .setUseHardwareNoiseSuppressor(true)
       .setAudioRecordErrorCallback(audioRecordErrorCallback)

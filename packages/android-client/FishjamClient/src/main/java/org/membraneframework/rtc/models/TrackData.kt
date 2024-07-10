@@ -11,4 +11,7 @@ import org.membraneframework.rtc.utils.Metadata
  *
  */
 
-data class TrackData(val metadata: Metadata?, val simulcastConfig: SimulcastConfig?)
+data class TrackData(
+  val metadata: Metadata?,
+  val simulcastConfig: SimulcastConfig?
+)

@@ -15,16 +15,15 @@ import java.util.*
  */
 class LocalAudioTrack(
   var mediaTrack: org.webrtc.AudioTrack
-) : AudioTrack(mediaTrack), LocalTrack {
+) : AudioTrack(mediaTrack),
+  LocalTrack {
   override fun start() {
   }
 
   override fun stop() {
   }
 
-  override fun enabled(): Boolean {
-    return audioTrack.enabled()
-  }
+  override fun enabled(): Boolean = audioTrack.enabled()
 
   override fun setEnabled(enabled: Boolean) {
     audioTrack.setEnabled(enabled)

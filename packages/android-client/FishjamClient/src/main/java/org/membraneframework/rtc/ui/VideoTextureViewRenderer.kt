@@ -371,13 +371,12 @@ open class VideoTextureViewRenderer :
 
   override fun onSurfaceTextureUpdated(surface: SurfaceTexture) {}
 
-  private fun getResourceName(): String {
-    return try {
+  private fun getResourceName(): String =
+    try {
       resources.getResourceEntryName(id)
     } catch (e: Resources.NotFoundException) {
       ""
     }
-  }
 
   /**
    * Post a task to clear the SurfaceView to a transparent uniform color.

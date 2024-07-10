@@ -8,7 +8,9 @@ import com.google.gson.annotations.SerializedName
  * `"m"` - original encoding scaled down by 2
  * `"l"` - original encoding scaled down by 4
  */
-enum class TrackEncoding(val rid: String) {
+enum class TrackEncoding(
+  val rid: String
+) {
   @SerializedName("l")
   L("l"),
 
@@ -19,9 +21,7 @@ enum class TrackEncoding(val rid: String) {
   H("h");
 
   companion object {
-    fun fromString(s: String): TrackEncoding? {
-      return values().find { it.rid == s }
-    }
+    fun fromString(s: String): TrackEncoding? = values().find { it.rid == s }
   }
 }
 

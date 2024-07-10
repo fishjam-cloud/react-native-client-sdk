@@ -15,8 +15,13 @@ class LocalVideoTrack(
   private val capturer: Capturer,
   eglBase: EglBase,
   val videoParameters: VideoParameters
-) : VideoTrack(mediaTrack, eglBase.eglBaseContext), LocalTrack {
-  data class CaptureDevice(val deviceName: String, val isFrontFacing: Boolean, val isBackFacing: Boolean)
+) : VideoTrack(mediaTrack, eglBase.eglBaseContext),
+  LocalTrack {
+  data class CaptureDevice(
+    val deviceName: String,
+    val isFrontFacing: Boolean,
+    val isBackFacing: Boolean
+  )
 
   companion object {
     fun create(
@@ -66,9 +71,7 @@ class LocalVideoTrack(
     capturer.stopCapture()
   }
 
-  override fun enabled(): Boolean {
-    return videoTrack.enabled()
-  }
+  override fun enabled(): Boolean = videoTrack.enabled()
 
   override fun setEnabled(enabled: Boolean) {
     videoTrack.setEnabled(enabled)
@@ -97,7 +100,8 @@ class CameraCapturer(
   private val rootEglBase: EglBase,
   private val videoParameters: VideoParameters,
   cameraName: String?
-) : Capturer, CameraVideoCapturer.CameraSwitchHandler {
+) : Capturer,
+  CameraVideoCapturer.CameraSwitchHandler {
   private lateinit var cameraCapturer: CameraVideoCapturer
   private lateinit var size: Size
   private var isCapturing = false
@@ -106,9 +110,7 @@ class CameraCapturer(
     createCapturer(cameraName)
   }
 
-  override fun capturer(): VideoCapturer {
-    return cameraCapturer
-  }
+  override fun capturer(): VideoCapturer = cameraCapturer
 
   override fun startCapture() {
     isCapturing = true
@@ -157,7 +159,8 @@ class CameraCapturer(
     )
 
     val sizes =
-      enumerator.getSupportedFormats(deviceName)
+      enumerator
+        .getSupportedFormats(deviceName)
         ?.map { Size(it.width, it.height) }
         ?: emptyList()
 

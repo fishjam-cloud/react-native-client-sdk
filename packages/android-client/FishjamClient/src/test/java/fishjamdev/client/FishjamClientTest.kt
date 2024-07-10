@@ -30,8 +30,11 @@ class FishjamClientTest {
   private val authRequest =
     PeerNotifications.PeerMessage
       .newBuilder()
-      .setAuthRequest(PeerNotifications.PeerMessage.AuthRequest.newBuilder().setToken(token))
-      .build()
+      .setAuthRequest(
+        PeerNotifications.PeerMessage.AuthRequest
+          .newBuilder()
+          .setToken(token)
+      ).build()
 
   private val authenticated =
     PeerNotifications.PeerMessage
@@ -71,14 +74,20 @@ class FishjamClientTest {
     val sdpOfferMediaEvent =
       PeerNotifications.PeerMessage
         .newBuilder()
-        .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("sdpOffer"))
-        .build()
+        .setMediaEvent(
+          PeerNotifications.PeerMessage.MediaEvent
+            .newBuilder()
+            .setData("sdpOffer")
+        ).build()
 
     val joinMediaEvent =
       PeerNotifications.PeerMessage
         .newBuilder()
-        .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData("join"))
-        .build()
+        .setMediaEvent(
+          PeerNotifications.PeerMessage.MediaEvent
+            .newBuilder()
+            .setData("join")
+        ).build()
 
     websocketMock.sendToClient(authenticated)
 

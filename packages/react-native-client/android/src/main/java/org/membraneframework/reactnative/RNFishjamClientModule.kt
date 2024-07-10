@@ -72,205 +72,205 @@ class ScreencastOptions : Record {
 }
 
 class RNFishjamClientModule : Module() {
-  override fun definition() = ModuleDefinition {
-    Name("RNFishjamClient")
+  override fun definition() =
+    ModuleDefinition {
+      Name("RNFishjamClient")
 
-    Events(
-      "IsCameraOn",
-      "IsMicrophoneOn",
-      "IsScreencastOn",
-      "SimulcastConfigUpdate",
-      "EndpointsUpdate",
-      "AudioDeviceUpdate",
-      "SendMediaEvent",
-      "BandwidthEstimation"
-    )
+      Events(
+        "IsCameraOn",
+        "IsMicrophoneOn",
+        "IsScreencastOn",
+        "SimulcastConfigUpdate",
+        "EndpointsUpdate",
+        "AudioDeviceUpdate",
+        "SendMediaEvent",
+        "BandwidthEstimation"
+      )
 
-    val rnFishjamClient = RNFishjamClient { name: String, data: Map<String, Any?> ->
-      sendEvent(name, data)
-    }
+      val rnFishjamClient =
+        RNFishjamClient { name: String, data: Map<String, Any?> ->
+          sendEvent(name, data)
+        }
 
-    OnCreate {
-      rnFishjamClient.onModuleCreate(appContext)
-    }
-
-    OnDestroy {
-      rnFishjamClient.onModuleDestroy()
-    }
-
-    OnActivityDestroys {
-      rnFishjamClient.leaveRoom()
-    }
-
-    OnActivityResult { _, result ->
-      rnFishjamClient.onActivityResult(result.requestCode, result.resultCode, result.data)
-    }
-
-    AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
-      CoroutineScope(Dispatchers.Main).launch {
-        rnFishjamClient.create()
-        rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
+      OnCreate {
+        rnFishjamClient.onModuleCreate(appContext)
       }
-    }
 
-    AsyncFunction("leaveRoom") Coroutine { ->
-      withContext(Dispatchers.Main) {
+      OnDestroy {
+        rnFishjamClient.onModuleDestroy()
+      }
+
+      OnActivityDestroys {
         rnFishjamClient.leaveRoom()
       }
-    }
 
-    AsyncFunction("startCamera") Coroutine { config: CameraConfig ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.startCamera(config)
+      OnActivityResult { _, result ->
+        rnFishjamClient.onActivityResult(result.requestCode, result.resultCode, result.data)
       }
-    }
 
-    AsyncFunction("startMicrophone") Coroutine { config: MicrophoneConfig ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.startMicrophone(config)
+      AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
+        CoroutineScope(Dispatchers.Main).launch {
+          rnFishjamClient.create()
+          rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
+        }
       }
-    }
 
-    Property("isMicrophoneOn") {
-      return@Property rnFishjamClient.isMicrophoneOn
-    }
-
-    AsyncFunction("toggleMicrophone") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.toggleMicrophone()
+      AsyncFunction("leaveRoom") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.leaveRoom()
+        }
       }
-    }
 
-    Property("isCameraOn") {
-      return@Property rnFishjamClient.isCameraOn
-    }
-
-    AsyncFunction("toggleCamera") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.toggleCamera()
+      AsyncFunction("startCamera") Coroutine { config: CameraConfig ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.startCamera(config)
+        }
       }
-    }
 
-    AsyncFunction("flipCamera") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.flipCamera()
+      AsyncFunction("startMicrophone") Coroutine { config: MicrophoneConfig ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.startMicrophone(config)
+        }
       }
-    }
 
-    AsyncFunction("switchCamera") Coroutine { captureDeviceId: String ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.switchCamera(captureDeviceId)
+      Property("isMicrophoneOn") {
+        return@Property rnFishjamClient.isMicrophoneOn
       }
-    }
 
-    AsyncFunction("getCaptureDevices") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.getCaptureDevices()
+      AsyncFunction("toggleMicrophone") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleMicrophone()
+        }
       }
-    }
 
-    AsyncFunction("toggleScreencast") { screencastOptions: ScreencastOptions, promise: Promise ->
-      CoroutineScope(Dispatchers.Main).launch {
-        rnFishjamClient.toggleScreencast(screencastOptions, promise)
+      Property("isCameraOn") {
+        return@Property rnFishjamClient.isCameraOn
       }
-    }
 
-    Property("isScreencastOn") {
-      return@Property rnFishjamClient.isScreencastOn
-    }
-
-    AsyncFunction("getEndpoints") Coroutine { ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.getEndpoints()
+      AsyncFunction("toggleCamera") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleCamera()
+        }
       }
-    }
 
-    AsyncFunction("updateEndpointMetadata") Coroutine { metadata: Map<String, Any> ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.updateEndpointMetadata(metadata)
+      AsyncFunction("flipCamera") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.flipCamera()
+        }
       }
-    }
 
-    AsyncFunction("updateVideoTrackMetadata") Coroutine { metadata: Map<String, Any> ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.updateLocalVideoTrackMetadata(metadata)
+      AsyncFunction("switchCamera") Coroutine { captureDeviceId: String ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.switchCamera(captureDeviceId)
+        }
       }
-    }
 
-    AsyncFunction("updateAudioTrackMetadata") Coroutine { metadata: Map<String, Any> ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.updateLocalAudioTrackMetadata(metadata)
+      AsyncFunction("getCaptureDevices") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.getCaptureDevices()
+        }
       }
-    }
 
-    AsyncFunction("updateScreencastTrackMetadata") Coroutine { metadata: Map<String, Any> ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.updateLocalScreencastTrackMetadata(metadata)
+      AsyncFunction("toggleScreencast") { screencastOptions: ScreencastOptions, promise: Promise ->
+        CoroutineScope(Dispatchers.Main).launch {
+          rnFishjamClient.toggleScreencast(screencastOptions, promise)
+        }
       }
-    }
 
-    AsyncFunction("setOutputAudioDevice") { audioDevice: String ->
-      rnFishjamClient.setOutputAudioDevice(audioDevice)
-    }
-
-    AsyncFunction("startAudioSwitcher") {
-      rnFishjamClient.startAudioSwitcher()
-    }
-
-    AsyncFunction("stopAudioSwitcher") {
-      rnFishjamClient.stopAudioSwitcher()
-    }
-
-    AsyncFunction("toggleScreencastTrackEncoding") Coroutine { encoding: String ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.toggleScreencastTrackEncoding(encoding)
+      Property("isScreencastOn") {
+        return@Property rnFishjamClient.isScreencastOn
       }
-    }
 
-    AsyncFunction("setScreencastTrackBandwidth") Coroutine { bandwidth: Int ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.setScreencastTrackBandwidth(bandwidth)
+      AsyncFunction("getEndpoints") Coroutine { ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.getEndpoints()
+        }
       }
-    }
 
-    AsyncFunction("setScreencastTrackEncodingBandwidth") Coroutine { encoding: String, bandwidth: Int ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.setScreencastTrackEncodingBandwidth(encoding, bandwidth)
+      AsyncFunction("updateEndpointMetadata") Coroutine { metadata: Map<String, Any> ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.updateEndpointMetadata(metadata)
+        }
       }
-    }
 
-    AsyncFunction("setTargetTrackEncoding") Coroutine { trackId: String, encoding: String ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.setTargetTrackEncoding(trackId, encoding)
+      AsyncFunction("updateVideoTrackMetadata") Coroutine { metadata: Map<String, Any> ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.updateLocalVideoTrackMetadata(metadata)
+        }
       }
-    }
 
-    AsyncFunction("toggleVideoTrackEncoding") Coroutine { encoding: String ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.toggleVideoTrackEncoding(encoding)
+      AsyncFunction("updateAudioTrackMetadata") Coroutine { metadata: Map<String, Any> ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.updateLocalAudioTrackMetadata(metadata)
+        }
       }
-    }
 
-    AsyncFunction("setVideoTrackEncodingBandwidth") Coroutine { encoding: String, bandwidth: Int ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.setVideoTrackEncodingBandwidth(encoding, bandwidth)
+      AsyncFunction("updateScreencastTrackMetadata") Coroutine { metadata: Map<String, Any> ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.updateLocalScreencastTrackMetadata(metadata)
+        }
       }
-    }
 
-    AsyncFunction("setVideoTrackBandwidth") Coroutine { bandwidth: Int ->
-      withContext(Dispatchers.Main) {
-        rnFishjamClient.setVideoTrackBandwidth(bandwidth)
+      AsyncFunction("setOutputAudioDevice") { audioDevice: String ->
+        rnFishjamClient.setOutputAudioDevice(audioDevice)
       }
-    }
 
-    AsyncFunction("changeWebRTCLoggingSeverity") Coroutine { severity: String ->
-      CoroutineScope(Dispatchers.Main).launch {
-        rnFishjamClient.changeWebRTCLoggingSeverity(severity)
+      AsyncFunction("startAudioSwitcher") {
+        rnFishjamClient.startAudioSwitcher()
       }
-    }
 
-    AsyncFunction("getStatistics") { ->
-      rnFishjamClient.getStatistics()
+      AsyncFunction("stopAudioSwitcher") {
+        rnFishjamClient.stopAudioSwitcher()
+      }
+
+      AsyncFunction("toggleScreencastTrackEncoding") Coroutine { encoding: String ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleScreencastTrackEncoding(encoding)
+        }
+      }
+
+      AsyncFunction("setScreencastTrackBandwidth") Coroutine { bandwidth: Int ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.setScreencastTrackBandwidth(bandwidth)
+        }
+      }
+
+      AsyncFunction("setScreencastTrackEncodingBandwidth") Coroutine { encoding: String, bandwidth: Int ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.setScreencastTrackEncodingBandwidth(encoding, bandwidth)
+        }
+      }
+
+      AsyncFunction("setTargetTrackEncoding") Coroutine { trackId: String, encoding: String ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.setTargetTrackEncoding(trackId, encoding)
+        }
+      }
+
+      AsyncFunction("toggleVideoTrackEncoding") Coroutine { encoding: String ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleVideoTrackEncoding(encoding)
+        }
+      }
+
+      AsyncFunction("setVideoTrackEncodingBandwidth") Coroutine { encoding: String, bandwidth: Int ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.setVideoTrackEncodingBandwidth(encoding, bandwidth)
+        }
+      }
+
+      AsyncFunction("setVideoTrackBandwidth") Coroutine { bandwidth: Int ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.setVideoTrackBandwidth(bandwidth)
+        }
+      }
+
+      AsyncFunction("changeWebRTCLoggingSeverity") Coroutine { severity: String ->
+        CoroutineScope(Dispatchers.Main).launch {
+          rnFishjamClient.changeWebRTCLoggingSeverity(severity)
+        }
+      }
+
+      AsyncFunction("getStatistics") { rnFishjamClient.getStatistics() }
     }
-  }
 }

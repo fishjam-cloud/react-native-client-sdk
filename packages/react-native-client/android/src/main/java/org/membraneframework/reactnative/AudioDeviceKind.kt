@@ -2,7 +2,10 @@ package org.membraneframework.reactnative
 
 import com.twilio.audioswitch.AudioDevice
 
-enum class AudioDeviceKind(val typeName: String, val audioDeviceClass: Class<out AudioDevice>) {
+enum class AudioDeviceKind(
+  val typeName: String,
+  val audioDeviceClass: Class<out AudioDevice>
+) {
   BLUETOOTH("bluetooth", AudioDevice.BluetoothHeadset::class.java),
   WIRED_HEADSET("headset", AudioDevice.WiredHeadset::class.java),
   SPEAKER("speaker", AudioDevice.Speakerphone::class.java),

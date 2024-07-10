@@ -7,7 +7,9 @@ import com.twilio.audioswitch.AudioDevice
 import com.twilio.audioswitch.AudioDeviceChangeListener
 import com.twilio.audioswitch.AudioSwitch
 
-class AudioSwitchManager(private val context: Context) {
+class AudioSwitchManager(
+  private val context: Context
+) {
   private var preferredDeviceList =
     listOf(
       AudioDevice.BluetoothHeadset::class.java,
@@ -19,7 +21,8 @@ class AudioSwitchManager(private val context: Context) {
   // AudioSwitch is not threadsafe, so all calls should be done on the main thread.
   private val handler: Handler = Handler(Looper.getMainLooper())
 
-  private var audioSwitch: AudioSwitch = AudioSwitch(context, loggingEnabled = true, preferredDeviceList = preferredDeviceList)
+  private var audioSwitch: AudioSwitch =
+    AudioSwitch(context, loggingEnabled = true, preferredDeviceList = preferredDeviceList)
 
   fun start(listener: AudioDeviceChangeListener) {
     handler.removeCallbacksAndMessages(null)
@@ -36,18 +39,15 @@ class AudioSwitchManager(private val context: Context) {
     }
   }
 
-  fun selectedAudioDevice(): AudioDevice? {
-    return audioSwitch.selectedAudioDevice
-  }
+  fun selectedAudioDevice(): AudioDevice? = audioSwitch.selectedAudioDevice
 
-  fun availableAudioDevices(): List<AudioDevice> {
-    return audioSwitch.availableAudioDevices
-  }
+  fun availableAudioDevices(): List<AudioDevice> = audioSwitch.availableAudioDevices
 
   fun selectAudioOutput(audioDeviceClass: Class<out AudioDevice?>) {
     handler.post {
       availableAudioDevices()
-        .find { it.javaClass == audioDeviceClass }?.let {
+        .find { it.javaClass == audioDeviceClass }
+        ?.let {
           audioSwitch.selectDevice(it)
         }
     }
