@@ -38,12 +38,12 @@ type StandardButtonProps = {
 } & AccessibilityLabel;
 
 const Button = ({
-                  type = 'primary',
-                  disabled = false,
-                  accessibilityLabel,
-                  onPress,
-                  title,
-                }: StandardButtonProps) => {
+  type = 'primary',
+  disabled = false,
+  accessibilityLabel,
+  onPress,
+  title,
+}: StandardButtonProps) => {
   const getBackgroundColorStyle = (
     buttonType: StandardButtonTypeName,
     isDisabled: boolean,
