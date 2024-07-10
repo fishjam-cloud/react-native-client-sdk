@@ -1,4 +1,3 @@
-import { updateEndpointMetadata } from './common/metadata';
 export { usePeers } from './hooks/usePeers';
 export type { Peer } from './hooks/usePeers';
 
@@ -11,7 +10,7 @@ export { useScreencast } from './hooks/useScreencast';
 
 export {
   updateAudioTrackMetadata,
-  updateEndpointMetadata,
+  updatePeerMetadata,
   updateVideoTrackMetadata,
 } from './common/metadata';
 export {
@@ -23,9 +22,3 @@ export * from './common/client';
 export { default as VideoPreviewView } from './VideoPreviewView';
 export { default as VideoRendererView } from './VideoRendererView';
 export * from './RNFishjamClient.types';
-
-/**
- * Function that updates peer's metadata on the server.
- * @param metadata a map `string -> any` containing user's metadata to be sent to the server.
- */
-export const updatePeerMetadata = updateEndpointMetadata;
