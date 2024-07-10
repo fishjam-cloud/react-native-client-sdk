@@ -1,0 +1,222 @@
+{
+  "dependencies" : [
+    {
+      "identity" : "specs",
+      "requirement" : {
+        "exact" : [
+          "114.5735.8"
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/webrtc-sdk/Specs.git"
+    },
+    {
+      "identity" : "swift-protobuf",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "1.18.0",
+            "upper_bound" : "2.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/apple/swift-protobuf.git"
+    },
+    {
+      "identity" : "starscream",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "4.0.0",
+            "upper_bound" : "5.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/daltoniam/Starscream.git"
+    },
+    {
+      "identity" : "mockingbird",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "0.20.0",
+            "upper_bound" : "0.21.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/birdrides/mockingbird.git"
+    },
+    {
+      "identity" : "promises",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "2.0.0",
+            "upper_bound" : "3.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/google/promises.git"
+    },
+    {
+      "identity" : "swiftphoenixclient",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "5.0.0",
+            "upper_bound" : "6.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/davidstump/SwiftPhoenixClient.git"
+    },
+    {
+      "identity" : "swift-log",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "1.4.2",
+            "upper_bound" : "2.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/apple/swift-log.git"
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "requirement" : {
+        "range" : [
+          {
+            "lower_bound" : "1.0.0",
+            "upper_bound" : "2.0.0"
+          }
+        ]
+      },
+      "type" : "sourceControl",
+      "url" : "https://github.com/apple/swift-docc-plugin"
+    }
+  ],
+  "manifest_display_name" : "FishjamClient",
+  "name" : "FishjamClient",
+  "path" : "/Users/karolkakol/WebstormProjects/react-native-client-sdk/packages/ios-client",
+  "platforms" : [
+    {
+      "name" : "ios",
+      "version" : "13.0"
+    }
+  ],
+  "products" : [
+    {
+      "name" : "FishjamClient",
+      "targets" : [
+        "FishjamClient"
+      ],
+      "type" : {
+        "library" : [
+          "automatic"
+        ]
+      }
+    }
+  ],
+  "targets" : [
+    {
+      "c99name" : "FishjamClientTests",
+      "module_type" : "SwiftTarget",
+      "name" : "FishjamClientTests",
+      "path" : "Tests/FishjamClientTests",
+      "product_dependencies" : [
+        "Mockingbird"
+      ],
+      "sources" : [
+        "FishjamClientTests.swift",
+        "PeerConnectionManagerTest.swift"
+      ],
+      "target_dependencies" : [
+        "FishjamClient"
+      ],
+      "type" : "test"
+    },
+    {
+      "c99name" : "FishjamClient",
+      "module_type" : "SwiftTarget",
+      "name" : "FishjamClient",
+      "path" : "Sources",
+      "product_dependencies" : [
+        "WebRTC",
+        "SwiftProtobuf",
+        "Promises",
+        "SwiftPhoenixClient",
+        "Starscream",
+        "FBLPromises",
+        "Logging"
+      ],
+      "product_memberships" : [
+        "FishjamClient"
+      ],
+      "sources" : [
+        "FishjamClient/FishjamClient.swift",
+        "FishjamClient/FishjamClientInternal.swift",
+        "FishjamClient/FishjamClientListener.swift",
+        "FishjamClient/TestUtils.swift",
+        "FishjamClient/protos/fishjam/peer_notifications.pb.swift",
+        "MembraneRTC/Constants.swift",
+        "MembraneRTC/EventTransport/EventTransport.swift",
+        "MembraneRTC/EventTransport/PhoenixTransport.swift",
+        "MembraneRTC/Events/Event.swift",
+        "MembraneRTC/IPC/IPC.swift",
+        "MembraneRTC/IPC/broadcast_ipc.pb.swift",
+        "MembraneRTC/Media/BroadcastSampleSource.swift",
+        "MembraneRTC/Media/Capturers/CameraCapturer.swift",
+        "MembraneRTC/Media/Capturers/FileCapturer.swift",
+        "MembraneRTC/Media/Capturers/ScreenBroadcastCapturer.swift",
+        "MembraneRTC/Media/Capturers/ScreenCapturer.swift",
+        "MembraneRTC/Media/Capturers/VideoCapturer.swift",
+        "MembraneRTC/Media/Dimensions.swift",
+        "MembraneRTC/Media/ScreenBroadcastNotificationReceiver.swift",
+        "MembraneRTC/Media/SoundDetection.swift",
+        "MembraneRTC/Media/Tracks/AudioTrack.swift",
+        "MembraneRTC/Media/Tracks/LocalAudioTrack.swift",
+        "MembraneRTC/Media/Tracks/LocalScreenBroadcastTrack.swift",
+        "MembraneRTC/Media/Tracks/LocalTrack.swift",
+        "MembraneRTC/Media/Tracks/LocalVideoTrack.swift",
+        "MembraneRTC/Media/Tracks/MediaTrackProvider.swift",
+        "MembraneRTC/Media/Tracks/RemoteAudioTrack.swift",
+        "MembraneRTC/Media/Tracks/RemoteTrack.swift",
+        "MembraneRTC/Media/Tracks/RemoteVideoTrack.swift",
+        "MembraneRTC/Media/Tracks/VideoTrack.swift",
+        "MembraneRTC/Media/VideoParameters.swift",
+        "MembraneRTC/MembraneRTC.swift",
+        "MembraneRTC/MembraneRTCDelegate.swift",
+        "MembraneRTC/PeerConnectionFactoryWrapper.swift",
+        "MembraneRTC/PeerConnectionListener.swift",
+        "MembraneRTC/PeerConnectionManager.swift",
+        "MembraneRTC/RTCEngineCommunication.swift",
+        "MembraneRTC/RTCEngineListener.swift",
+        "MembraneRTC/Types/AnyJson.swift",
+        "MembraneRTC/Types/Encoder.swift",
+        "MembraneRTC/Types/EncodingReason.swift",
+        "MembraneRTC/Types/Endpoint.swift",
+        "MembraneRTC/Types/Metadata.swift",
+        "MembraneRTC/Types/RTCStats.swift",
+        "MembraneRTC/Types/SerializedMediaEvent.swift",
+        "MembraneRTC/Types/SimulcastConfig.swift",
+        "MembraneRTC/Types/TrackBandwidthLimit.swift",
+        "MembraneRTC/Types/TrackContext.swift",
+        "MembraneRTC/Types/TrackData.swift",
+        "MembraneRTC/Types/VadStatus.swift",
+        "MembraneRTC/UI/SwiftUIVideoView.swift",
+        "MembraneRTC/UI/VideoView.swift",
+        "MembraneRTC/Utilities/MulticastDelegate.swift",
+        "MembraneRTC/Utilities/SimulcastUtils.swift"
+      ],
+      "type" : "library"
+    }
+  ],
+  "tools_version" : "5.5"
+}
