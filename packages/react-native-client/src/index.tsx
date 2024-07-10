@@ -1,6 +1,6 @@
-import { Endpoint, Metadata } from './RNFishjamClient.types';
 import { updateEndpointMetadata } from './common/metadata';
-import { useEndpoints } from './hooks/useEndpoints';
+export { usePeers } from './hooks/usePeers';
+export type { Peer } from './hooks/usePeers';
 
 export { useAudioSettings } from './hooks/useAudioSettings';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
@@ -23,24 +23,6 @@ export * from './common/client';
 export { default as VideoPreviewView } from './VideoPreviewView';
 export { default as VideoRendererView } from './VideoRendererView';
 export * from './RNFishjamClient.types';
-
-// below are aliases used by 'old' rn-client-sdk. They should be removed
-export type Peer<
-  MetadataType extends Metadata,
-  VideoTrackMetadataType extends Metadata,
-  AudioTrackMetadataType extends Metadata,
-> = Endpoint<MetadataType, VideoTrackMetadataType, AudioTrackMetadataType>;
-
-/**
- * This hook provides live updates of room peers.
- * @returns An array of room peers.
- */
-export const usePeers: <
-  MetadataType extends Metadata,
-  VideoTrackMetadataType extends Metadata,
-  AudioTrackMetadataType extends Metadata,
->() => Peer<MetadataType, VideoTrackMetadataType, AudioTrackMetadataType>[] =
-  useEndpoints;
 
 /**
  * Function that updates peer's metadata on the server.

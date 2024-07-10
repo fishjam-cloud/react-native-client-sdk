@@ -8,42 +8,44 @@ import {
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
+export type Peer<
+  MetadataType extends Metadata,
+  VideoTrackMetadataType extends Metadata,
+  AudioTrackMetadataType extends Metadata,
+> = Endpoint<MetadataType, VideoTrackMetadataType, AudioTrackMetadataType>;
+
 /**
  * This hook provides live updates of room endpoints.
  * @returns An array of room endpoints.
  */
-export function useEndpoints<
-  EndpointMetadataType extends Metadata,
+export function usePeers<
+  MetadataType extends Metadata,
   VideoTrackMetadataType extends Metadata,
   AudioTrackMetadataType extends Metadata,
 >() {
-  const [endpoints, setEndpoints] = useState<
-    Endpoint<
-      EndpointMetadataType,
-      VideoTrackMetadataType,
-      AudioTrackMetadataType
-    >[]
+  const [peers, setPeers] = useState<
+    Peer<MetadataType, VideoTrackMetadataType, AudioTrackMetadataType>[]
   >([]);
 
   useEffect(() => {
     const eventListener = eventEmitter.addListener<
       EndpointsUpdateEvent<
-        EndpointMetadataType,
+        MetadataType,
         VideoTrackMetadataType,
         AudioTrackMetadataType
       >
     >(ReceivableEvents.EndpointsUpdate, (event) => {
-      setEndpoints(event.EndpointsUpdate);
+      setPeers(event.EndpointsUpdate);
     });
     RNFishjamClientModule.getEndpoints<
-      EndpointMetadataType,
+      MetadataType,
       VideoTrackMetadataType,
       AudioTrackMetadataType
     >().then((endpoints) => {
-      setEndpoints(endpoints);
+      setPeers(endpoints);
     });
     return () => eventListener.remove();
   }, []);
 
-  return endpoints;
+  return peers;
 }
