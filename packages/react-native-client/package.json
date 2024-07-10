@@ -7,8 +7,6 @@
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
-    "format": "sh ./scripts/format.sh",
-    "format:check": "sh ./scripts/format_check.sh",
     "lint": "sh ./scripts/lint.sh",
     "lint:check": "sh ./scripts/lint_check.sh",
     "test": "expo-module test",
@@ -108,7 +106,6 @@
   },
   "lint-staged": {
     "*.(js|ts|tsx)": [
-      "yarn format:check",
       "yarn lint:check"
     ]
   }

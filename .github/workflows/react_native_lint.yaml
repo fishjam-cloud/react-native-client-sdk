@@ -22,5 +22,3 @@ jobs:
         run: yarn tsc
       - name: Lint
         run: yarn lint:check
-      - name: Prettier
-        run: yarn format:check

@@ -1,7 +1,7 @@
 {
   "name": "android-client",
   "scripts": {
-    "format": "ktlint -F **/*.kt",
-    "format:check": "ktlint **/*.kt"
+    "lint": "ktlint -F **/*.kt",
+    "lint:check": "ktlint **/*.kt"
   }
 }
