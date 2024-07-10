@@ -119,8 +119,6 @@ const tests: Test[] = [
       await tapButton(driver, '~' + CONNECT_BUTTON);
       if (driver.isIOS) {
         await driver.acceptAlert();
-        await tapApp(driver);
-        await tapButton(driver, '~' + CONNECT_BUTTON);
         await driver.pause(1000);
         await driver.acceptAlert();
       }
