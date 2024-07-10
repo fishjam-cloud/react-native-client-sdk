@@ -1,5 +1,3 @@
-import { ViewStyle } from 'react-native';
-
 export enum TrackType {
   Audio = 'Audio',
   Video = 'Video',
@@ -332,47 +330,6 @@ export type IsScreencastOnEvent = { IsScreencastOn: boolean };
 export type SimulcastConfigUpdateEvent = SimulcastConfig;
 
 export type BandwidthEstimationEvent = { BandwidthEstimation: number };
-
-export type VideoPreviewViewProps = {
-  /**
-   * `FILL` or `FIT` - it works just like RN Image component. `FILL` fills the whole view
-   * with video and it may cut some parts of the video. `FIT` scales the video so the whole
-   * video is visible, but it may leave some empty space in the view.
-   * @default `FILL`
-   */
-  videoLayout?: VideoLayout;
-  /**
-   * whether to mirror video
-   * @default false
-   */
-  mirrorVideo?: boolean;
-  style?: ViewStyle;
-  /**
-   * Id of the camera used for preview. Get available cameras with `getCaptureDevices()` function.
-   * @default the first front camera
-   */
-  captureDeviceId?: string;
-};
-
-export type VideoRendererProps = {
-  /**
-   * id of the video track which you want to render.
-   */
-  trackId: string;
-  /**
-   * `FILL` or `FIT` - it works just like RN Image component. `FILL` fills the whole view
-   * with video and it may cut some parts of the video. `FIT` scales the video so the whole
-   * video is visible, but it may leave some empty space in the view.
-   * @default `FILL`
-   */
-  videoLayout?: VideoLayout;
-  /**
-   * whether to mirror video
-   * @default false
-   */
-  mirrorVideo?: boolean;
-  style?: ViewStyle;
-};
 
 export type RNFishjamClient = {
   appContext?: any;

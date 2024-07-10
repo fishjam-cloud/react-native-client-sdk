@@ -19,6 +19,9 @@ export {
 } from './common/webRTC';
 export * from './common/client';
 
-export { default as VideoPreviewView } from './VideoPreviewView';
-export { default as VideoRendererView } from './VideoRendererView';
+export { VideoPreviewView } from './VideoPreviewView';
+export type { VideoPreviewViewProps } from './VideoPreviewView';
+export { VideoRendererView } from './VideoRendererView';
+export type { VideoRendererProps } from './VideoRendererView';
+
 export * from './RNFishjamClient.types';
