@@ -4,10 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "prettier --write . --ignore-path ./.eslintignore",
-    "format:check": "prettier --check . --ignore-path ./.eslintignore",
-    "lint": "eslint . --ext .ts,.tsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx",
+    "lint": "sh ./scripts/lint.sh",
+    "lint:check": "sh ./scripts/lint_check.sh",
     "wdio": "wdio run ./wdio.conf.ts"
   },
   "keywords": [],

@@ -11,10 +11,8 @@
     "build": "tsc",
     "open:ios": "open -a \"Xcode\" ios/FishjamExample.xcworkspace",
     "open:android": "open -a \"Android Studio\" android",
-    "format": "prettier --write . --ignore-path ./.eslintignore",
-    "format:check": "prettier --check . --ignore-path ./.eslintignore",
-    "lint": "eslint . --ext .ts,.tsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx"
+    "lint": "sh ./scripts/lint.sh",
+    "lint:check": "sh ./scripts/lint_check.sh"
   },
   "dependencies": {
     "@expo-google-fonts/noto-sans": "^0.2.3",
@@ -64,7 +62,6 @@
   },
   "lint-staged": {
     "*.(js|ts|tsx)": [
-      "yarn format:check",
       "yarn lint:check"
     ]
   }

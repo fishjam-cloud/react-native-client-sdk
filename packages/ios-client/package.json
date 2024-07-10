@@ -1,7 +1,7 @@
 {
   "name": "ios-client",
   "scripts": {
-    "format": "swift-format format -i -r ./**/**/*.swift --configuration swift-format-config.json",
-    "format:check": "swift-format lint -r -s ./**/**/*.swift --configuration swift-format-config.json"
+    "lint": "swift-format format -i -r ./**/**/*.swift --configuration swift-format-config.json",
+    "lint:check": "swift-format lint -r -s ./**/**/*.swift --configuration swift-format-config.json"
   }
 }
