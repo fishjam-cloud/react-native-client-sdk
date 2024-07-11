@@ -5,8 +5,8 @@
 1. Clone the repository:
 
 ```
-git clone https://github.com/fishjam-dev/react-native-client-sdk.git
-cd react-native-client-sdk
+git clone https://github.com/fishjam-cloud/mobile-client-sdk.git
+cd mobile-client-sdk
 ```
 
 2. Install node_modules in project root directory:

@@ -9,7 +9,7 @@ quickly and easily create a mobile client app in React Native for a
 # Documentation
 
 API documentation is available
-[here](https://fishjam-dev.github.io/react-native-client-sdk/)
+[here](https://fishjam-cloud.github.io/mobile-client-sdk/)
 
 # Installation
 
