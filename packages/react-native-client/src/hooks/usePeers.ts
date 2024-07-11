@@ -15,8 +15,8 @@ export type Peer<
 > = Endpoint<MetadataType, VideoTrackMetadataType, AudioTrackMetadataType>;
 
 /**
- * This hook provides live updates of room endpoints.
- * @returns An array of room endpoints.
+ * This hook provides live updates of room peers.
+ * @returns An array of room peers.
  */
 export function usePeers<
   MetadataType extends Metadata,
