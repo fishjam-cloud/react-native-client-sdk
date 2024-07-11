@@ -1,4 +1,4 @@
-name: Android Build & lint
+name: Android - Build & Lint
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - packages/android-client/**
 
 jobs:
-  build:
+  android_build_and_lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

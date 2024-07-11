@@ -1,11 +1,11 @@
-name: Ios lint & tests
+name: iOS - Lint & Tests
 on:
   pull_request:
     paths:
       - packages/ios-client/**
 
 jobs:
-  lint:
+  ios_build_and_lint:
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v3
