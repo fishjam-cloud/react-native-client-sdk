@@ -1,7 +1,7 @@
 import android.content.Context
-import com.fishjamdev.client.Config
-import com.fishjamdev.client.FishjamClient
-import com.fishjamdev.client.FishjamClientListener
+import com.fishjamcloud.client.Config
+import com.fishjamcloud.client.FishjamClient
+import com.fishjamcloud.client.FishjamClientListener
 import fishjam.PeerNotifications
 import fishjamdev.client.WebsocketMock
 import io.mockk.confirmVerified
