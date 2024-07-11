@@ -13,6 +13,6 @@ export default React.forwardRef<
   React.ComponentType<VideoRendererProps>,
   VideoRendererProps
 >((props, ref) => (
-  // @ts-ignore
+  // @ts-expect-error ref prop needs to be updated
   <NativeView {...props} ref={ref} />
 ));
