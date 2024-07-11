@@ -113,7 +113,7 @@ test('processing statistics', async () => {
   getStatisticsMocked.mockResolvedValueOnce(mockedStats(2));
 
   await act(async () => {
-    jest.advanceTimersByTime(1004);
+    jest.advanceTimersByTime(1001);
   });
 
   expect(result.current.statistics).toEqual([
