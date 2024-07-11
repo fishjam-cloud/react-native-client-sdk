@@ -2,13 +2,12 @@ import { Metadata } from '../RNFishjamClient.types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 
 /**
-/**
  * a function that updates endpoints's metadata on the server
  * @param metadata a map `string -> any` containing user's track metadata to be sent to the server
  */
-export async function updateEndpointMetadata<
-  EndpointMetadataType extends Metadata,
->(metadata: EndpointMetadataType) {
+export async function updatePeerMetadata<EndpointMetadataType extends Metadata>(
+  metadata: EndpointMetadataType,
+) {
   await RNFishjamClientModule.updateEndpointMetadata(metadata);
 }
 
@@ -21,6 +20,7 @@ export async function updateVideoTrackMetadata<
 >(metadata: VideoTrackMetadataType) {
   await RNFishjamClientModule.updateVideoTrackMetadata(metadata);
 }
+
 /**
  * a function that updates audio metadata on the server
  * @param metadata a map `string -> any` containing audio track metadata to be sent to the server
