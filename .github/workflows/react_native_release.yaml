@@ -77,7 +77,7 @@ jobs:
       - name: Build and bump package version in the example
         run: |
           yarn install --frozen-lockfile && cd example
-          yarn upgrade @fishjam-dev/react-native-client && cd ..
+          yarn upgrade @fishjam-cloud/react-native-client && cd ..
 
       # Commit changes
       - name: Commit changed files and create a new tag
