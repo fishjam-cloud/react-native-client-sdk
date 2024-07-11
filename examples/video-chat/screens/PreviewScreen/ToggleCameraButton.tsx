@@ -24,7 +24,7 @@ export const ToggleCameraButton: FC<ToggleCameraButtonProps> = ({
       return;
     }
     toggleCamera();
-  }, [isCameraOn, toggleCamera]);
+  }, [toggleCamera]);
 
   return (
     <InCallButton

@@ -15,24 +15,6 @@ export function useRTCStatistics(refreshInterval: number) {
   const MAX_SIZE = 120;
   const [statistics, setStatistics] = useState<RTCStats[]>([]);
 
-  useEffect(() => {
-    const intervalId = setInterval(getStatistics, refreshInterval);
-    return () => {
-      clearInterval(intervalId);
-      setStatistics([]);
-    };
-  }, []);
-
-  // Gets stats from the native libraries.
-  const getStatistics = useCallback(async () => {
-    const stats = await RNFishjamClientModule.getStatistics();
-    setStatistics((prev) => {
-      const newStats = [...prev, processIncomingStats(prev, stats)];
-      takeRight(newStats, MAX_SIZE);
-      return newStats;
-    });
-  }, []);
-
   // Calculates diff between pervious and current stats,
   // providing end users with a per second metric.
   const processIncomingStats = useCallback(
@@ -96,6 +78,24 @@ export function useRTCStatistics(refreshInterval: number) {
     },
     [],
   );
+
+  // Gets stats from the native libraries.
+  const getStatistics = useCallback(async () => {
+    const stats = await RNFishjamClientModule.getStatistics();
+    setStatistics((prev) => {
+      const newStats = [...prev, processIncomingStats(prev, stats)];
+      takeRight(newStats, MAX_SIZE);
+      return newStats;
+    });
+  }, [processIncomingStats]);
+
+  useEffect(() => {
+    const intervalId = setInterval(getStatistics, refreshInterval);
+    return () => {
+      clearInterval(intervalId);
+      setStatistics([]);
+    };
+  }, [getStatistics, refreshInterval]);
 
   return { statistics };
 }
