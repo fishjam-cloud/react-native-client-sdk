@@ -17,7 +17,7 @@ export {
   changeWebRTCLoggingSeverity,
   setTargetTrackEncoding,
 } from './common/webRTC';
-export * from './common/client';
+export { connect, leaveRoom } from './common/client';
 
 export { VideoPreviewView } from './VideoPreviewView';
 export type { VideoPreviewViewProps } from './VideoPreviewView';

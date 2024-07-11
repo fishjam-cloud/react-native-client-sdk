@@ -332,7 +332,6 @@ export type SimulcastConfigUpdateEvent = SimulcastConfig;
 export type BandwidthEstimationEvent = { BandwidthEstimation: number };
 
 export type RNFishjamClient = {
-  appContext?: any;
   connect: (
     url: string,
     peerToken: string,
