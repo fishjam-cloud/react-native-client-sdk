@@ -155,10 +155,7 @@ const tests: Test[] = [
       //todo remove next lines of code when this issue is solved https://membraneframework.atlassian.net/browse/RTC-549
       await driver.pause(4000);
       if (driver.isIOS) {
-        try {
-          await driver.acceptAlert();
-        } finally {
-        }
+        await driver.acceptAlert();
       }
       //todo up to here
     },

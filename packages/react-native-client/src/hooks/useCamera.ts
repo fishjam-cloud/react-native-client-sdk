@@ -98,10 +98,10 @@ export function useCamera() {
       // expo-modules on Android don't support Either type, so we workaround it
       if (Platform.OS === 'android') {
         if (typeof config.maxBandwidth === 'object') {
-          //@ts-ignore
+          // @ts-expect-error we should update typings to make maxBandwidthMap available
           config.maxBandwidthMap = config.maxBandwidth;
         } else {
-          //@ts-ignore
+          // @ts-expect-error we should update typings to make maxBandwidthInt available
           config.maxBandwidthInt = config.maxBandwidth;
         }
         delete config.maxBandwidth;

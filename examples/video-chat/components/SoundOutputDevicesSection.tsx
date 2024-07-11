@@ -31,7 +31,7 @@ export const SoundOutputDevicesSection = () => {
         renderItem={(item) => (
           <SoundOutputDeviceTile
             item={item.item}
-            selected={audioSettings.selectedAudioOutputDevice!}
+            selected={audioSettings.selectedAudioOutputDevice ?? undefined}
             selectOutputAudioDevice={audioSettings.selectOutputAudioDevice}
             accessibilityLabel={OUTPUT_DEVICE_BUTTON + item.index}
           />
@@ -49,7 +49,7 @@ const SoundOutputDeviceTile = ({
   accessibilityLabel,
 }: {
   item: AudioOutputDevice;
-  selected: AudioOutputDevice;
+  selected: AudioOutputDevice | undefined;
   selectOutputAudioDevice: (device: AudioOutputDeviceType) => Promise<void>;
   accessibilityLabel?: string | undefined;
 }) => {
