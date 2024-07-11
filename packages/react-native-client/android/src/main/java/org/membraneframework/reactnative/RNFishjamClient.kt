@@ -5,10 +5,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.media.projection.MediaProjectionManager
 import androidx.appcompat.app.AppCompatActivity
-import com.fishjamdev.client.Config
-import com.fishjamdev.client.FishjamClient
-import com.fishjamdev.client.FishjamClientListener
-import com.fishjamdev.client.Peer
+import com.fishjamcloud.client.Config
+import com.fishjamcloud.client.FishjamClient
+import com.fishjamcloud.client.FishjamClientListener
+import com.fishjamcloud.client.Peer
 import com.twilio.audioswitch.AudioDevice
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.Promise

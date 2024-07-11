@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/noto-sans": "^0.2.3",
-    "@fishjam-dev/react-native-client": "*",
+    "@fishjam-cloud/react-native-client": "*",
     "@gorhom/bottom-sheet": "^4",
     "@notifee/react-native": "^7.8.2",
     "@react-navigation/bottom-tabs": "^6.5.20",

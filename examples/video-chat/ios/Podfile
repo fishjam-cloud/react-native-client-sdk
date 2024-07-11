@@ -49,8 +49,10 @@ target 'FishjamExample' do
       :mac_catalyst_enabled => false
     )
   end
-  pod 'FishjamClient', :path => '../../../packages/ios-client/'
+#   pod 'FishjamCloudClient'
+  pod 'FishjamCloudClient', :path => '../../../'
 end
 target 'ScreenBroadcast' do
-  pod 'FishjamClient/Broadcast', :path => '../../../packages/ios-client/'
+#   pod 'FishjamCloudClient/Broadcast'
+  pod 'FishjamCloudClient/Broadcast', :path => '../../../'
 end

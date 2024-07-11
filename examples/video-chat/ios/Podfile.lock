@@ -32,15 +32,15 @@ PODS:
     - React-Core (= 0.73.4)
     - React-jsi (= 0.73.4)
     - ReactCommon/turbomodule/core (= 0.73.4)
-  - FishjamClient (0.3.1):
-    - FishjamClient/Broadcast (= 0.3.1)
+  - FishjamCloudClient (0.1.0):
+    - FishjamCloudClient/Broadcast (= 0.1.0)
     - PromisesSwift
     - Starscream (~> 4.0.0)
     - SwiftLogJellyfish (= 1.5.2)
     - SwiftPhoenixClient (~> 5.0.0)
     - SwiftProtobuf (~> 1.18.0)
     - WebRTC-SDK (= 114.5735.08)
-  - FishjamClient/Broadcast (0.3.1):
+  - FishjamCloudClient/Broadcast (0.1.0):
     - PromisesSwift
     - Starscream (~> 4.0.0)
     - SwiftLogJellyfish (= 1.5.2)
@@ -1096,9 +1096,9 @@ PODS:
     - React-jsi (= 0.73.4)
     - React-logger (= 0.73.4)
     - React-perflogger (= 0.73.4)
-  - RNFishjamClient (0.3.0):
+  - RNFishjamClient (0.1.0):
     - ExpoModulesCore
-    - FishjamClient (= 0.3.1)
+    - FishjamCloudClient
   - RNGestureHandler (2.16.2):
     - glog
     - RCT-Folly (= 2022.05.16.00)
@@ -1144,8 +1144,8 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../../../node_modules/expo-modules-core`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
-  - FishjamClient (from `../../../packages/ios-client/`)
-  - FishjamClient/Broadcast (from `../../../packages/ios-client/`)
+  - FishjamCloudClient (from `../../../`)
+  - FishjamCloudClient/Broadcast (from `../../../`)
   - glog (from `../../../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../../../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
@@ -1239,8 +1239,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/Libraries/FBLazyVector"
   FBReactNativeSpec:
     :path: "../../../node_modules/react-native/React/FBReactNativeSpec"
-  FishjamClient:
-    :path: "../../../packages/ios-client/"
+  FishjamCloudClient:
+    :path: "../../../"
   glog:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
@@ -1356,7 +1356,7 @@ SPEC CHECKSUMS:
   ExpoModulesCore: 4a8928a228569301ac4fc4a1e846713e05754d05
   FBLazyVector: 84f6edbe225f38aebd9deaf1540a4160b1f087d7
   FBReactNativeSpec: 75c20d8ec82467d86fc15e5cb41c7501258a884f
-  FishjamClient: c1cf10484a705500c9fac352b75a4c1b8cec3cf2
+  FishjamCloudClient: 8f3c79593604da052fbb4f7d8b7102696ad81aa4
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
   hermes-engine: b2669ce35fc4ac14f523b307aff8896799829fe2
@@ -1405,7 +1405,7 @@ SPEC CHECKSUMS:
   React-runtimescheduler: ed48e5faac6751e66ee1261c4bd01643b436f112
   React-utils: 6e5ad394416482ae21831050928ae27348f83487
   ReactCommon: 840a955d37b7f3358554d819446bffcf624b2522
-  RNFishjamClient: 6e7021e6d170aabdde759ebade44151960244a05
+  RNFishjamClient: aebc445dc6ff1c838fbe741b8fd2a66ebce6cb81
   RNGestureHandler: 48c9d38f57c7761b4153def57b718f491f4bbb4b
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
   RNReanimated: 67ce4c9160c7dee5bed2fdfae76afa3880958c53
@@ -1419,6 +1419,6 @@ SPEC CHECKSUMS:
   Yoga: 64cd2a583ead952b0315d5135bf39e053ae9be70
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 2c30f3251567073d449ed093b86832597a8e3058
+PODFILE CHECKSUM: 1fef67cae9dc16c1e1e3463a9c998636c73a863d
 
-COCOAPODS: 1.14.2
+COCOAPODS: 1.15.2

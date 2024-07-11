@@ -1,3 +1,3 @@
-# Module FishjamClient
+# Module FishjamCloudClient
 
 ## Overview

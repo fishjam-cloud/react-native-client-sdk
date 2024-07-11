@@ -1,4 +1,4 @@
-import FishjamClient
+import FishjamCloudClient
 
 class MembraneRoom: NSObject {
     static let sharedInstance = MembraneRoom()

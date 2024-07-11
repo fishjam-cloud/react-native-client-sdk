@@ -1,7 +1,7 @@
 import {
   updateAudioTrackMetadata,
   useMicrophone,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import { useCallback } from 'react';
 
 export function useToggleMicrophone() {

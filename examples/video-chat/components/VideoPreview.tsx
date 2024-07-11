@@ -2,7 +2,7 @@ import {
   VideoPreviewView,
   CaptureDevice,
   VideoLayout,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import React from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 type Props = {
