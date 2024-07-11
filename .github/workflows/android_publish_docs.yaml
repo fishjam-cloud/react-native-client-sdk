@@ -1,4 +1,4 @@
-name: Android Deploy Docs
+name: Android - Deploy Docs
 on:
   workflow_dispatch:
   push:

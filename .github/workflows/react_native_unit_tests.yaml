@@ -1,8 +1,8 @@
-name: React-Native Unit tests
+name: React Native - Unit tests
 on:
   pull_request:
 jobs:
-  check:
+  rn-client-unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
