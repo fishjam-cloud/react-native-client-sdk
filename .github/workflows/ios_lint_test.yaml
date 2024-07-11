@@ -1,4 +1,4 @@
-name: Ios lint & tests
+name: iOS - Lint & Tests
 on:
   pull_request:
     paths:

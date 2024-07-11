@@ -1,4 +1,4 @@
-name: React-Native Unit tests
+name: React Native - Unit tests
 on:
   pull_request:
 jobs:

@@ -1,4 +1,4 @@
-name: React-Native Lint & Types
+name: All packages - Lint & Types
 on:
   pull_request:
 jobs:

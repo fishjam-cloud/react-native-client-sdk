@@ -1,4 +1,4 @@
-name: Android Build & lint
+name: Android - Build & Lint
 
 on:
   pull_request:

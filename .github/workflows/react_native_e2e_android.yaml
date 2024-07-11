@@ -1,4 +1,4 @@
-name: React-Native e2e android
+name: React Native - Android E2E tests
 on:
   push:
     branches:
