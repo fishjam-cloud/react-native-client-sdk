@@ -2,7 +2,7 @@ package org.membraneframework.rtc
 
 import android.content.Context
 import android.content.Intent
-import com.fishjamdev.client.BuildConfig
+import com.fishjamcloud.client.BuildConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

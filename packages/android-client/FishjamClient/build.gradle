@@ -13,7 +13,7 @@ ext {
 }
 
 android {
-    namespace 'com.fishjamdev.client'
+    namespace 'com.fishjamcloud.client'
     compileSdk 33
 
     defaultConfig {
@@ -49,7 +49,7 @@ afterEvaluate {
             // Creates a Maven publication called "release".
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.fishjamdev.client'
+                groupId = 'com.fishjamcloud.client'
                 artifactId = 'fishjam-android-client'
                 version = '0.0.1'
             }
@@ -65,7 +65,7 @@ afterEvaluate {
 }
 
 tasks.named("dokkaHtml") {
-    moduleName.set("FishjamClient")
+    moduleName.set("FishjamCloudClient")
     dokkaSourceSets {
         named("main") {
             includes.from("module.md")

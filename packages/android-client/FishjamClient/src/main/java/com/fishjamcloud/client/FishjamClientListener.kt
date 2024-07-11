@@ -1,4 +1,4 @@
-package com.fishjamdev.client
+package com.fishjamcloud.client
 
 import okhttp3.Response
 import org.membraneframework.rtc.models.TrackContext

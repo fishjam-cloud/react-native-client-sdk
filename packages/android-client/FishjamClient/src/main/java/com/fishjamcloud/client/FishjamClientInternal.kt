@@ -1,4 +1,4 @@
-package com.fishjamdev.client
+package com.fishjamcloud.client
 
 import android.content.Context
 import fishjam.PeerNotifications.PeerMessage
