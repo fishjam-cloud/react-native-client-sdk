@@ -39,7 +39,7 @@ jobs:
         run: |
           pod lib lint FishjamCloudClient.podspec
 
-      - name: Publish to npm
+      - name: Run npm publish check
         run: npm publish --dry-run --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
