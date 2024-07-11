@@ -1108,12 +1108,12 @@ PODS:
     - RNNotifee/NotifeeCore (= 7.8.2)
   - RNNotifee/NotifeeCore (7.8.2):
     - React-Core
-  - RNReanimated (3.12.0):
+  - RNReanimated (3.13.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
     - ReactCommon/turbomodule/core
-  - RNScreens (3.31.1):
+  - RNScreens (3.32.0):
     - glog
     - RCT-Folly (= 2022.05.16.00)
     - React-Core
@@ -1408,8 +1408,8 @@ SPEC CHECKSUMS:
   RNFishjamClient: 6e7021e6d170aabdde759ebade44151960244a05
   RNGestureHandler: 48c9d38f57c7761b4153def57b718f491f4bbb4b
   RNNotifee: 8e2d3df3f0e9ce8f5d1fe4c967431138190b6175
-  RNReanimated: 029ae990587773fc20b938f06383eb492fb3a689
-  RNScreens: 79c1020e7f52f4edde5ad96540f6e33c8b9b3b6c
+  RNReanimated: 67ce4c9160c7dee5bed2fdfae76afa3880958c53
+  RNScreens: f0edd01b3ab160acc31fb056622a1d7c2909a0a5
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Starscream: 19b5533ddb925208db698f0ac508a100b884a1b9
   SwiftLogJellyfish: 6207ec91ef3913d303ac797b73298248ee360eb0
@@ -1421,4 +1421,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 2c30f3251567073d449ed093b86832597a8e3058
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.14.2

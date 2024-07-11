@@ -60,7 +60,7 @@ yarn test
 
 To edit the Swift files, open `example/ios/MembraneExample.xcworkspace` in XCode
 and find the source files at
-`Pods > Development Pods > react-native-client-sdk`.
+`Pods > Development Pods > mobile-client-sdk`.
 
 To edit the Kotlin files, open `examples/video-chat/android` in Android studio and find the
 source files at `reactnativemembrane` under `Android`.

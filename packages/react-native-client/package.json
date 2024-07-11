@@ -26,13 +26,13 @@
     "MembraneWebRTC",
     "Fishjam"
   ],
-  "repository": "https://github.com/fishjam-dev/react-native-client-sdk",
+  "repository": "https://github.com/fishjam-cloud/mobile-client-sdk",
   "author": "Software Mansion (https://swmansion.com)",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/fishjam-dev/react-native-client-sdk/issues"
+    "url": "https://github.com/fishjam-cloud/mobile-client-sdk/issues"
   },
-  "homepage": "https://github.com/fishjam-dev/react-native-client-sdk#readme",
+  "homepage": "https://github.com/fishjam-cloud/mobile-client-sdk#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
