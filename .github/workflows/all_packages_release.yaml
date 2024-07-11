@@ -15,6 +15,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check if tagged push to main
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" && ! -z "${{ github.event.push.tags }}" ]]; then
+            echo "Running on a tag push to main branch"
+            # Place steps or call other jobs/workflows here
+          else
+            echo "This workflow runs only on a tagged push to main branch"
+            exit 1  # Exiting with non-zero status will fail the job
+
       - name: Get the tag name
         id: tag_name
         run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
