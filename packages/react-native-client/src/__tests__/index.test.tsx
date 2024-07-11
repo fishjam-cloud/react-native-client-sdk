@@ -1,7 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
-
 import * as membraneWebRTC from '../index';
-import { NativeMembraneMock as mockXd } from '../__mocks__/native';
+import RNFishjamClientModule from '../RNFishjamClientModule';
+
 jest.mock('expo-modules-core', () => ({
   EventEmitter: jest.fn(),
   requireNativeModule: jest.fn().mockReturnValue({}),
@@ -15,20 +15,60 @@ jest.mock('react-native', () => ({
 }));
 
 jest.mock('../RNFishjamClientModule', () => ({
-  getStatistics: () => mockXd.getStatistics(),
+  getStatistics: jest.fn(),
   addListener: jest.fn(),
   removeEventListener: jest.fn(),
 }));
 
+function mockedStats(numCalled: number) {
+  return {
+    RTCOutboundTest_1: {
+      kind: 'test_out',
+      rid: 'h',
+      bytesSent: 1 + numCalled * 10,
+      targetBitrate: 2 + numCalled * 10,
+      packetsSent: 3 + numCalled * 10,
+      framesEncoded: 4 + numCalled * 10,
+      framesPerSecond: 5 + numCalled * 10,
+      frameWidth: 6 + numCalled * 10,
+      frameHeight: 7 + numCalled * 10,
+      qualityLimitationDurations: {
+        cpu: 8 + numCalled * 10,
+        bandwidth: 9 + numCalled * 10,
+        none: 10 + numCalled * 10,
+        other: 11 + numCalled * 10,
+      },
+    },
+    RTCInboundTest_1: {
+      kind: 'test_in',
+      jitter: 1 + numCalled * 10,
+      packetsLost: 2 + numCalled * 10,
+      packetsReceived: 3 + numCalled * 10,
+      bytesReceived: 4 + numCalled * 10,
+      framesReceived: 5 + numCalled * 10,
+      frameWidth: 6 + numCalled * 10,
+      frameHeight: 7 + numCalled * 10,
+      framesPerSecond: 8 + numCalled * 10,
+      framesDropped: 9 + numCalled * 10,
+    },
+  };
+}
+
 test('processing statistics', async () => {
   jest.useFakeTimers();
+  const getStatisticsMocked = RNFishjamClientModule.getStatistics as jest.Mock;
+  getStatisticsMocked.mockResolvedValueOnce(mockedStats(1));
 
   const { result } = renderHook(() => membraneWebRTC.useRTCStatistics(1000));
+  expect(getStatisticsMocked.call.length).toBe(1);
+
   expect(result.current.statistics).toEqual([]);
 
   await act(async () => {
     jest.advanceTimersByTime(1001);
   });
+  expect(getStatisticsMocked.call.length).toBe(1);
+
   expect(result.current.statistics).toEqual([
     {
       RTCOutboundTest_1: {
@@ -70,10 +110,12 @@ test('processing statistics', async () => {
       },
     },
   ]);
+  getStatisticsMocked.mockResolvedValueOnce(mockedStats(2));
 
   await act(async () => {
-    jest.advanceTimersByTime(1001);
+    jest.advanceTimersByTime(1004);
   });
+
   expect(result.current.statistics).toEqual([
     {
       RTCOutboundTest_1: {
