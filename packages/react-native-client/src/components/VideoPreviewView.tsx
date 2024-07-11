@@ -1,9 +1,8 @@
 import { requireNativeViewManager } from 'expo-modules-core';
 import * as React from 'react';
-import { View, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 
 import { VideoLayout } from '../RNFishjamClient.types';
-import { isJest } from '../utils';
 
 export type VideoPreviewViewProps = {
   /**
@@ -26,9 +25,8 @@ export type VideoPreviewViewProps = {
   captureDeviceId?: string;
 };
 
-const NativeView: React.ComponentType<VideoPreviewViewProps> = isJest()
-  ? () => <View />
-  : requireNativeViewManager('VideoPreviewViewModule');
+const NativeView: React.ComponentType<VideoPreviewViewProps> =
+  requireNativeViewManager('VideoPreviewViewModule');
 
 export const VideoPreviewView = React.forwardRef<
   React.ComponentType<VideoPreviewViewProps>,
