@@ -1,16 +1,23 @@
 import { renderHook, act } from '@testing-library/react';
 
 import * as membraneWebRTC from '../index';
-
+import { NativeMembraneMock as mockXd } from '../__mocks__/native';
 jest.mock('expo-modules-core', () => ({
   EventEmitter: jest.fn(),
   requireNativeModule: jest.fn().mockReturnValue({}),
+  requireNativeViewManager: jest.fn(),
 }));
 
 jest.mock('react-native', () => ({
   NativeEventEmitter: jest.fn().mockImplementation(() => ({
     addListener: jest.fn(),
   })),
+}));
+
+jest.mock('../RNFishjamClientModule', () => ({
+  getStatistics: () => mockXd.getStatistics(),
+  addListener: jest.fn(),
+  removeEventListener: jest.fn(),
 }));
 
 test('processing statistics', async () => {
