@@ -91,7 +91,7 @@ jobs:
         with:
           name: yarn-lock
           path: |
-            /home/runner/work/react-native-client-sdk/react-native-client-sdk/yarn.lock
+            /home/runner/work/mobile-client-sdk/mobile-client-sdk/yarn.lock
       - name: Run yarn build
         run: |
           cd $GITHUB_WORKSPACE
@@ -109,7 +109,7 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
           cache-dependency-path: |
-            /home/runner/work/react-native-client-sdk/react-native-client-sdk/yarn.lock
+            /home/runner/work/mobile-client-sdk/mobile-client-sdk/yarn.lock
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
@@ -176,11 +176,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: appium.txt
-          path: /home/runner/work/react-native-client-sdk/react-native-client-sdk/examples/webdriverio-test/appium.txt
+          path: /home/runner/work/mobile-client-sdk/mobile-client-sdk/examples/webdriverio-test/appium.txt
 
       - name: Upload logs from app
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs.txt
-          path: /home/runner/work/react-native-client-sdk/react-native-client-sdk/examples/webdriverio-test/logs.txt
+          path: /home/runner/work/mobile-client-sdk/mobile-client-sdk/examples/webdriverio-test/logs.txt

@@ -10,8 +10,8 @@ runs:
         path: ${{ env.ANDROID_APP_PATH }}
         key: |
           APK-${{ hashFiles(
-            '/home/runner/work/react-native-client-sdk/react-native-client-sdk/example/**/*',
-            '/home/runner/work/react-native-client-sdk/react-native-client-sdk/android/**/*/components/**/*',
-            '/home/runner/work/react-native-client-sdk/react-native-client-sdk/src/**/*',
-            '/home/runner/work/react-native-client-sdk/react-native-client-sdk/yarn.lock'
+            '/home/runner/work/mobile-client-sdk/mobile-client-sdk/example/**/*',
+            '/home/runner/work/mobile-client-sdk/mobile-client-sdk/android/**/*/components/**/*',
+            '/home/runner/work/mobile-client-sdk/mobile-client-sdk/src/**/*',
+            '/home/runner/work/mobile-client-sdk/mobile-client-sdk/yarn.lock'
           ) }}
