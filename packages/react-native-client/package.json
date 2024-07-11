@@ -23,8 +23,9 @@
     "react-native",
     "expo",
     "@fishjam-cloud/react-native-client",
+    "fishjam-cloud",
     "MembraneWebRTC",
-    "Fishjam"
+    "fishjam"
   ],
   "repository": "https://github.com/fishjam-cloud/mobile-client-sdk",
   "author": "Software Mansion (https://swmansion.com)",
