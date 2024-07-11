@@ -1,9 +1,8 @@
 import { requireNativeViewManager } from 'expo-modules-core';
 import * as React from 'react';
-import { View, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 
 import { VideoLayout } from '../RNFishjamClient.types';
-import { isJest } from '../utils';
 
 export type VideoRendererProps = {
   /**
@@ -25,9 +24,8 @@ export type VideoRendererProps = {
   style?: ViewStyle;
 };
 
-const NativeView: React.ComponentType<VideoRendererProps> = isJest()
-  ? () => <View />
-  : requireNativeViewManager('VideoRendererViewModule');
+const NativeView: React.ComponentType<VideoRendererProps> =
+  requireNativeViewManager('VideoRendererViewModule');
 
 export const VideoRendererView = React.forwardRef<
   React.ComponentType<VideoRendererProps>,
