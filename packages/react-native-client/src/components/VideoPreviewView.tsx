@@ -34,6 +34,6 @@ export const VideoPreviewView = React.forwardRef<
   React.ComponentType<VideoPreviewViewProps>,
   VideoPreviewViewProps
 >((props, ref) => (
-  // @ts-ignore
+  // @ts-expect-error ref prop needs to be updated
   <NativeView {...props} ref={ref} />
 ));

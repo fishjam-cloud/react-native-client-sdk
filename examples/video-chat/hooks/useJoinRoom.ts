@@ -70,7 +70,13 @@ export function useJoinRoom({
       audioTrackMetadata: { active: isMicrophoneAvailable, type: 'audio' },
       microphoneEnabled: isMicrophoneAvailable,
     });
-  }, [isCameraAvailable, isMicrophoneAvailable, startCamera, startMicrophone]);
+  }, [
+    getCaptureDevices,
+    isCameraAvailable,
+    isMicrophoneAvailable,
+    startCamera,
+    startMicrophone,
+  ]);
 
   return { joinRoom };
 }

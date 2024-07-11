@@ -43,7 +43,7 @@ export function useAudioSettings() {
         RNFishjamClientModule.stopAudioSwitcher();
       }
     };
-  }, []);
+  }, [onAudioDevice]);
 
   /**
    * [Android only] selects output audio device.

@@ -38,7 +38,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
     isCameraOn: isCameraAvailable,
     isMicrophoneOn: isMicrophoneAvailable,
     userName,
-  } = route?.params;
+  } = route?.params ?? {};
   usePreventBackButton();
   const audioSettings = useAudioSettings();
 

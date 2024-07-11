@@ -58,7 +58,9 @@ export const TextInput = ({
   value,
   accessibilityLabel,
   editable = true,
-  onChangeText = () => {},
+  onChangeText = () => {
+    /* empty function */
+  },
 }: TextInputProps) => {
   const [focusStyle, setFocusStyle] = useState(TextInputStyles.offFocus);
   const placeholderTextColor = AdditionalColors.grey80;
