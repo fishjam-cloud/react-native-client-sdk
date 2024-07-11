@@ -143,9 +143,12 @@ export function useCamera() {
    * their resolution.
    * @param BandwidthLimit to set
    */
-  const setVideoTrackBandwidth = async (bandwidth: BandwidthLimit) => {
-    await RNFishjamClientModule.setVideoTrackBandwidth(bandwidth);
-  };
+  const setVideoTrackBandwidth = useCallback(
+    async (bandwidth: BandwidthLimit) => {
+      await RNFishjamClientModule.setVideoTrackBandwidth(bandwidth);
+    },
+    [],
+  );
 
   return {
     isCameraOn,

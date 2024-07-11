@@ -9,6 +9,13 @@ import {
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
+type OnAudioDeviceEvent = {
+  AudioDeviceUpdate: {
+    selectedDevice: AudioOutputDevice;
+    availableDevices: AudioOutputDevice[];
+  };
+};
+
 /**
  * This hook manages audio settings.
  */
@@ -19,14 +26,7 @@ export function useAudioSettings() {
     [],
   );
 
-  type onAudioDeviceEvent = {
-    AudioDeviceUpdate: {
-      selectedDevice: AudioOutputDevice;
-      availableDevices: AudioOutputDevice[];
-    };
-  };
-
-  const onAudioDevice = useCallback((event: onAudioDeviceEvent) => {
+  const onAudioDevice = useCallback((event: OnAudioDeviceEvent) => {
     setSelectedAudioOutputDevice(event.AudioDeviceUpdate.selectedDevice);
     setAvailableDevices(event.AudioDeviceUpdate.availableDevices);
   }, []);
