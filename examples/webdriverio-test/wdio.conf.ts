@@ -1,8 +1,9 @@
 import type { Options } from '@wdio/types';
 
 import { capabilities } from './utils';
+import * as dotenv from 'dotenv';
 
-require('dotenv').config({
+dotenv.config({
   path: '.env',
 });
 

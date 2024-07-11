@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 
-const membraneWebRTC = require('../index');
+import * as membraneWebRTC from '../index';
 
 jest.mock('expo-modules-core', () => ({
   EventEmitter: jest.fn(),
