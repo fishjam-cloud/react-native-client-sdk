@@ -9,10 +9,10 @@ prettier --write . --ignore-path ./.eslintignore
 
 echo "Running ktlint for react-native android files \n"
 cd android
-ktlint -F **/*.kt || exit 1
+ktlint -F **/*.kt
 cd ..
 
 echo "Running swift-format for react-native ios files \n"
 cd ios
-swift-format format -i -r ./*.swift --configuration swift-format-config.json || exit 1
+swift-format format -i -r ./*.swift --configuration swift-format-config.json
 cd ..

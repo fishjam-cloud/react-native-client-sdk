@@ -1,3 +1,4 @@
 #!/bin/bash
+set -e
 
-yarn lint:check || exit 1
+yarn lint:check
