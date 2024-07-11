@@ -2,8 +2,8 @@ import { requireNativeViewManager } from 'expo-modules-core';
 import * as React from 'react';
 import { View, ViewStyle } from 'react-native';
 
-import { VideoLayout } from './RNFishjamClient.types';
-import { isJest } from './utils';
+import { VideoLayout } from '../RNFishjamClient.types';
+import { isJest } from '../utils';
 
 export type VideoPreviewViewProps = {
   /**

@@ -19,9 +19,9 @@ export {
 } from './common/webRTC';
 export { connect, leaveRoom } from './common/client';
 
-export { VideoPreviewView } from './VideoPreviewView';
-export type { VideoPreviewViewProps } from './VideoPreviewView';
-export { VideoRendererView } from './VideoRendererView';
-export type { VideoRendererProps } from './VideoRendererView';
+export { VideoPreviewView } from './components/VideoPreviewView';
+export type { VideoPreviewViewProps } from './components/VideoPreviewView';
+export { VideoRendererView } from './components/VideoRendererView';
+export type { VideoRendererProps } from './components/VideoRendererView';
 
 export * from './RNFishjamClient.types';
