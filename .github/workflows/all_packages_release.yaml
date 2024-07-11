@@ -1,0 +1,54 @@
+name: Release all mobile packages
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+jobs:
+  release-mobile-packages:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get the tag name
+        id: tag_name
+        run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
+
+      - name: Run CocoaPod publish check
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          pod lib lint FishjamCloudClient.podspec
+
+      - name: Publish to npm
+        run: npm publish --dry-run --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./packages/android-client
+
+      - name: Publish to CocoaPod
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          pod trunk push FishjamCloudClient.podspec
+
+      - name: Publish to npm
+        run: npm publish --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./packages/android-client
+
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: 'Release ${{ steps.tag_name.outputs.TAG_NAME }}'
+          tag_name: ${{ steps.tag_name.outputs.TAG_NAME }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
