@@ -2,14 +2,22 @@ package com.fishjamdev.client
 
 import android.content.Context
 import android.content.Intent
-import org.membraneframework.rtc.TrackEncoding
-import org.membraneframework.rtc.media.LocalAudioTrack
-import org.membraneframework.rtc.media.LocalScreencastTrack
-import org.membraneframework.rtc.media.LocalVideoTrack
-import org.membraneframework.rtc.media.TrackBandwidthLimit
-import org.membraneframework.rtc.media.VideoParameters
-import org.membraneframework.rtc.models.RTCStats
-import org.membraneframework.rtc.utils.Metadata
+import com.fishjamdev.client.media.LocalAudioTrack
+import com.fishjamdev.client.media.LocalScreencastTrack
+import com.fishjamdev.client.media.LocalVideoTrack
+import com.fishjamdev.client.media.createAudioDeviceModule
+import com.fishjamdev.client.models.EncoderOptions
+import com.fishjamdev.client.models.TrackEncoding
+import com.fishjamdev.client.models.TrackBandwidthLimit
+import com.fishjamdev.client.models.VideoParameters
+import com.fishjamdev.client.models.RTCStats
+import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.Peer
+import com.fishjamdev.client.ui.VideoTextureViewRenderer
+import com.fishjamdev.client.webrtc.PeerConnectionFactoryWrapper
+import com.fishjamdev.client.webrtc.PeerConnectionManager
+import com.fishjamdev.client.webrtc.RTCEngineCommunication
+import org.webrtc.EglBase
 import org.webrtc.Logging
 
 data class Config(
@@ -17,11 +25,12 @@ data class Config(
   val token: String
 )
 
-class FishjamClient(
-  appContext: Context,
-  listener: FishjamClientListener
-) {
-  private val client = FishjamClientInternal(appContext, listener)
+class FishjamClient(appContext: Context, listener: FishjamClientListener) {
+  private val peerConnectionFactoryWrapper =
+    PeerConnectionFactoryWrapper(EncoderOptions(), createAudioDeviceModule(appContext), EglBase.create(), appContext)
+  private val peerConnectionManager = PeerConnectionManager(peerConnectionFactoryWrapper)
+  private val rtcEngineCommunication = RTCEngineCommunication()
+  private val client = FishjamClientInternal(listener, peerConnectionFactoryWrapper, peerConnectionManager, rtcEngineCommunication)
 
   /**
    * Connects to the server using the WebSocket connection
@@ -49,15 +58,7 @@ class FishjamClient(
    * after accepting this peer
    */
   fun join(peerMetadata: Metadata = emptyMap()) {
-    client.webrtcClient.connect(peerMetadata)
-  }
-
-  /**
-   * Disconnect from the room, and close the websocket connection. Tries to leave the room gracefully, but if it fails,
-   * it will close the websocket anyway.
-   */
-  fun cleanUp() {
-    client.cleanUp()
+    client.join(peerMetadata)
   }
 
   /**
@@ -71,11 +72,13 @@ class FishjamClient(
    * `LocalVideoTrack.getCaptureDevices` method
    * @return an instance of the video track
    */
-  fun createVideoTrack(
+  suspend fun createVideoTrack(
     videoParameters: VideoParameters,
     metadata: Metadata,
     captureDeviceName: String? = null
-  ): LocalVideoTrack = client.webrtcClient.createVideoTrack(videoParameters, metadata, captureDeviceName)
+  ): LocalVideoTrack {
+    return client.createVideoTrack(videoParameters, metadata, captureDeviceName)
+  }
 
   /**
    * Creates an audio track utilizing device's microphone.
@@ -85,7 +88,9 @@ class FishjamClient(
    * @param metadata the metadata that will be sent to the <strong>Membrane RTC Engine</strong> for media negotiation
    * @return an instance of the audio track
    */
-  fun createAudioTrack(metadata: Metadata): LocalAudioTrack = client.webrtcClient.createAudioTrack(metadata)
+  suspend fun createAudioTrack(metadata: Metadata): LocalAudioTrack {
+    return client.createAudioTrack(metadata)
+  }
 
   /**
    * Creates a screen track recording the entire device's screen.
@@ -98,13 +103,13 @@ class FishjamClient(
    * @param onEnd callback that will be invoked once the screen capture ends
    * @return an instance of the screencast track
    */
-  fun createScreencastTrack(
+  suspend fun createScreencastTrack(
     mediaProjectionPermission: Intent,
     videoParameters: VideoParameters,
     metadata: Metadata,
     onEnd: (() -> Unit)? = null
-  ): LocalScreencastTrack =
-    client.webrtcClient.createScreencastTrack(
+  ): LocalScreencastTrack {
+    return client.createScreencastTrack(
       mediaProjectionPermission,
       videoParameters,
       metadata,
@@ -117,7 +122,9 @@ class FishjamClient(
    * @param trackId an id of a valid local track that has been created using the current client
    * @return a boolean whether the track has been successfully removed or not
    */
-  fun removeTrack(trackId: String): Boolean = client.webrtcClient.removeTrack(trackId)
+  suspend fun removeTrack(trackId: String) {
+    return client.removeTrack(trackId)
+  }
 
   /**
    * Sets track encoding that server should send to the client library.
@@ -133,7 +140,7 @@ class FishjamClient(
     trackId: String,
     encoding: TrackEncoding
   ) {
-    client.webrtcClient.setTargetTrackEncoding(trackId, encoding)
+    client.setTargetTrackEncoding(trackId, encoding)
   }
 
   /**
@@ -146,7 +153,7 @@ class FishjamClient(
     trackId: String,
     encoding: TrackEncoding
   ) {
-    client.webrtcClient.enableTrackEncoding(trackId, encoding)
+    client.enableTrackEncoding(trackId, encoding)
   }
 
   /**
@@ -159,7 +166,7 @@ class FishjamClient(
     trackId: String,
     encoding: TrackEncoding
   ) {
-    client.webrtcClient.disableTrackEncoding(trackId, encoding)
+    client.disableTrackEncoding(trackId, encoding)
   }
 
   /**
@@ -170,7 +177,7 @@ class FishjamClient(
    * callback `onPeerUpdated` will be triggered for other peers in the room.
    */
   fun updatePeerMetadata(peerMetadata: Metadata) {
-    client.webrtcClient.updateEndpointMetadata(peerMetadata)
+    client.updatePeerMetadata(peerMetadata)
   }
 
   /**
@@ -185,7 +192,7 @@ class FishjamClient(
     trackId: String,
     trackMetadata: Metadata
   ) {
-    client.webrtcClient.updateTrackMetadata(trackId, trackMetadata)
+    client.updateTrackMetadata(trackId, trackMetadata)
   }
 
   /**
@@ -199,7 +206,7 @@ class FishjamClient(
     trackId: String,
     bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
   ) {
-    client.webrtcClient.setTrackBandwidth(trackId, bandwidthLimit)
+    client.setTrackBandwidth(trackId, bandwidthLimit)
   }
 
   /**
@@ -213,7 +220,7 @@ class FishjamClient(
     encoding: String,
     bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
   ) {
-    client.webrtcClient.setEncodingBandwidth(trackId, encoding, bandwidthLimit)
+    client.setEncodingBandwidth(trackId, encoding, bandwidthLimit)
   }
 
   /**
@@ -221,12 +228,27 @@ class FishjamClient(
    * @param severity enum value representing the logging severity
    */
   fun changeWebRTCLoggingSeverity(severity: Logging.Severity) {
-    client.webrtcClient.changeWebRTCLoggingSeverity(severity)
+    client.changeWebRTCLoggingSeverity(severity)
   }
 
   /**
    * Returns current connection stats
    * @return a map containing statistics
    */
-  fun getStats(): Map<String, RTCStats> = client.webrtcClient.getStats()
+  fun getStats(): Map<String, RTCStats> {
+    return client.getStats()
+  }
+
+  fun getRemotePeers(): List<Peer> {
+    return client.getRemotePeers()
+  }
+
+  fun getLocalEndpoint(): Peer {
+    return client.getLocalEndpoint()
+  }
+
+  fun createVideoViewRenderer(): VideoTextureViewRenderer {
+    return client.createVideoViewRenderer()
+  }
+
 }

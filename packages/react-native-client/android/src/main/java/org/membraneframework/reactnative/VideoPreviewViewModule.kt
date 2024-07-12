@@ -16,10 +16,6 @@ class VideoPreviewViewModule : Module() {
         Prop("mirrorVideo") { view: VideoPreviewView, mirrorVideo: Boolean ->
           view.setMirrorVideo(mirrorVideo)
         }
-
-        Prop("captureDeviceId") { view: VideoPreviewView, captureDeviceId: String ->
-          view.switchCamera(captureDeviceId)
-        }
       }
     }
 }

@@ -8,7 +8,7 @@
 
   <application>
       <service
-          android:name="org.membraneframework.rtc.media.screencast.ScreencastService"
+          android:name=".media.screencast.ScreencastService"
           android:enabled="true"
           android:foregroundServiceType="mediaProjection"
           android:stopWithTask="true" />

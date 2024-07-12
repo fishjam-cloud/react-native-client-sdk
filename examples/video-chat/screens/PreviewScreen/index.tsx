@@ -3,6 +3,8 @@ import {
   TrackEncoding,
   useCamera,
   useMicrophone,
+  VideoQuality,
+  VideoPreviewView,
 } from '@fishjam-dev/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,7 +25,6 @@ import { InCallButton } from '../../components';
 import LetterButton from '../../components/LetterButton';
 import { NoCameraView } from '../../components/NoCameraView';
 import { SoundOutputDevicesBottomSheet } from '../../components/SoundOutputDevicesBottomSheet';
-import VideoPreview from '../../components/VideoPreview';
 import { usePreventBackButton } from '../../hooks/usePreventBackButton';
 import type { AppRootStackParamList } from '../../navigators/AppNavigator';
 import { previewScreenLabels } from '../../types/ComponentLabels';
@@ -45,8 +46,9 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     null,
   );
   const {
+    startCamera,
     getCaptureDevices,
-    isCameraOn: isCameraAvailable,
+    isCameraOn,
     simulcastConfig,
     toggleVideoTrackEncoding,
   } = useCamera();
@@ -54,7 +56,6 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(
     isMicrophoneAvailable,
   );
-  const [isCameraOn, setIsCameraOn] = useState<boolean>(isCameraAvailable);
 
   const encodings: Record<string, TrackEncoding[]> = {
     ios: ['l', 'h'],
@@ -63,10 +64,6 @@ const PreviewScreen = ({ navigation, route }: Props) => {
 
   const toggleMicrophone = () => {
     setIsMicrophoneOn(!isMicrophoneOn);
-  };
-
-  const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
   };
 
   const toggleSwitchCamera = () => {
@@ -80,9 +77,21 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   useEffect(() => {
     getCaptureDevices().then((devices) => {
       availableCameras.current = devices;
+
+      startCamera({
+        simulcastConfig: {
+          enabled: true,
+          activeEncodings:
+            Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
+        },
+        quality: VideoQuality.HD_169,
+        maxBandwidth: { l: 150, m: 500, h: 1500 },
+        videoTrackMetadata: { active: true, type: 'camera' },
+        captureDeviceId: devices.find((device) => device.isFrontFacing)?.id,
+        cameraEnabled: true,
+      });
       setCurrentCamera(devices.find((device) => device.isFrontFacing) || null);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onJoinPressed = async () => {
@@ -103,7 +112,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.cameraPreview}>
         {!isIosSimulator && isCameraOn ? (
-          <VideoPreview currentCamera={currentCamera} />
+          <VideoPreviewView style={styles.cameraPreviewView} />
         ) : (
           <NoCameraView username={route?.params?.userName || 'RN Mobile'} />
         )}
@@ -114,10 +123,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
           onPress={toggleMicrophone}
           accessibilityLabel={TOGGLE_MICROPHONE_BUTTON}
         />
-        <ToggleCameraButton
-          toggleCamera={toggleCamera}
-          isCameraOn={isCameraOn}
-        />
+        <ToggleCameraButton toggleCamera={() => {}} isCameraOn={isCameraOn} />
         <SwitchCameraButton switchCamera={toggleSwitchCamera} />
         <SwitchOutputDeviceButton bottomSheetRef={bottomSheetRef} />
       </View>
@@ -189,5 +195,9 @@ const styles = StyleSheet.create({
   },
   joinButton: {
     flex: 1,
+  },
+  cameraPreviewView: {
+    width: '100%',
+    height: '100%',
   },
 });
