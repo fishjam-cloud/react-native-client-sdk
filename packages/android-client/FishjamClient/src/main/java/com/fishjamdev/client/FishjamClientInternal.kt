@@ -181,8 +181,17 @@ internal class FishjamClientInternal(
   }
 
   fun leave() {
-    peerConnectionManager.removeListener(this)
-    rtcEngineCommunication.removeListener(this)
+    coroutineScope.launch {
+      rtcEngineCommunication.disconnect()
+      localEndpoint.tracks.values.forEach { (it as? LocalTrack)?.stop() }
+      peerConnectionManager.close()
+      localEndpoint = Endpoint(id = "", type = EndpointType.WEBRTC)
+      remoteEndpoints = mutableMapOf()
+      peerConnectionManager.removeListener(this@FishjamClientInternal)
+      rtcEngineCommunication.removeListener(this@FishjamClientInternal)
+      webSocket?.close(1000, null)
+      webSocket = null
+    }
   }
 
   suspend fun createVideoTrack(
