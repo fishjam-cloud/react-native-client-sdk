@@ -5,7 +5,7 @@ export { useAudioSettings } from './hooks/useAudioSettings';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
 export { useCamera } from './hooks/useCamera';
 export { useMicrophone } from './hooks/useMicrophone';
-export { useRTCStatistics } from './hooks/useRTCStatistics';
+export { useRTCStatistics } from './stats/useRTCStatistics';
 export { useScreencast } from './hooks/useScreencast';
 
 export {

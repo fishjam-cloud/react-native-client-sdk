@@ -1,11 +1,7 @@
 import { takeRight } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  RTCInboundStats,
-  RTCOutboundStats,
-  RTCStats,
-} from '../RNFishjamClient.types';
+import type { RTCInboundStats, RTCOutboundStats, RTCStats } from './types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 
 /**
