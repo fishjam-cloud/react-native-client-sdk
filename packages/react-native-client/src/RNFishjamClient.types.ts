@@ -1,4 +1,5 @@
 import type { RTCStats } from './stats/types';
+import type { MicrophoneConfig } from './hooks/useMicrophone';
 
 export enum TrackType {
   Audio = 'Audio',
@@ -40,7 +41,7 @@ export type Track<MetadataType extends Metadata> = {
   // The reason of currently selected encoding. Only present for remote tracks.
   encodingReason: EncodingReason | null;
 };
-
+// global
 export type Metadata = { [key: string]: any };
 export type SocketConnectionParams = { [key: string]: any };
 export type SocketChannelParams = { [key: string]: any };
@@ -99,23 +100,6 @@ export enum ScreencastQuality {
 }
 
 export type TrackEncoding = 'l' | 'm' | 'h';
-
-export enum AudioOutputDeviceType {
-  Bluetooth = 'bluetooth',
-  Headset = 'headset',
-  Speaker = 'speaker',
-  Earpiece = 'earpiece',
-}
-
-export enum AudioSessionMode {
-  VoiceChat = 'voiceChat',
-  VideoChat = 'videoChat',
-}
-
-export type AudioOutputDevice = {
-  type: AudioOutputDeviceType;
-  name: string;
-};
 
 /**
  * A type describing simulcast configuration.
@@ -205,18 +189,6 @@ export type CameraConfig<MetadataType extends Metadata> = {
   captureDeviceId: string;
 };
 
-export type MicrophoneConfig<MetadataType extends Metadata> = {
-  /**
-   * a map `string -> any` containing audio track metadata to be sent to the server.
-   */
-  audioTrackMetadata: MetadataType;
-  /**
-   * whether the microphone is initially enabled, you can toggle it on/off later with toggleMicrophone method
-   * @default `true`
-   */
-  microphoneEnabled: boolean;
-};
-
 export type ScreencastOptions<MetadataType extends Metadata> = {
   /**
    * Resolution + fps of screencast track, one of: `VGA`, `HD5`, `HD15`, `FHD15`, `FHD30`.
@@ -268,13 +240,9 @@ export type EndpointsUpdateEvent<
 
 export type IsCameraOnEvent = { IsCameraOn: boolean };
 
-export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
-
 export type IsScreencastOnEvent = { IsScreencastOn: boolean };
 
 export type SimulcastConfigUpdateEvent = SimulcastConfig;
-
-export type BandwidthEstimationEvent = { BandwidthEstimation: number };
 
 export type RNFishjamClient = {
   connect: (

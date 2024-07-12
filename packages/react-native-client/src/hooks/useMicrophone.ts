@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import {
-  IsMicrophoneOnEvent,
-  Metadata,
-  MicrophoneConfig,
-} from '../RNFishjamClient.types';
+import { Metadata } from '../RNFishjamClient.types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+
+export type MicrophoneConfig<MetadataType extends Metadata> = {
+  /**
+   * a map `string -> any` containing audio track metadata to be sent to the server.
+   */
+  audioTrackMetadata: MetadataType;
+  /**
+   * whether the microphone is initially enabled, you can toggle it on/off later with toggleMicrophone method
+   * @default `true`
+   */
+  microphoneEnabled: boolean;
+};
+export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
 
 /**
  * This hook can toggle microphone on/off and provides current microphone state.

@@ -12,7 +12,13 @@ export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
 
 export { useCamera } from './hooks/useCamera';
+
+export type {
+  IsMicrophoneOnEvent,
+  MicrophoneConfig,
+} from './hooks/useMicrophone';
 export { useMicrophone } from './hooks/useMicrophone';
+
 export { useRTCStatistics } from './stats/useRTCStatistics';
 export { useScreencast } from './hooks/useScreencast';
 
