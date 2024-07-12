@@ -1,6 +1,11 @@
 export { usePeers } from './hooks/usePeers';
 export type { Peer } from './hooks/usePeers';
 
+export type {
+  AudioOutputDevice,
+  AudioOutputDeviceType,
+  AudioSessionMode,
+} from './hooks/useAudioSettings';
 export { useAudioSettings } from './hooks/useAudioSettings';
 
 export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
