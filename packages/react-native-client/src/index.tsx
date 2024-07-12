@@ -2,7 +2,10 @@ export { usePeers } from './hooks/usePeers';
 export type { Peer } from './hooks/usePeers';
 
 export { useAudioSettings } from './hooks/useAudioSettings';
+
+export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
+
 export { useCamera } from './hooks/useCamera';
 export { useMicrophone } from './hooks/useMicrophone';
 export { useRTCStatistics } from './stats/useRTCStatistics';

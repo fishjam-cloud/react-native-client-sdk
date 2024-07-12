@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import { BandwidthEstimationEvent } from '../RNFishjamClient.types';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+
+export type BandwidthEstimationEvent = { BandwidthEstimation: number };
 
 /**
  * This hook provides current bandwidth estimation
