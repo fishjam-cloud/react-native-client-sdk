@@ -27,7 +27,7 @@ data class Config(
 
 class FishjamClient(appContext: Context, listener: FishjamClientListener) {
   private val peerConnectionFactoryWrapper =
-    PeerConnectionFactoryWrapper(EncoderOptions(), createAudioDeviceModule(appContext), EglBase.create(), appContext)
+    PeerConnectionFactoryWrapper(EncoderOptions(), createAudioDeviceModule(appContext), appContext)
   private val peerConnectionManager = PeerConnectionManager(peerConnectionFactoryWrapper)
   private val rtcEngineCommunication = RTCEngineCommunication()
   private val client = FishjamClientInternal(listener, peerConnectionFactoryWrapper, peerConnectionManager, rtcEngineCommunication)

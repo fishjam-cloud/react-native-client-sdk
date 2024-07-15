@@ -32,11 +32,7 @@ class VideoRendererView(
 
   private fun update() {
     CoroutineScope(Dispatchers.Main).launch {
-      val listOfPeers = RNFishjamClient.fishjamClient?.getRemotePeers()?.toMutableList() ?: mutableListOf()
-      val localEndpoint = RNFishjamClient.fishjamClient?.getLocalEndpoint()
-      if(localEndpoint != null) {
-        listOfPeers.add(localEndpoint)
-      }
+      val listOfPeers = RNFishjamClient.getAllPeers()
       val endpoint = listOfPeers.firstOrNull { it.tracks[trackId] != null } ?: return@launch
       val videoTrack = endpoint.tracks[trackId] as? VideoTrack ?: return@launch
       setupTrack(videoTrack)

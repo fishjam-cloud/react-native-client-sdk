@@ -65,6 +65,14 @@ class RNFishjamClient(
   companion object {
     var onTracksUpdateListeners: MutableList<OnTrackUpdateListener> = mutableListOf()
     var fishjamClient: FishjamClient? = null
+    fun getAllPeers(): List<Peer> {
+      val listOfPeers = fishjamClient?.getRemotePeers()?.toMutableList() ?: mutableListOf()
+      val localEndpoint = fishjamClient?.getLocalEndpoint()
+      if(localEndpoint != null) {
+        listOfPeers.add(localEndpoint)
+      }
+      return listOfPeers
+    }
   }
 
   fun onModuleCreate(appContext: AppContext) {
@@ -324,12 +332,7 @@ class RNFishjamClient(
   }
 
   fun getEndpoints(): List<Map<String, Any?>> {
-    val listOfPeers = fishjamClient?.getRemotePeers()?.toMutableList() ?: mutableListOf()
-    val localEndpoint = fishjamClient?.getLocalEndpoint()
-    if(localEndpoint != null) {
-      listOfPeers.add(localEndpoint)
-    }
-    return listOfPeers.map { endpoint ->
+    return getAllPeers().map { endpoint ->
       mapOf("id" to endpoint.id,
         "isLocal" to (endpoint.id == fishjamClient?.getLocalEndpoint()?.id),
         "type" to endpoint.type,
