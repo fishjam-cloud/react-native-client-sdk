@@ -47,14 +47,15 @@ export function useMicrophone() {
    * @param config configuration of the microphone capture
    * @returns A promise that resolves when microphone capturing is started.
    */
-  const startMicrophone = useCallback(
-    async <MicrophoneConfigMetadataType extends Metadata>(
-      config: Partial<MicrophoneConfig<MicrophoneConfigMetadataType>> = {},
-    ) => {
-      await RNFishjamClientModule.startMicrophone(config);
-    },
-    [],
-  );
+  const startMicrophone = useCallback<
+    <MicrophoneConfigMetadataType extends Metadata>(
+      config?: Readonly<
+        Partial<MicrophoneConfig<MicrophoneConfigMetadataType>>
+      >,
+    ) => Promise<void>
+  >(async (config = {}) => {
+    await RNFishjamClientModule.startMicrophone(config);
+  }, []);
 
   return { isMicrophoneOn, toggleMicrophone, startMicrophone };
 }
