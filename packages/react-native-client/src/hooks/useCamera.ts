@@ -149,21 +149,27 @@ export function useCamera() {
    */
   const startCamera = useCallback<
     <CameraConfigMetadataType extends Metadata>(
-      config?: Partial<CameraConfig<CameraConfigMetadataType>>,
+      config?: Readonly<Partial<CameraConfig<CameraConfigMetadataType>>>,
     ) => Promise<void>
   >(async (config = {}) => {
     // expo-modules on Android don't support Either type, so we workaround it
     if (Platform.OS === 'android') {
       if (typeof config.maxBandwidth === 'object') {
-        // @ts-expect-error we should update typings to make maxBandwidthMap available
-        config.maxBandwidthMap = config.maxBandwidth;
+        await RNFishjamClientModule.startCamera({
+          ...config,
+          maxBandwidth: undefined,
+          maxBandwidthMap: config.maxBandwidth,
+        });
       } else {
-        // @ts-expect-error we should update typings to make maxBandwidthInt available
-        config.maxBandwidthInt = config.maxBandwidth;
+        await RNFishjamClientModule.startCamera({
+          ...config,
+          maxBandwidth: undefined,
+          maxBandwidthInt: config.maxBandwidth,
+        });
       }
-      delete config.maxBandwidth;
+    } else {
+      await RNFishjamClientModule.startCamera(config);
     }
-    await RNFishjamClientModule.startCamera(config);
   }, []);
 
   /**

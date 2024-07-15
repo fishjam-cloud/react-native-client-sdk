@@ -2,11 +2,24 @@ import { requireNativeModule } from 'expo-modules-core';
 import { NativeModule } from 'react-native';
 
 import type { RTCStats } from './stats/types';
-import type { Metadata, SimulcastConfig } from './types';
+import type {
+  BandwidthLimit,
+  Metadata,
+  SimulcastBandwidthLimit,
+  SimulcastConfig,
+} from './types';
 import type { CameraConfig, CaptureDevice } from './hooks/useCamera';
 import type { MicrophoneConfig } from './hooks/useMicrophone';
 import type { Endpoint } from './hooks/usePeers';
 import type { ScreencastOptions } from './hooks/useScreencast';
+
+type InternalCameraConfig<MetadataType extends Metadata> = Partial<
+  CameraConfig<MetadataType> &
+    (
+      | { maxBandwidthInt: BandwidthLimit }
+      | { maxBandwidthMap: SimulcastBandwidthLimit }
+    )
+>;
 
 type RNFishjamClient = {
   connect: (
@@ -16,7 +29,7 @@ type RNFishjamClient = {
   ) => Promise<void>;
   leaveRoom: () => Promise<void>;
   startCamera: <MetadataType extends Metadata>(
-    config: Partial<CameraConfig<MetadataType>>,
+    config: InternalCameraConfig<MetadataType>,
   ) => Promise<void>;
   startMicrophone: <MetadataType extends Metadata>(
     config: Partial<MicrophoneConfig<MetadataType>>,
