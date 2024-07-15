@@ -259,6 +259,7 @@ class RNFishjamClient(
   suspend fun startCamera(config: CameraConfig) {
     val cameraTrack = createCameraTrack(config) ?: return
     setCameraTrackState(cameraTrack, config.cameraEnabled)
+    emitEndpoints()
   }
 
   private suspend fun createCameraTrack(config: CameraConfig): LocalVideoTrack? {
@@ -303,6 +304,7 @@ class RNFishjamClient(
       fishjamClient?.createAudioTrack(config.audioTrackMetadata)
         ?: throw CodedException("Failed to Create Track")
     setMicrophoneTrackState(microphoneTrack, config.microphoneEnabled)
+    emitEndpoints()
   }
 
   private fun setMicrophoneTrackState(
