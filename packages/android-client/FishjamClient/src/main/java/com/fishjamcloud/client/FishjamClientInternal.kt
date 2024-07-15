@@ -403,18 +403,18 @@ internal class FishjamClientInternal(
     trackId: String,
     trackMetadata: Metadata
   ) {
+    val track =
+      getTrack(trackId) ?: run {
+        Timber.e("updateTrackMetadata: invalid track id")
+        return
+      }
+    track.metadata = trackMetadata
+    localEndpoint = localEndpoint.addOrReplaceTrack(track)
     coroutineScope.launch {
-      val track =
-        getTrack(trackId) ?: run {
-          Timber.e("updateTrackMetadata: invalid track id")
-          return@launch
-        }
       val rtcEngineTrackId = track.getRTCEngineId()
       if (rtcEngineTrackId != null) {
         rtcEngineCommunication.updateTrackMetadata(rtcEngineTrackId, trackMetadata)
       }
-      track.metadata = trackMetadata
-      localEndpoint = localEndpoint.addOrReplaceTrack(track)
     }
   }
 
