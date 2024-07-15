@@ -28,7 +28,6 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.webrtc.Logging
@@ -65,10 +64,11 @@ class RNFishjamClient(
   companion object {
     var onTracksUpdateListeners: MutableList<OnTrackUpdateListener> = mutableListOf()
     var fishjamClient: FishjamClient? = null
+
     fun getAllPeers(): List<Peer> {
       val listOfPeers = fishjamClient?.getRemotePeers()?.toMutableList() ?: mutableListOf()
       val localEndpoint = fishjamClient?.getLocalEndpoint()
-      if(localEndpoint != null) {
+      if (localEndpoint != null) {
         listOfPeers.add(localEndpoint)
       }
       return listOfPeers
@@ -86,19 +86,21 @@ class RNFishjamClient(
   }
 
   fun onActivityResult(
-    requestCode: Int, resultCode: Int, data: Intent?
+    requestCode: Int,
+    resultCode: Int,
+    data: Intent?
   ) = runBlocking {
     launch(Dispatchers.Main) {
-        if (requestCode != SCREENCAST_REQUEST) return@launch
-        if (resultCode != Activity.RESULT_OK) {
-          screencastPromise?.resolve(false)
-          screencastPromise = null
-          return@launch
-        }
+      if (requestCode != SCREENCAST_REQUEST) return@launch
+      if (resultCode != Activity.RESULT_OK) {
+        screencastPromise?.resolve(false)
+        screencastPromise = null
+        return@launch
+      }
 
-        data?.let {
-          startScreencast(it)
-        }
+      data?.let {
+        startScreencast(it)
+      }
     }
   }
 
@@ -127,9 +129,11 @@ class RNFishjamClient(
 
   private fun create() {
     audioSwitchManager = AudioSwitchManager(appContext?.reactContext!!)
-    fishjamClient = FishjamClient(
-      appContext = appContext?.reactContext!!, listener = this
-    )
+    fishjamClient =
+      FishjamClient(
+        appContext = appContext?.reactContext!!,
+        listener = this
+      )
   }
 
   private fun getVideoParametersFromOptions(createOptions: CameraConfig): VideoParameters {
@@ -158,20 +162,29 @@ class RNFishjamClient(
     return videoParameters
   }
 
-  private fun getLocalVideoTrack(): LocalVideoTrack? {
-    return fishjamClient?.getLocalEndpoint()?.tracks?.values?.filterIsInstance<LocalVideoTrack>()
+  private fun getLocalVideoTrack(): LocalVideoTrack? =
+    fishjamClient
+      ?.getLocalEndpoint()
+      ?.tracks
+      ?.values
+      ?.filterIsInstance<LocalVideoTrack>()
       ?.first()
-  }
 
-  private fun getLocalAudioTrack(): LocalAudioTrack? {
-    return fishjamClient?.getLocalEndpoint()?.tracks?.values?.filterIsInstance<LocalAudioTrack>()
+  private fun getLocalAudioTrack(): LocalAudioTrack? =
+    fishjamClient
+      ?.getLocalEndpoint()
+      ?.tracks
+      ?.values
+      ?.filterIsInstance<LocalAudioTrack>()
       ?.first()
-  }
 
-  private fun getLocalScreencastTrack(): LocalScreencastTrack? {
-    return fishjamClient?.getLocalEndpoint()?.tracks?.values?.filterIsInstance<LocalScreencastTrack>()
+  private fun getLocalScreencastTrack(): LocalScreencastTrack? =
+    fishjamClient
+      ?.getLocalEndpoint()
+      ?.tracks
+      ?.values
+      ?.filterIsInstance<LocalScreencastTrack>()
       ?.first()
-  }
 
   private fun ensureCreated() {
     if (fishjamClient == null) {
@@ -258,7 +271,10 @@ class RNFishjamClient(
     )
   }
 
-  private fun setCameraTrackState(cameraTrack: LocalVideoTrack, isEnabled: Boolean) {
+  private fun setCameraTrackState(
+    cameraTrack: LocalVideoTrack,
+    isEnabled: Boolean
+  ) {
     cameraTrack.setEnabled(isEnabled)
     isCameraOn = isEnabled
     val eventName = EmitableEvents.IsCameraOn
@@ -283,12 +299,16 @@ class RNFishjamClient(
   }
 
   suspend fun startMicrophone(config: MicrophoneConfig) {
-    val microphoneTrack = fishjamClient?.createAudioTrack(config.audioTrackMetadata)
-      ?: throw CodedException("Failed to Create Track")
+    val microphoneTrack =
+      fishjamClient?.createAudioTrack(config.audioTrackMetadata)
+        ?: throw CodedException("Failed to Create Track")
     setMicrophoneTrackState(microphoneTrack, config.microphoneEnabled)
   }
 
-  private fun setMicrophoneTrackState(microphoneTrack: LocalAudioTrack, isEnabled: Boolean) {
+  private fun setMicrophoneTrackState(
+    microphoneTrack: LocalAudioTrack,
+    isEnabled: Boolean
+  ) {
     microphoneTrack.setEnabled(isEnabled)
     isMicrophoneOn = isEnabled
     val eventName = EmitableEvents.IsMicrophoneOn
@@ -331,52 +351,54 @@ class RNFishjamClient(
     }
   }
 
-  fun getEndpoints(): List<Map<String, Any?>> {
-    return getAllPeers().map { endpoint ->
-      mapOf("id" to endpoint.id,
+  fun getEndpoints(): List<Map<String, Any?>> =
+    getAllPeers().map { endpoint ->
+      mapOf(
+        "id" to endpoint.id,
         "isLocal" to (endpoint.id == fishjamClient?.getLocalEndpoint()?.id),
         "type" to endpoint.type,
         "metadata" to endpoint.metadata,
-        "tracks" to endpoint.tracks.values.mapNotNull { track ->
-          when (track) {
-            is RemoteVideoTrack ->
-              mapOf(
-                "id" to track.id(),
-                "type" to "Video",
-                "metadata" to track.metadata,
-                "encoding" to track.encoding?.rid,
-                "encodingReason" to track.encodingReason?.value
-              )
+        "tracks" to
+          endpoint.tracks.values.mapNotNull { track ->
+            when (track) {
+              is RemoteVideoTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata,
+                  "encoding" to track.encoding?.rid,
+                  "encodingReason" to track.encodingReason?.value
+                )
 
-            is RemoteAudioTrack ->
-              mapOf(
-                "id" to track.id(),
-                "type" to "Audio",
-                "metadata" to track.metadata,
-                "vadStatus" to track.vadStatus.value
-              )
+              is RemoteAudioTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Audio",
+                  "metadata" to track.metadata,
+                  "vadStatus" to track.vadStatus.value
+                )
 
-            is LocalVideoTrack ->
-              mapOf(
-                "id" to track.id(),
-                "type" to "Video",
-                "metadata" to track.metadata
-              )
+              is LocalVideoTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata
+                )
 
-            is LocalAudioTrack ->
-              mapOf(
-                "id" to track.id(),
-                "type" to "Audio",
-                "metadata" to track.metadata
-              )
+              is LocalAudioTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Audio",
+                  "metadata" to track.metadata
+                )
 
-            else -> {
-              null
+              else -> {
+                null
+              }
             }
           }
-        })
+      )
     }
-  }
 
   fun getCaptureDevices(): List<Map<String, Any>> {
     val devices = LocalVideoTrack.getCaptureDevices(appContext?.reactContext!!)
@@ -492,7 +514,9 @@ class RNFishjamClient(
     ensureScreencastTrack()
     getLocalScreencastTrack()?.let {
       fishjamClient?.setEncodingBandwidth(
-        it.id(), encoding, TrackBandwidthLimit.BandwidthLimit(bandwidth)
+        it.id(),
+        encoding,
+        TrackBandwidthLimit.BandwidthLimit(bandwidth)
       )
     }
   }
@@ -521,7 +545,9 @@ class RNFishjamClient(
     ensureVideoTrack()
     getLocalVideoTrack()?.let {
       fishjamClient?.setEncodingBandwidth(
-        it.id(), encoding, TrackBandwidthLimit.BandwidthLimit(bandwidth)
+        it.id(),
+        encoding,
+        TrackBandwidthLimit.BandwidthLimit(bandwidth)
       )
     }
   }
@@ -608,7 +634,9 @@ class RNFishjamClient(
   private suspend fun startScreencast(mediaProjectionPermission: Intent) {
     val videoParameters = getScreencastVideoParameters()
     fishjamClient?.createScreencastTrack(
-      mediaProjectionPermission, videoParameters, screencastMetadata
+      mediaProjectionPermission,
+      videoParameters,
+      screencastMetadata
     ) ?: throw CodedException("Failed to Create ScreenCast Track")
     setScreencastTrackState(true)
 
@@ -706,7 +734,10 @@ class RNFishjamClient(
         }
     )
 
-  override fun onJoined(peerID: String, peersInRoom: MutableMap<String, Endpoint>) {
+  override fun onJoined(
+    peerID: String,
+    peersInRoom: MutableMap<String, Endpoint>
+  ) {
     CoroutineScope(Dispatchers.Main).launch {
       connectPromise?.resolve(null)
       connectPromise = null

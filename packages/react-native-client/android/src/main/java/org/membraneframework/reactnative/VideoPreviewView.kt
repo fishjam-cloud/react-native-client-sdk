@@ -20,11 +20,16 @@ class VideoPreviewView(
     if (isInitialized) return
     isInitialized = true
 
-    videoView = RNFishjamClient.fishjamClient!!.createVideoViewRenderer().also {
-      addView(it)
-    }
+    videoView =
+      RNFishjamClient.fishjamClient!!.createVideoViewRenderer().also {
+        addView(it)
+      }
 
-    localVideoTrack = RNFishjamClient.fishjamClient?.getLocalEndpoint()?.tracks?.values?.firstOrNull { track -> track is LocalVideoTrack } as? LocalVideoTrack?
+    localVideoTrack =
+      RNFishjamClient.fishjamClient?.getLocalEndpoint()?.tracks?.values?.firstOrNull {
+          track ->
+        track is LocalVideoTrack
+      } as? LocalVideoTrack?
     videoView?.let { localVideoTrack?.addRenderer(it) }
   }
 

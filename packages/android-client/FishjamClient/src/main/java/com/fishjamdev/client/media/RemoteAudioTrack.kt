@@ -1,7 +1,7 @@
 package com.fishjamdev.client.media
 
-import com.fishjamdev.client.models.VadStatus
 import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.VadStatus
 import org.webrtc.AudioTrack
 import java.util.UUID
 
@@ -9,7 +9,13 @@ fun interface OnVoiceActivityChangedListener {
   fun onVoiceActivityChanged(trackContext: RemoteAudioTrack)
 }
 
-class RemoteAudioTrack(audioTrack: AudioTrack, endpointId: String,  rtcEngineId: String?, metadata: Metadata, id: String = UUID.randomUUID().toString()) : Track(audioTrack, endpointId, rtcEngineId, metadata, id) {
+class RemoteAudioTrack(
+  audioTrack: AudioTrack,
+  endpointId: String,
+  rtcEngineId: String?,
+  metadata: Metadata,
+  id: String = UUID.randomUUID().toString()
+) : Track(audioTrack, endpointId, rtcEngineId, metadata, id) {
   private var onVadNotificationListener: (OnVoiceActivityChangedListener)? = null
 
   var vadStatus: VadStatus = VadStatus.SILENCE

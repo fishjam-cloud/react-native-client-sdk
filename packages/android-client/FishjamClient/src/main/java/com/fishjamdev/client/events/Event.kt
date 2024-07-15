@@ -1,12 +1,12 @@
 package com.fishjamdev.client.events
 
+import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.Payload
+import com.fishjamdev.client.models.SimulcastConfig
 import com.google.gson.Gson
 import com.google.gson.JsonParseException
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
-import com.fishjamdev.client.models.Metadata
-import com.fishjamdev.client.models.Payload
-import com.fishjamdev.client.models.SimulcastConfig
 import timber.log.Timber
 
 internal val gson = Gson()
@@ -253,7 +253,12 @@ sealed class ReceivableEvent {
     }
   }
 }
-data class TrackData(val metadata: Metadata?, val simulcastConfig: SimulcastConfig?)
+
+data class TrackData(
+  val metadata: Metadata?,
+  val simulcastConfig: SimulcastConfig?
+)
+
 data class Endpoint(
   val id: String,
   val type: String,
@@ -276,10 +281,10 @@ data class EndpointAdded(
   val data: Data
 ) : ReceivableEvent() {
   data class Data(
-      val id: String,
-      val type: String,
-      val metadata: Metadata?,
-      val tracks: Map<String, TrackData>
+    val id: String,
+    val type: String,
+    val metadata: Metadata?,
+    val tracks: Map<String, TrackData>
   )
 }
 

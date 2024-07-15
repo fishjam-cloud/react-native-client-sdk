@@ -33,24 +33,24 @@ class SoundDetection {
     volumeThreshold: Int = -60
   ) {
     if (isRecording) {
-        Timber.w("Sound detection is already in progress. Ignoring the start request.")
+      Timber.w("Sound detection is already in progress. Ignoring the start request.")
       return
     }
     bufferSize =
-        AudioRecord.getMinBufferSize(
-            samplingRate,
-            AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT
-        )
+      AudioRecord.getMinBufferSize(
+        samplingRate,
+        AudioFormat.CHANNEL_IN_MONO,
+        AudioFormat.ENCODING_PCM_16BIT
+      )
     audioRecord =
       try {
-          AudioRecord(
-              MediaRecorder.AudioSource.MIC,
-              samplingRate,
-              AudioFormat.CHANNEL_IN_MONO,
-              AudioFormat.ENCODING_PCM_16BIT,
-              bufferSize
-          )
+        AudioRecord(
+          MediaRecorder.AudioSource.MIC,
+          samplingRate,
+          AudioFormat.CHANNEL_IN_MONO,
+          AudioFormat.ENCODING_PCM_16BIT,
+          bufferSize
+        )
       } catch (e: SecurityException) {
         throw SecurityException(
           "Unable to initialize the AudioRecord." +
@@ -63,7 +63,7 @@ class SoundDetection {
       isRecording = true
       startTimer(monitorInterval, volumeThreshold)
     } else {
-        Timber.e("COULDNT_PREPARE_RECORDING AudioRecord couldn't be initialized.")
+      Timber.e("COULDNT_PREPARE_RECORDING AudioRecord couldn't be initialized.")
       throw IllegalStateException("AudioRecord couldn't be initialized.")
     }
   }
@@ -73,7 +73,7 @@ class SoundDetection {
    */
   fun stop() {
     if (!isRecording) {
-        Timber.e("INVALID_STATE Please call start before stopping recording")
+      Timber.e("INVALID_STATE Please call start before stopping recording")
       return
     }
     stopTimer()
@@ -82,9 +82,9 @@ class SoundDetection {
       audioRecord?.stop()
       audioRecord?.release()
     } catch (e: RuntimeException) {
-        Timber.e(
-            "RUNTIME_EXCEPTION No valid audio data received. You may be using a device that can't record audio."
-        )
+      Timber.e(
+        "RUNTIME_EXCEPTION No valid audio data received. You may be using a device that can't record audio."
+      )
     } finally {
       audioRecord = null
     }
@@ -189,7 +189,7 @@ class SoundDetection {
           val buffer = ShortArray(bufferSize)
           val bytesRead = readAudioData(buffer)
           if (bytesRead == AudioRecord.ERROR_INVALID_OPERATION || bytesRead == AudioRecord.ERROR_BAD_VALUE) {
-              Timber.w("Invalid bytesRead value: $bytesRead")
+            Timber.w("Invalid bytesRead value: $bytesRead")
             return
           }
           val amplitude = getMaxAmplitude(buffer, bytesRead)

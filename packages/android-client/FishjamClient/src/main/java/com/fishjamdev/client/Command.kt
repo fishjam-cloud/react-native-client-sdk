@@ -9,7 +9,7 @@ internal enum class CommandName {
   ADD_TRACK,
   REMOVE_TRACK,
   RENEGOTIATE,
-  LEAVE,
+  LEAVE
 }
 
 internal enum class ClientState {
@@ -18,7 +18,12 @@ internal enum class ClientState {
   JOINED
 }
 
-internal data class Command(val commandName: CommandName, val clientStateAfterCommand: ClientState?, val command: () -> Unit = {}) {
+internal data class Command(
+  val commandName: CommandName,
+  val clientStateAfterCommand: ClientState?,
+  val command: () -> Unit = {}
+) {
   constructor(commandName: CommandName, command: () -> Unit = {}) : this(commandName, null, command)
+
   val job: CompletableJob = Job()
 }

@@ -1,29 +1,28 @@
 package com.fishjamdev.client.webrtc
 
-import android.util.Log
-import com.fishjamdev.client.media.LocalVideoTrack
-import com.fishjamdev.client.media.Track
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import com.fishjamdev.client.models.Constants
-import com.fishjamdev.client.models.SimulcastConfig
-import com.fishjamdev.client.models.TrackEncoding
 import com.fishjamdev.client.events.OfferData
 import com.fishjamdev.client.media.LocalScreencastTrack
-import com.fishjamdev.client.models.TrackBandwidthLimit
+import com.fishjamdev.client.media.LocalVideoTrack
+import com.fishjamdev.client.media.Track
+import com.fishjamdev.client.models.Constants
 import com.fishjamdev.client.models.QualityLimitationDurations
 import com.fishjamdev.client.models.RTCInboundStats
 import com.fishjamdev.client.models.RTCOutboundStats
 import com.fishjamdev.client.models.RTCStats
+import com.fishjamdev.client.models.SimulcastConfig
+import com.fishjamdev.client.models.TrackBandwidthLimit
+import com.fishjamdev.client.models.TrackEncoding
 import com.fishjamdev.client.utils.ClosableCoroutineScope
 import com.fishjamdev.client.utils.addTransceiver
 import com.fishjamdev.client.utils.createOffer
 import com.fishjamdev.client.utils.getEncodings
 import com.fishjamdev.client.utils.setLocalDescription
 import com.fishjamdev.client.utils.setRemoteDescription
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.webrtc.*
 import timber.log.Timber
 import java.math.BigInteger
@@ -31,7 +30,7 @@ import java.util.*
 import kotlin.math.pow
 
 internal class PeerConnectionManager(
-    private val peerConnectionFactory: PeerConnectionFactoryWrapper
+  private val peerConnectionFactory: PeerConnectionFactoryWrapper
 ) : PeerConnection.Observer {
   private val listeners = mutableListOf<PeerConnectionListener>()
 
@@ -518,7 +517,7 @@ internal class PeerConnectionManager(
           return@launch
         }
       }
-      listeners.forEach{ listener -> listener.onAddTrack(trackId!!, receiver!!.track()!!) }
+      listeners.forEach { listener -> listener.onAddTrack(trackId!!, receiver!!.track()!!) }
     }
   }
 

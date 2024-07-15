@@ -1,10 +1,10 @@
 package com.fishjamdev.client.webrtc
 
 import com.fishjamdev.client.events.Endpoint
-import com.fishjamdev.client.models.Metadata
-import com.fishjamdev.client.models.SerializedMediaEvent
 import com.fishjamdev.client.events.OfferData
 import com.fishjamdev.client.events.TrackData
+import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.SerializedMediaEvent
 
 internal interface RTCEngineListener {
   fun onConnected(
@@ -14,7 +14,11 @@ internal interface RTCEngineListener {
 
   fun onSendMediaEvent(event: SerializedMediaEvent)
 
-  fun onEndpointAdded(endpointId: String, type: String, metadata: Metadata?)
+  fun onEndpointAdded(
+    endpointId: String,
+    type: String,
+    metadata: Metadata?
+  )
 
   fun onEndpointRemoved(endpointId: String)
 

@@ -1,7 +1,6 @@
 package com.fishjamdev.client
 
 import android.content.Intent
-import android.util.Log
 import com.fishjamdev.client.events.OfferData
 import com.fishjamdev.client.events.TrackData
 import com.fishjamdev.client.media.LocalAudioTrack
@@ -73,90 +72,100 @@ internal class FishjamClientInternal(
     }
   }
 
-  private fun getTrack(trackId: String): Track? {
-    return localEndpoint.tracks[trackId]
+  private fun getTrack(trackId: String): Track? =
+    localEndpoint.tracks[trackId]
       ?: remoteEndpoints.values.find { endpoint -> endpoint.tracks[trackId] != null }?.tracks?.get(
         trackId
       )
-  }
 
-  private fun getTrackWithRtcEngineId(trackId: String): Track? {
-    return localEndpoint.tracks.values.firstOrNull { track -> track.webrtcId() == trackId }
-      ?: remoteEndpoints.values.firstOrNull { endpoint -> endpoint.tracks.values.firstOrNull { track -> track.getRTCEngineId() == trackId } != null }?.tracks?.values?.firstOrNull { track -> track.getRTCEngineId() == trackId }
-  }
+  private fun getTrackWithRtcEngineId(trackId: String): Track? =
+    localEndpoint.tracks.values.firstOrNull { track -> track.webrtcId() == trackId }
+      ?: remoteEndpoints.values
+        .firstOrNull { endpoint ->
+          endpoint.tracks.values.firstOrNull { track -> track.getRTCEngineId() == trackId } !=
+            null
+        }?.tracks
+        ?.values
+        ?.firstOrNull { track -> track.getRTCEngineId() == trackId }
 
   fun connect(config: Config) {
     peerConnectionManager.addListener(this)
     rtcEngineCommunication.addListener(this)
-    val websocketListener = object : WebSocketListener() {
-      override fun onClosed(
-        webSocket: WebSocket,
-        code: Int,
-        reason: String
-      ) {
-        listener.onSocketClose(code, reason)
-      }
+    val websocketListener =
+      object : WebSocketListener() {
+        override fun onClosed(
+          webSocket: WebSocket,
+          code: Int,
+          reason: String
+        ) {
+          listener.onSocketClose(code, reason)
+        }
 
-      override fun onMessage(
-        webSocket: WebSocket,
-        bytes: ByteString
-      ) {
-        try {
-          val peerMessage = PeerNotifications.PeerMessage.parseFrom(bytes.toByteArray())
-          if (peerMessage.hasAuthenticated()) {
-            listener.onAuthSuccess()
-            commandsQueue.finishCommand()
-          } else if (peerMessage.hasMediaEvent()) {
-            receiveEvent(peerMessage.mediaEvent.data)
-          } else {
-            Timber.w("Received unexpected websocket message: $peerMessage")
+        override fun onMessage(
+          webSocket: WebSocket,
+          bytes: ByteString
+        ) {
+          try {
+            val peerMessage = PeerNotifications.PeerMessage.parseFrom(bytes.toByteArray())
+            if (peerMessage.hasAuthenticated()) {
+              listener.onAuthSuccess()
+              commandsQueue.finishCommand()
+            } else if (peerMessage.hasMediaEvent()) {
+              receiveEvent(peerMessage.mediaEvent.data)
+            } else {
+              Timber.w("Received unexpected websocket message: $peerMessage")
+            }
+          } catch (e: Exception) {
+            Timber.e("Received invalid websocket message", e)
           }
-        } catch (e: Exception) {
-          Timber.e("Received invalid websocket message", e)
+        }
+
+        override fun onOpen(
+          webSocket: WebSocket,
+          response: Response
+        ) {
+          listener.onSocketOpen()
+          val authRequest =
+            PeerNotifications.PeerMessage
+              .newBuilder()
+              .setAuthRequest(
+                PeerNotifications.PeerMessage.AuthRequest
+                  .newBuilder()
+                  .setToken(config.token)
+              ).build()
+          sendEvent(authRequest)
+        }
+
+        override fun onFailure(
+          webSocket: WebSocket,
+          t: Throwable,
+          response: Response?
+        ) {
+          listener.onSocketError(t, response)
         }
       }
 
-      override fun onOpen(
-        webSocket: WebSocket,
-        response: Response
-      ) {
-        listener.onSocketOpen()
-        val authRequest =
-          PeerNotifications.PeerMessage
-            .newBuilder()
-            .setAuthRequest(
-              PeerNotifications.PeerMessage.AuthRequest.newBuilder().setToken(config.token)
-            )
-            .build()
-        sendEvent(authRequest)
+    commandsQueue.addCommand(
+      Command(CommandName.CONNECT, ClientState.CONNECTED) {
+        val request = Request.Builder().url(config.websocketUrl).build()
+        val webSocket =
+          OkHttpClient().newWebSocket(
+            request,
+            websocketListener
+          )
+
+        this.webSocket = webSocket
       }
-
-      override fun onFailure(
-        webSocket: WebSocket,
-        t: Throwable,
-        response: Response?
-      ) {
-        listener.onSocketError(t, response)
-      }
-    }
-
-    commandsQueue.addCommand(Command(CommandName.CONNECT, ClientState.CONNECTED) {
-      val request = Request.Builder().url(config.websocketUrl).build()
-      val webSocket =
-        OkHttpClient().newWebSocket(
-          request,
-          websocketListener
-        )
-
-      this.webSocket = webSocket
-    })
+    )
   }
 
   fun join(peerMetadata: Metadata = emptyMap()) {
-    commandsQueue.addCommand(Command(CommandName.JOIN, ClientState.JOINED) {
-      localEndpoint = localEndpoint.copy(metadata = peerMetadata)
-      rtcEngineCommunication.connect(peerMetadata)
-    })
+    commandsQueue.addCommand(
+      Command(CommandName.JOIN, ClientState.JOINED) {
+        localEndpoint = localEndpoint.copy(metadata = peerMetadata)
+        rtcEngineCommunication.connect(peerMetadata)
+      }
+    )
   }
 
   override fun onConnected(
@@ -202,29 +211,33 @@ internal class FishjamClientInternal(
   ): LocalVideoTrack {
     val videoSource = peerConnectionFactoryWrapper.createVideoSource()
     val webrtcVideoTrack = peerConnectionFactoryWrapper.createVideoTrack(videoSource)
-    val videoCapturer = peerConnectionFactoryWrapper.createVideoCapturer(
-      videoSource,
-      videoParameters,
-      captureDeviceName
-    )
+    val videoCapturer =
+      peerConnectionFactoryWrapper.createVideoCapturer(
+        videoSource,
+        videoParameters,
+        captureDeviceName
+      )
 
     val videoTrack =
       LocalVideoTrack(webrtcVideoTrack, localEndpoint.id, metadata, videoCapturer, videoParameters)
 
     videoTrack.start()
 
-    commandsQueue.addCommand(Command(CommandName.ADD_TRACK) {
-      localEndpoint = localEndpoint.addOrReplaceTrack(videoTrack)
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(videoTrack)
 
-      coroutineScope.launch {
-        peerConnectionManager.addTrack(videoTrack)
-        if(commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
-          rtcEngineCommunication.renegotiateTracks()
-        } else {
-          commandsQueue.finishCommand(CommandName.ADD_TRACK)
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(videoTrack)
+            if (commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
+              rtcEngineCommunication.renegotiateTracks()
+            } else {
+              commandsQueue.finishCommand(CommandName.ADD_TRACK)
+            }
+          }
         }
-      }
-    }).join()
+      ).join()
 
     return videoTrack
   }
@@ -263,14 +276,17 @@ internal class FishjamClientInternal(
     val audioTrack = LocalAudioTrack(webrtcAudioTrack, localEndpoint.id, metadata)
     audioTrack.start()
 
-    commandsQueue.addCommand(Command(CommandName.ADD_TRACK) {
-      localEndpoint = localEndpoint.addOrReplaceTrack(audioTrack)
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(audioTrack)
 
-      coroutineScope.launch {
-        peerConnectionManager.addTrack(audioTrack)
-        rtcEngineCommunication.renegotiateTracks()
-      }
-    }).join()
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(audioTrack)
+            rtcEngineCommunication.renegotiateTracks()
+          }
+        }
+      ).join()
 
     return audioTrack
   }
@@ -284,11 +300,12 @@ internal class FishjamClientInternal(
     val videoSource = peerConnectionFactoryWrapper.createScreencastVideoSource()
     val webrtcTrack = peerConnectionFactoryWrapper.createVideoTrack(videoSource)
     val callback = LocalScreencastTrack.ProjectionCallback()
-    val capturer = peerConnectionFactoryWrapper.createScreenCapturer(
-      videoSource,
-      callback,
-      mediaProjectionPermission
-    )
+    val capturer =
+      peerConnectionFactoryWrapper.createScreenCapturer(
+        videoSource,
+        callback,
+        mediaProjectionPermission
+      )
     val screencastTrack =
       LocalScreencastTrack(webrtcTrack, localEndpoint.id, metadata, capturer, videoParameters)
     callback.addCallback {
@@ -297,33 +314,40 @@ internal class FishjamClientInternal(
       }
     }
 
-    commandsQueue.addCommand(Command(CommandName.ADD_TRACK) {
-      localEndpoint = localEndpoint.addOrReplaceTrack(screencastTrack)
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(screencastTrack)
 
-      coroutineScope.launch {
-        peerConnectionManager.addTrack(screencastTrack)
-        rtcEngineCommunication.renegotiateTracks()
-      }
-    }).join()
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(screencastTrack)
+            rtcEngineCommunication.renegotiateTracks()
+          }
+        }
+      ).join()
 
     return screencastTrack
   }
 
   suspend fun removeTrack(trackId: String) {
-    commandsQueue.addCommand(Command(CommandName.REMOVE_TRACK) {
-      val track: Track = getTrack(trackId) ?: run {
-        Timber.e("removeTrack: Can't find track to remove")
-        return@Command
-      }
+    commandsQueue
+      .addCommand(
+        Command(CommandName.REMOVE_TRACK) {
+          val track: Track =
+            getTrack(trackId) ?: run {
+              Timber.e("removeTrack: Can't find track to remove")
+              return@Command
+            }
 
-      localEndpoint = localEndpoint.removeTrack(trackId)
-      (track as LocalTrack).stop()
+          localEndpoint = localEndpoint.removeTrack(trackId)
+          (track as LocalTrack).stop()
 
-      coroutineScope.launch {
-        peerConnectionManager.removeTrack(track.webrtcId())
-        rtcEngineCommunication.renegotiateTracks()
-      }
-    }).join()
+          coroutineScope.launch {
+            peerConnectionManager.removeTrack(track.webrtcId())
+            rtcEngineCommunication.renegotiateTracks()
+          }
+        }
+      ).join()
   }
 
   fun setTargetTrackEncoding(
@@ -331,10 +355,11 @@ internal class FishjamClientInternal(
     encoding: TrackEncoding
   ) {
     coroutineScope.launch {
-      val rtcEngineTrackId = getTrack(trackId)?.getRTCEngineId() ?: run {
-        Timber.e("setTargetTrackEncoding: invalid track id")
-        return@launch
-      }
+      val rtcEngineTrackId =
+        getTrack(trackId)?.getRTCEngineId() ?: run {
+          Timber.e("setTargetTrackEncoding: invalid track id")
+          return@launch
+        }
       rtcEngineCommunication.setTargetTrackEncoding(rtcEngineTrackId, encoding)
     }
   }
@@ -344,10 +369,11 @@ internal class FishjamClientInternal(
     encoding: TrackEncoding
   ) {
     coroutineScope.launch {
-      val webrtcId = getTrack(trackId)?.webrtcId() ?: run {
-        Timber.e("enableTrackEncoding: invalid track id")
-        return@launch
-      }
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("enableTrackEncoding: invalid track id")
+          return@launch
+        }
       peerConnectionManager.setTrackEncoding(webrtcId, encoding, true)
     }
   }
@@ -357,10 +383,11 @@ internal class FishjamClientInternal(
     encoding: TrackEncoding
   ) {
     coroutineScope.launch {
-      val webrtcId = getTrack(trackId)?.webrtcId() ?: run {
-        Timber.e("enableTrackEncoding: invalid track id")
-        return@launch
-      }
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("enableTrackEncoding: invalid track id")
+          return@launch
+        }
       peerConnectionManager.setTrackEncoding(webrtcId, encoding, false)
     }
   }
@@ -378,10 +405,11 @@ internal class FishjamClientInternal(
   ) {
     coroutineScope.launch {
       val track = getTrack(trackId)
-      val rtcEngineTrackId = track?.getRTCEngineId() ?: run {
-        Timber.e("updateTrackMetadata: invalid track id")
-        return@launch
-      }
+      val rtcEngineTrackId =
+        track?.getRTCEngineId() ?: run {
+          Timber.e("updateTrackMetadata: invalid track id")
+          return@launch
+        }
       rtcEngineCommunication.updateTrackMetadata(rtcEngineTrackId, trackMetadata)
       track.metadata = trackMetadata
       localEndpoint = localEndpoint.addOrReplaceTrack(track)
@@ -393,10 +421,11 @@ internal class FishjamClientInternal(
     bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
   ) {
     coroutineScope.launch {
-      val webrtcId = getTrack(trackId)?.webrtcId() ?: run {
-        Timber.e("setTrackBandwidth: invalid track id")
-        return@launch
-      }
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("setTrackBandwidth: invalid track id")
+          return@launch
+        }
       peerConnectionManager.setTrackBandwidth(webrtcId, bandwidthLimit)
     }
   }
@@ -407,10 +436,11 @@ internal class FishjamClientInternal(
     bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
   ) {
     coroutineScope.launch {
-      val webrtcId = getTrack(trackId)?.webrtcId() ?: run {
-        Timber.e("setEncodingBandwidth: invalid track id")
-        return@launch
-      }
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("setEncodingBandwidth: invalid track id")
+          return@launch
+        }
       peerConnectionManager.setEncodingBandwidth(webrtcId, encoding, bandwidthLimit)
     }
   }
@@ -419,21 +449,13 @@ internal class FishjamClientInternal(
     Logging.enableLogToDebugOutput(severity)
   }
 
-  fun getStats(): Map<String, RTCStats> {
-    return peerConnectionManager.getStats()
-  }
+  fun getStats(): Map<String, RTCStats> = peerConnectionManager.getStats()
 
-  fun getRemotePeers(): List<Peer> {
-    return remoteEndpoints.values.toList()
-  }
+  fun getRemotePeers(): List<Peer> = remoteEndpoints.values.toList()
 
-  fun getLocalEndpoint(): Endpoint {
-    return localEndpoint
-  }
+  fun getLocalEndpoint(): Endpoint = localEndpoint
 
-  fun createVideoViewRenderer(): VideoTextureViewRenderer {
-    return peerConnectionFactoryWrapper.createVideoViewRenderer()
-  }
+  fun createVideoViewRenderer(): VideoTextureViewRenderer = peerConnectionFactoryWrapper.createVideoViewRenderer()
 
   private fun sendEvent(peerMessage: PeerNotifications.PeerMessage) {
     webSocket?.send(peerMessage.toByteArray().toByteString())
@@ -447,12 +469,19 @@ internal class FishjamClientInternal(
     val mediaEvent =
       PeerNotifications.PeerMessage
         .newBuilder()
-        .setMediaEvent(PeerNotifications.PeerMessage.MediaEvent.newBuilder().setData(event))
-        .build()
+        .setMediaEvent(
+          PeerNotifications.PeerMessage.MediaEvent
+            .newBuilder()
+            .setData(event)
+        ).build()
     sendEvent(mediaEvent)
   }
 
-  override fun onEndpointAdded(endpointId: String, type: String, metadata: Metadata?) {
+  override fun onEndpointAdded(
+    endpointId: String,
+    type: String,
+    metadata: Metadata?
+  ) {
     if (endpointId == this.localEndpoint.id) {
       return
     }
@@ -482,7 +511,10 @@ internal class FishjamClientInternal(
     listener.onPeerLeft(endpoint)
   }
 
-  override fun onEndpointUpdated(endpointId: String, endpointMetadata: Metadata?) {
+  override fun onEndpointUpdated(
+    endpointId: String,
+    endpointMetadata: Metadata?
+  ) {
     val endpoint =
       remoteEndpoints.remove(endpointId) ?: run {
         Timber.e("Failed to process EndpointUpdated event: Endpoint not found: $endpointId")
@@ -498,11 +530,12 @@ internal class FishjamClientInternal(
   ) {
     coroutineScope.launch {
       try {
-        val offer = peerConnectionManager.getSdpOffer(
-          integratedTurnServers,
-          tracksTypes,
-          localEndpoint.tracks.values.toList()
-        )
+        val offer =
+          peerConnectionManager.getSdpOffer(
+            integratedTurnServers,
+            tracksTypes,
+            localEndpoint.tracks.values.toList()
+          )
 
         rtcEngineCommunication.sdpOffer(
           offer.description,
@@ -515,7 +548,11 @@ internal class FishjamClientInternal(
     }
   }
 
-  override fun onRemoteCandidate(candidate: String, sdpMLineIndex: Int, sdpMid: String?) {
+  override fun onRemoteCandidate(
+    candidate: String,
+    sdpMLineIndex: Int,
+    sdpMid: String?
+  ) {
     coroutineScope.launch {
       val iceCandidate =
         IceCandidate(
@@ -528,7 +565,10 @@ internal class FishjamClientInternal(
     }
   }
 
-  override fun onTracksAdded(endpointId: String, tracks: Map<String, TrackData>) {
+  override fun onTracksAdded(
+    endpointId: String,
+    tracks: Map<String, TrackData>
+  ) {
     if (localEndpoint.id == endpointId) return
 
     val endpoint =
@@ -555,7 +595,10 @@ internal class FishjamClientInternal(
     remoteEndpoints[updatedEndpoint.id] = updatedEndpoint
   }
 
-  override fun onTracksRemoved(endpointId: String, trackIds: List<String>) {
+  override fun onTracksRemoved(
+    endpointId: String,
+    trackIds: List<String>
+  ) {
     var endpoint =
       remoteEndpoints[endpointId] ?: run {
         Timber.e("Failed to process TracksRemoved event: Endpoint not found: $endpointId")
@@ -570,11 +613,16 @@ internal class FishjamClientInternal(
     remoteEndpoints[endpointId] = endpoint
   }
 
-  override fun onTrackUpdated(endpointId: String, trackId: String, metadata: Metadata?) {
-    val track = getTrack(trackId) ?: run {
-      Timber.e("Failed to process TrackUpdated event: Track context not found: $trackId")
-      return
-    }
+  override fun onTrackUpdated(
+    endpointId: String,
+    trackId: String,
+    metadata: Metadata?
+  ) {
+    val track =
+      getTrack(trackId) ?: run {
+        Timber.e("Failed to process TrackUpdated event: Track context not found: $trackId")
+        return
+      }
 
     track.metadata = metadata ?: mapOf()
 
@@ -605,11 +653,15 @@ internal class FishjamClientInternal(
     track.setEncoding(encodingEnum, encodingReasonEnum)
   }
 
-  override fun onVadNotification(trackId: String, status: String) {
-    val track = getTrack(trackId) as? RemoteAudioTrack ?: run {
-      Timber.e("Invalid track id = $trackId")
-      return
-    }
+  override fun onVadNotification(
+    trackId: String,
+    status: String
+  ) {
+    val track =
+      getTrack(trackId) as? RemoteAudioTrack ?: run {
+        Timber.e("Invalid track id = $trackId")
+        return
+      }
     val vadStatus = VadStatus.fromString(status)
     if (vadStatus == null) {
       Timber.e("Invalid vad status = $status")
@@ -622,35 +674,41 @@ internal class FishjamClientInternal(
     listener.onBandwidthEstimationChanged(estimation)
   }
 
-  override fun onAddTrack(rtcEngineTrackId: String, webrtcTrack: MediaStreamTrack) {
-    var track = getTrackWithRtcEngineId(rtcEngineTrackId) ?: run {
-      Timber.e("onAddTrack: Track context with trackId=$rtcEngineTrackId not found")
-      return
-    }
-
+  override fun onAddTrack(
+    rtcEngineTrackId: String,
+    webrtcTrack: MediaStreamTrack
+  ) {
+    var track =
+      getTrackWithRtcEngineId(rtcEngineTrackId) ?: run {
+        Timber.e("onAddTrack: Track context with trackId=$rtcEngineTrackId not found")
+        return
+      }
 
     val trackId = track.id()
 
-    track = when (webrtcTrack) {
-      is VideoTrack -> RemoteVideoTrack(
-        webrtcTrack,
-        track.endpointId,
-        track.getRTCEngineId(),
-        track.metadata,
-        trackId
-      )
+    track =
+      when (webrtcTrack) {
+        is VideoTrack ->
+          RemoteVideoTrack(
+            webrtcTrack,
+            track.endpointId,
+            track.getRTCEngineId(),
+            track.metadata,
+            trackId
+          )
 
-      is AudioTrack -> RemoteAudioTrack(
-        webrtcTrack,
-        track.endpointId,
-        track.getRTCEngineId(),
-        track.metadata,
-        trackId
-      )
+        is AudioTrack ->
+          RemoteAudioTrack(
+            webrtcTrack,
+            track.endpointId,
+            track.getRTCEngineId(),
+            track.metadata,
+            trackId
+          )
 
-      else ->
-        throw IllegalStateException("invalid type of incoming track")
-    }
+        else ->
+          throw IllegalStateException("invalid type of incoming track")
+      }
 
     remoteEndpoints[track.endpointId] = remoteEndpoints[track.endpointId]!!.addOrReplaceTrack(track)
     listener.onTrackReady(track)
@@ -661,5 +719,4 @@ internal class FishjamClientInternal(
       rtcEngineCommunication.localCandidate(candidate.sdp, candidate.sdpMLineIndex)
     }
   }
-
 }

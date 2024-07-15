@@ -93,7 +93,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
       });
       setCurrentCamera(devices.find((device) => device.isFrontFacing) || null);
     });
-  }, []);
+  }, [getCaptureDevices, startCamera]);
 
   const onJoinPressed = async () => {
     await connect(route.params.fishjamUrl, route.params.peerToken, {

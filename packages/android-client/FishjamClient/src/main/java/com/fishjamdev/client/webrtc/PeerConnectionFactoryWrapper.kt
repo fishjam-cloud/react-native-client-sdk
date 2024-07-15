@@ -40,49 +40,41 @@ internal class PeerConnectionFactoryWrapper(
     eglBase = EglBase.create()
 
     peerConnectionFactory =
-      PeerConnectionFactory.builder().setAudioDeviceModule(audioDeviceModule).setVideoEncoderFactory(
-        SimulcastVideoEncoderFactoryWrapper(
-          eglBase.eglBaseContext,
-          encoderOptions
-        )
-      ).setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
+      PeerConnectionFactory
+        .builder()
+        .setAudioDeviceModule(audioDeviceModule)
+        .setVideoEncoderFactory(
+          SimulcastVideoEncoderFactoryWrapper(
+            eglBase.eglBaseContext,
+            encoderOptions
+          )
+        ).setVideoDecoderFactory(DefaultVideoDecoderFactory(eglBase.eglBaseContext))
         .createPeerConnectionFactory()
   }
 
   fun createPeerConnection(
     rtcConfig: PeerConnection.RTCConfiguration,
     observer: PeerConnection.Observer
-  ): PeerConnection? {
-    return peerConnectionFactory.createPeerConnection(rtcConfig, observer)
-  }
+  ): PeerConnection? = peerConnectionFactory.createPeerConnection(rtcConfig, observer)
 
-  fun createVideoSource(): VideoSource {
-    return peerConnectionFactory.createVideoSource(false)
-  }
+  fun createVideoSource(): VideoSource = peerConnectionFactory.createVideoSource(false)
 
-  fun createScreencastVideoSource(): VideoSource {
-    return peerConnectionFactory.createVideoSource(true)
-  }
+  fun createScreencastVideoSource(): VideoSource = peerConnectionFactory.createVideoSource(true)
 
-  fun createVideoTrack(
-    source: VideoSource,
-  ): VideoTrack {
-    return peerConnectionFactory.createVideoTrack(UUID.randomUUID().toString(), source)
-  }
+  fun createVideoTrack(source: VideoSource): VideoTrack = peerConnectionFactory.createVideoTrack(UUID.randomUUID().toString(), source)
 
   fun createVideoCapturer(
     source: VideoSource,
     videoParameters: VideoParameters,
     captureDeviceName: String? = null
-  ): CameraCapturer {
-    return CameraCapturer(
+  ): CameraCapturer =
+    CameraCapturer(
       context = appContext,
       source = source,
       rootEglBase = eglBase,
       videoParameters = videoParameters,
       captureDeviceName
     )
-  }
 
   fun createAudioSource(): AudioSource {
     if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.RECORD_AUDIO) !=
@@ -106,11 +98,8 @@ internal class PeerConnectionFactoryWrapper(
     return peerConnectionFactory.createAudioSource(audioConstraints)
   }
 
-  fun createAudioTrack(
-    audioSource: AudioSource
-  ): AudioTrack {
-    return peerConnectionFactory.createAudioTrack(UUID.randomUUID().toString(), audioSource)
-  }
+  fun createAudioTrack(audioSource: AudioSource): AudioTrack =
+    peerConnectionFactory.createAudioTrack(UUID.randomUUID().toString(), audioSource)
 
   fun createScreenCapturer(
     source: VideoSource,

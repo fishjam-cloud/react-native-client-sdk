@@ -3,8 +3,8 @@ package com.fishjamdev.client.media
 import com.fishjamdev.client.models.EncoderOptions
 import com.fishjamdev.client.models.EncoderType
 import com.fishjamdev.client.models.EncodingReason
-import com.fishjamdev.client.models.TrackEncoding
 import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.TrackEncoding
 import org.webrtc.EglBase
 import org.webrtc.HardwareVideoEncoderFactory
 import org.webrtc.SimulcastVideoEncoderFactory
@@ -25,7 +25,13 @@ fun interface OnEncodingChangedListener {
   fun onEncodingChanged(trackContext: RemoteVideoTrack)
 }
 
-class RemoteVideoTrack(videoTrack: org.webrtc.VideoTrack, endpointId: String,  rtcEngineId: String?, metadata: Metadata, id: String = UUID.randomUUID().toString()) : VideoTrack(videoTrack, endpointId,rtcEngineId, metadata, id) {
+class RemoteVideoTrack(
+  videoTrack: org.webrtc.VideoTrack,
+  endpointId: String,
+  rtcEngineId: String?,
+  metadata: Metadata,
+  id: String = UUID.randomUUID().toString()
+) : VideoTrack(videoTrack, endpointId, rtcEngineId, metadata, id) {
   private var onTrackEncodingChangeListener: (OnEncodingChangedListener)? = null
 
   /**
@@ -65,8 +71,8 @@ class RemoteVideoTrack(videoTrack: org.webrtc.VideoTrack, endpointId: String,  r
 }
 
 internal open class SimulcastVideoEncoderFactoryWrapper(
-    sharedContext: EglBase.Context?,
-    encoderOptions: EncoderOptions
+  sharedContext: EglBase.Context?,
+  encoderOptions: EncoderOptions
 ) : VideoEncoderFactory {
   /**
    * Factory that prioritizes software encoder.
@@ -91,15 +97,16 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
    * This results in HardwareVideoEncoderFactory being both the primary and fallback,
    * but there aren't any specific problems in doing so.
    */
-  private class FallbackFactory(private val hardwareVideoEncoderFactory: VideoEncoderFactory) :
-      VideoEncoderFactory {
+  private class FallbackFactory(
+    private val hardwareVideoEncoderFactory: VideoEncoderFactory
+  ) : VideoEncoderFactory {
     private val softwareVideoEncoderFactory: VideoEncoderFactory = SoftwareVideoEncoderFactory()
 
     override fun createEncoder(info: VideoCodecInfo): VideoEncoder? {
       val softwareEncoder = softwareVideoEncoderFactory.createEncoder(info)
       val hardwareEncoder = hardwareVideoEncoderFactory.createEncoder(info)
       return if (hardwareEncoder != null && softwareEncoder != null) {
-          VideoEncoderFallback(hardwareEncoder, softwareEncoder)
+        VideoEncoderFallback(hardwareEncoder, softwareEncoder)
       } else {
         softwareEncoder ?: hardwareEncoder
       }
@@ -127,8 +134,8 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
     var streamSettings: VideoEncoder.Settings? = null
 
     override fun initEncode(
-        settings: VideoEncoder.Settings,
-        callback: VideoEncoder.Callback?
+      settings: VideoEncoder.Settings,
+      callback: VideoEncoder.Callback?
     ): VideoCodecStatus {
       streamSettings = settings
 
@@ -147,8 +154,8 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
     }
 
     override fun encode(
-        frame: VideoFrame,
-        encodeInfo: VideoEncoder.EncodeInfo?
+      frame: VideoFrame,
+      encodeInfo: VideoEncoder.EncodeInfo?
     ): VideoCodecStatus {
       val future =
         executor.submit(
@@ -182,8 +189,8 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
     }
 
     override fun setRateAllocation(
-        allocation: VideoEncoder.BitrateAllocation?,
-        frameRate: Int
+      allocation: VideoEncoder.BitrateAllocation?,
+      frameRate: Int
     ): VideoCodecStatus {
       val future =
         executor.submit(
@@ -233,8 +240,9 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
     }
   }
 
-  private class StreamEncoderWrapperFactory(private val factory: VideoEncoderFactory) :
-      VideoEncoderFactory {
+  private class StreamEncoderWrapperFactory(
+    private val factory: VideoEncoderFactory
+  ) : VideoEncoderFactory {
     override fun createEncoder(videoCodecInfo: VideoCodecInfo?): VideoEncoder? {
       val encoder = factory.createEncoder(videoCodecInfo) ?: return null
       if (encoder is WrappedNativeVideoEncoder) {
@@ -252,25 +260,25 @@ internal open class SimulcastVideoEncoderFactoryWrapper(
 
   init {
     val hardwareVideoEncoderFactory =
-        HardwareVideoEncoderFactory(
-            sharedContext,
-            encoderOptions.enableIntelVp8Encoder,
-            encoderOptions.enableH264HighProfile
-        )
+      HardwareVideoEncoderFactory(
+        sharedContext,
+        encoderOptions.enableIntelVp8Encoder,
+        encoderOptions.enableH264HighProfile
+      )
     val softwareVideoEncoderFactory = SoftwareVideoEncoderFactory()
     primary = StreamEncoderWrapperFactory(hardwareVideoEncoderFactory)
     fallback = StreamEncoderWrapperFactory(FallbackFactory(primary))
     native =
       if (encoderOptions.encoderType == EncoderType.HARDWARE) {
-          SimulcastVideoEncoderFactory(
-              StreamEncoderWrapperFactory(hardwareVideoEncoderFactory),
-              fallback
-          )
+        SimulcastVideoEncoderFactory(
+          StreamEncoderWrapperFactory(hardwareVideoEncoderFactory),
+          fallback
+        )
       } else {
-          SimulcastVideoEncoderFactory(
-              StreamEncoderWrapperFactory(softwareVideoEncoderFactory),
-              fallback
-          )
+        SimulcastVideoEncoderFactory(
+          StreamEncoderWrapperFactory(softwareVideoEncoderFactory),
+          fallback
+        )
       }
   }
 

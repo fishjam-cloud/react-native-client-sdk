@@ -23,20 +23,14 @@ open class Track(
    */
   private val id: String = UUID.randomUUID().toString()
 ) {
-  fun id(): String {
-    return id
-  }
+  fun id(): String = id
 
-  internal fun webrtcId(): String {
-    return mediaTrack?.id() ?: ""
-  }
+  internal fun webrtcId(): String = mediaTrack?.id() ?: ""
 
   var metadata: Metadata = metadata
     internal set
 
-  fun isEnabled(): Boolean {
-    return mediaTrack?.enabled() ?: false
-  }
+  fun isEnabled(): Boolean = mediaTrack?.enabled() ?: false
 
   fun setEnabled(isEnabled: Boolean) {
     mediaTrack?.setEnabled(isEnabled)
@@ -46,7 +40,5 @@ open class Track(
     rtcEngineId = id
   }
 
-  internal fun getRTCEngineId(): String? {
-    return rtcEngineId
-  }
+  internal fun getRTCEngineId(): String? = rtcEngineId
 }

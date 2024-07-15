@@ -17,7 +17,8 @@ class VideoRendererView(
   var activeVideoTrack: VideoTrack? = null
   var trackId: String? = null
 
-  private val videoView = RNFishjamClient.fishjamClient!!.createVideoViewRenderer().also {
+  private val videoView =
+    RNFishjamClient.fishjamClient!!.createVideoViewRenderer().also {
       addView(it)
       RNFishjamClient.onTracksUpdateListeners.add(this)
     }

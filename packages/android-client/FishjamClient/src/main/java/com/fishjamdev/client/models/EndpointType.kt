@@ -4,8 +4,6 @@ enum class EndpointType {
   WEBRTC;
 
   companion object {
-    fun fromString(type: String): EndpointType {
-      return EndpointType.valueOf(type.uppercase())
-    }
+    fun fromString(type: String): EndpointType = EndpointType.valueOf(type.uppercase())
   }
 }

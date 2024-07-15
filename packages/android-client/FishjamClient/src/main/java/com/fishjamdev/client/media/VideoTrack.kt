@@ -1,19 +1,22 @@
 package com.fishjamdev.client.media
 
-import org.webrtc.VideoSink
 import com.fishjamdev.client.models.Metadata
+import org.webrtc.VideoSink
 import java.util.UUID
 
 open class VideoTrack(
   internal val videoTrack: org.webrtc.VideoTrack,
-  endpointId: String,  rtcEngineId: String?, metadata: Metadata, id: String = UUID.randomUUID().toString()
+  endpointId: String,
+  rtcEngineId: String?,
+  metadata: Metadata,
+  id: String = UUID.randomUUID().toString()
 ) : Track(
-  videoTrack,
-  endpointId,
-  rtcEngineId,
-  metadata,
-  id
-) {
+    videoTrack,
+    endpointId,
+    rtcEngineId,
+    metadata,
+    id
+  ) {
   fun addRenderer(renderer: VideoSink) {
     this.videoTrack.addSink(renderer)
   }

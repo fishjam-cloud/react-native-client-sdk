@@ -124,19 +124,21 @@ internal class RTCEngineCommunication {
 
   fun onEvent(serializedEvent: SerializedMediaEvent) {
     when (val event = decodeEvent(serializedEvent)) {
-      is Connected -> listeners.forEach { listener ->
-        listener.onConnected(
-          event.data.id,
-          event.data.otherEndpoints
-        )
-      }
+      is Connected ->
+        listeners.forEach { listener ->
+          listener.onConnected(
+            event.data.id,
+            event.data.otherEndpoints
+          )
+        }
 
-      is OfferData -> listeners.forEach { listener ->
-        listener.onOfferData(
-          event.data.integratedTurnServers,
-          event.data.tracksTypes
-        )
-      }
+      is OfferData ->
+        listeners.forEach { listener ->
+          listener.onOfferData(
+            event.data.integratedTurnServers,
+            event.data.tracksTypes
+          )
+        }
 
       is EndpointRemoved -> listeners.forEach { listener -> listener.onEndpointRemoved(event.data.id) }
       is EndpointAdded ->
@@ -148,12 +150,13 @@ internal class RTCEngineCommunication {
           )
         }
 
-      is EndpointUpdated -> listeners.forEach { listener ->
-        listener.onEndpointUpdated(
-          event.data.id,
-          event.data.metadata
-        )
-      }
+      is EndpointUpdated ->
+        listeners.forEach { listener ->
+          listener.onEndpointUpdated(
+            event.data.id,
+            event.data.metadata
+          )
+        }
 
       is RemoteCandidate ->
         listeners.forEach { listener ->
@@ -164,13 +167,14 @@ internal class RTCEngineCommunication {
           )
         }
 
-      is SdpAnswer -> listeners.forEach { listener ->
-        listener.onSdpAnswer(
-          event.data.type,
-          event.data.sdp,
-          event.data.midToTrackId
-        )
-      }
+      is SdpAnswer ->
+        listeners.forEach { listener ->
+          listener.onSdpAnswer(
+            event.data.type,
+            event.data.sdp,
+            event.data.midToTrackId
+          )
+        }
 
       is TrackUpdated ->
         listeners.forEach { listener ->
@@ -189,12 +193,13 @@ internal class RTCEngineCommunication {
           )
         }
 
-      is TracksRemoved -> listeners.forEach { listener ->
-        listener.onTracksRemoved(
-          event.data.endpointId,
-          event.data.trackIds
-        )
-      }
+      is TracksRemoved ->
+        listeners.forEach { listener ->
+          listener.onTracksRemoved(
+            event.data.endpointId,
+            event.data.trackIds
+          )
+        }
 
       is EncodingSwitched ->
         listeners.forEach { listener ->
@@ -206,12 +211,13 @@ internal class RTCEngineCommunication {
           )
         }
 
-      is VadNotification -> listeners.forEach { listener ->
-        listener.onVadNotification(
-          event.data.trackId,
-          event.data.status
-        )
-      }
+      is VadNotification ->
+        listeners.forEach { listener ->
+          listener.onVadNotification(
+            event.data.trackId,
+            event.data.status
+          )
+        }
 
       is BandwidthEstimation -> listeners.forEach { listener -> listener.onBandwidthEstimation(event.data.estimation.roundToLong()) }
       else -> Timber.e("Failed to process unknown event: $event")

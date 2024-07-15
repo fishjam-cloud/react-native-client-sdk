@@ -1,8 +1,8 @@
 package com.fishjamdev.client.media
 
 import android.content.Context
-import com.fishjamdev.client.models.VideoParameters
 import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.VideoParameters
 import org.webrtc.Camera1Enumerator
 import org.webrtc.Camera2Enumerator
 import org.webrtc.CameraEnumerationAndroid
@@ -14,14 +14,14 @@ import org.webrtc.VideoCapturer
 import org.webrtc.VideoSource
 import timber.log.Timber
 
-
 class LocalVideoTrack(
   mediaTrack: org.webrtc.VideoTrack,
   endpointId: String,
   metadata: Metadata,
   private val capturer: Capturer,
   val videoParameters: VideoParameters
-) : VideoTrack(mediaTrack, endpointId, rtcEngineId = null, metadata), LocalTrack {
+) : VideoTrack(mediaTrack, endpointId, rtcEngineId = null, metadata),
+  LocalTrack {
   data class CaptureDevice(
     val deviceName: String,
     val isFrontFacing: Boolean,

@@ -18,7 +18,7 @@ internal class CommandsQueue {
     val command = commandsQueue.first()
     val job = command.job
     commandsQueue.removeFirst()
-    if(command.clientStateAfterCommand != null) {
+    if (command.clientStateAfterCommand != null) {
       clientState = command.clientStateAfterCommand
     }
     job.complete()

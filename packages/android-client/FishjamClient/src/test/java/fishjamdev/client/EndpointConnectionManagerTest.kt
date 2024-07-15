@@ -7,6 +7,10 @@ import com.fishjamdev.client.models.SimulcastConfig
 import com.fishjamdev.client.models.TrackBandwidthLimit
 import com.fishjamdev.client.models.TrackEncoding
 import com.fishjamdev.client.models.VideoParameters
+import com.fishjamdev.client.utils.addTransceiver
+import com.fishjamdev.client.utils.createOffer
+import com.fishjamdev.client.utils.getEncodings
+import com.fishjamdev.client.utils.setLocalDescription
 import com.fishjamdev.client.webrtc.PeerConnectionFactoryWrapper
 import com.fishjamdev.client.webrtc.PeerConnectionListener
 import com.fishjamdev.client.webrtc.PeerConnectionManager
@@ -20,10 +24,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
-import com.fishjamdev.client.utils.addTransceiver
-import com.fishjamdev.client.utils.createOffer
-import com.fishjamdev.client.utils.getEncodings
-import com.fishjamdev.client.utils.setLocalDescription
 import org.webrtc.MediaConstraints
 import org.webrtc.PeerConnection
 import org.webrtc.RtpParameters
@@ -40,10 +40,10 @@ class EndpointConnectionManagerTest {
     val endpointConnectionListenerMock = mockk<PeerConnectionListener>(relaxed = true)
     val endpointConnectionFactoryMock = mockk<PeerConnectionFactoryWrapper>(relaxed = true)
 
-      mockkStatic("org.membraneframework.rtc.utils.SuspendableSdpObserverKt")
-      mockkStatic("org.membraneframework.rtc.utils.EndpointConnectionUtilsKt")
+    mockkStatic("org.membraneframework.rtc.utils.SuspendableSdpObserverKt")
+    mockkStatic("org.membraneframework.rtc.utils.EndpointConnectionUtilsKt")
 
-      mockkStatic(Log::class)
+    mockkStatic(Log::class)
     every { Log.v(any(), any()) } returns 0
     every { Log.d(any(), any()) } returns 0
     every { Log.i(any(), any()) } returns 0
@@ -53,10 +53,10 @@ class EndpointConnectionManagerTest {
     endpointConnectionMock = mockk(relaxed = true)
 
     coEvery {
-        endpointConnectionMock.createOffer(any<MediaConstraints>())
+      endpointConnectionMock.createOffer(any<MediaConstraints>())
     } returns Result.success(SessionDescription(SessionDescription.Type.OFFER, "test_description"))
     coEvery {
-        endpointConnectionMock.setLocalDescription(any<SessionDescription>())
+      endpointConnectionMock.setLocalDescription(any<SessionDescription>())
     } returns Result.success(Unit)
 
     every { endpointConnectionFactoryMock.createPeerConnection(any(), any()) } returns endpointConnectionMock
@@ -67,163 +67,163 @@ class EndpointConnectionManagerTest {
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun createsOffer() =
-      runTest {
-          val offer = manager.getSdpOffer(emptyList(), emptyMap(), emptyList())
+    runTest {
+      val offer = manager.getSdpOffer(emptyList(), emptyMap(), emptyList())
 
-          Assert.assertNotNull(offer)
-          Assert.assertEquals("test_description", offer.description)
-      }
+      Assert.assertNotNull(offer)
+      Assert.assertEquals("test_description", offer.description)
+    }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun addsAudioTrack() =
-      runTest {
-          val audioTrack = LocalAudioTrack(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
-          manager.getSdpOffer(emptyList(), emptyMap(), listOf(audioTrack))
+    runTest {
+      val audioTrack = LocalAudioTrack(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+      manager.getSdpOffer(emptyList(), emptyMap(), listOf(audioTrack))
 
-          verify(exactly = 1) {
-              endpointConnectionMock.addTransceiver(
-                  audioTrack.mediaTrack!!,
-                  eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
-                  match { it.size == 1 },
-                  withArg {
-                      Assert.assertEquals("should be just 1 encoding", 1, it.size)
-                      Assert.assertNull("without rid", it[0].rid)
-                  }
-              )
+      verify(exactly = 1) {
+        endpointConnectionMock.addTransceiver(
+          audioTrack.mediaTrack!!,
+          eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
+          match { it.size == 1 },
+          withArg {
+            Assert.assertEquals("should be just 1 encoding", 1, it.size)
+            Assert.assertNull("without rid", it[0].rid)
           }
+        )
       }
+    }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun addsVideoTrack() =
-      runTest {
-          val mediaTrack: VideoTrack = mockk(relaxed = true)
+    runTest {
+      val mediaTrack: VideoTrack = mockk(relaxed = true)
 
-          every { mediaTrack.kind() } returns "video"
+      every { mediaTrack.kind() } returns "video"
 
-          val videoTrack =
-              LocalVideoTrack(
-                  mediaTrack,
-                  mockk(relaxed = true),
-                  mockk(relaxed = true),
-                  mockk(relaxed = true),
-                  VideoParameters.presetFHD169
-              )
+      val videoTrack =
+        LocalVideoTrack(
+          mediaTrack,
+          mockk(relaxed = true),
+          mockk(relaxed = true),
+          mockk(relaxed = true),
+          VideoParameters.presetFHD169
+        )
 
-          manager.getSdpOffer(emptyList(), emptyMap(), listOf(videoTrack))
+      manager.getSdpOffer(emptyList(), emptyMap(), listOf(videoTrack))
 
-          verify(exactly = 1) {
-              endpointConnectionMock.addTransceiver(
-                  videoTrack.videoTrack,
-                  eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
-                  match { it.size == 1 },
-                  withArg {
-                      Assert.assertEquals("should be just 1 encoding", 1, it.size)
-                      Assert.assertNull("without rid", it[0].rid)
-                  }
-              )
+      verify(exactly = 1) {
+        endpointConnectionMock.addTransceiver(
+          videoTrack.videoTrack,
+          eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
+          match { it.size == 1 },
+          withArg {
+            Assert.assertEquals("should be just 1 encoding", 1, it.size)
+            Assert.assertNull("without rid", it[0].rid)
           }
+        )
       }
+    }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun simulcastConfigIsSet() =
-      runTest {
-          val videoParameters =
-              VideoParameters.presetFHD169.copy(
-                  simulcastConfig =
-                  SimulcastConfig(
-                      true,
-                      listOf(TrackEncoding.H, TrackEncoding.L)
-                  )
-              )
+    runTest {
+      val videoParameters =
+        VideoParameters.presetFHD169.copy(
+          simulcastConfig =
+            SimulcastConfig(
+              true,
+              listOf(TrackEncoding.H, TrackEncoding.L)
+            )
+        )
 
-          val mediaTrack: VideoTrack = mockk(relaxed = true)
+      val mediaTrack: VideoTrack = mockk(relaxed = true)
 
-          every { mediaTrack.kind() } returns "video"
+      every { mediaTrack.kind() } returns "video"
 
-          val videoTrack =
-              LocalVideoTrack(
-                  mediaTrack,
-                  mockk(relaxed = true),
-                  mockk(relaxed = true),
-                  mockk(relaxed = true),
-                  videoParameters
-              )
+      val videoTrack =
+        LocalVideoTrack(
+          mediaTrack,
+          mockk(relaxed = true),
+          mockk(relaxed = true),
+          mockk(relaxed = true),
+          videoParameters
+        )
 
-          manager.getSdpOffer(emptyList(), emptyMap(), listOf(videoTrack))
+      manager.getSdpOffer(emptyList(), emptyMap(), listOf(videoTrack))
 
-          verify(exactly = 1) {
-              endpointConnectionMock.addTransceiver(
-                  videoTrack.videoTrack,
-                  eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
-                  any(),
-                  withArg {
-                      Assert.assertEquals("Should be 3 encodings", 3, it.size)
+      verify(exactly = 1) {
+        endpointConnectionMock.addTransceiver(
+          videoTrack.videoTrack,
+          eq(RtpTransceiver.RtpTransceiverDirection.SEND_ONLY),
+          any(),
+          withArg {
+            Assert.assertEquals("Should be 3 encodings", 3, it.size)
 
-                      Assert.assertEquals("first encoding should have rid=l", "l", it[0].rid)
-                      Assert.assertTrue("l encoding should be active", it[0].active)
-                      Assert.assertEquals(
-                          "l layer should be 4x smaller",
-                          it[0].scaleResolutionDownBy,
-                          4.0
-                      )
+            Assert.assertEquals("first encoding should have rid=l", "l", it[0].rid)
+            Assert.assertTrue("l encoding should be active", it[0].active)
+            Assert.assertEquals(
+              "l layer should be 4x smaller",
+              it[0].scaleResolutionDownBy,
+              4.0
+            )
 
-                      Assert.assertEquals("first encoding should have rid=m", "m", it[1].rid)
-                      Assert.assertFalse("m encoding should not be active", it[1].active)
-                      Assert.assertEquals(
-                          "m layer should be 2x smaller",
-                          it[1].scaleResolutionDownBy,
-                          2.0
-                      )
+            Assert.assertEquals("first encoding should have rid=m", "m", it[1].rid)
+            Assert.assertFalse("m encoding should not be active", it[1].active)
+            Assert.assertEquals(
+              "m layer should be 2x smaller",
+              it[1].scaleResolutionDownBy,
+              2.0
+            )
 
-                      Assert.assertEquals("third encoding should have rid=h", "h", it[2].rid)
-                      Assert.assertTrue("h encoding should be active", it[2].active)
-                      Assert.assertEquals(
-                          "h layer should have original size",
-                          it[2].scaleResolutionDownBy,
-                          1.0
-                      )
-                  }
-              )
+            Assert.assertEquals("third encoding should have rid=h", "h", it[2].rid)
+            Assert.assertTrue("h encoding should be active", it[2].active)
+            Assert.assertEquals(
+              "h layer should have original size",
+              it[2].scaleResolutionDownBy,
+              1.0
+            )
           }
+        )
       }
+    }
 
   @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun setTrackBandwidth() =
-      runTest {
-          val h = RtpParameters.Encoding("h", true, 1.0)
-          val m = RtpParameters.Encoding("m", true, 2.0)
-          val l = RtpParameters.Encoding("l", true, 4.0)
+    runTest {
+      val h = RtpParameters.Encoding("h", true, 1.0)
+      val m = RtpParameters.Encoding("m", true, 2.0)
+      val l = RtpParameters.Encoding("l", true, 4.0)
 
-          every { endpointConnectionMock.senders } returns
+      every { endpointConnectionMock.senders } returns
+        listOf(
+          mockk(relaxed = true) {
+            every { parameters } returns
+              mockk(relaxed = true) {
+                every { track()?.id() } returns "dummy_track"
+              }
+          },
+          mockk(relaxed = true) {
+            every { parameters } returns
+              mockk(relaxed = true) {
+                every { track()?.id() } returns "track_id"
+                every { getEncodings() } returns
                   listOf(
-                      mockk(relaxed = true) {
-                          every { parameters } returns
-                                  mockk(relaxed = true) {
-                                      every { track()?.id() } returns "dummy_track"
-                                  }
-                      },
-                      mockk(relaxed = true) {
-                          every { parameters } returns
-                                  mockk(relaxed = true) {
-                                      every { track()?.id() } returns "track_id"
-                                      every { getEncodings() } returns
-                                              listOf(
-                                                  h,
-                                                  m,
-                                                  l
-                                              )
-                                  }
-                      }
+                    h,
+                    m,
+                    l
                   )
-          manager.getSdpOffer(emptyList(), emptyMap(), emptyList())
-          Assert.assertNull("layers have no maxBitrateBps", h.maxBitrateBps)
-          manager.setTrackBandwidth("track_id", TrackBandwidthLimit.BandwidthLimit(1000))
-          Assert.assertEquals("h layer has correct maxBitrateBps", 780190, h.maxBitrateBps)
-          Assert.assertEquals("m layer has correct maxBitrateBps", 195047, m.maxBitrateBps)
-          Assert.assertEquals("l layer has correct maxBitrateBps", 48761, l.maxBitrateBps)
-      }
+              }
+          }
+        )
+      manager.getSdpOffer(emptyList(), emptyMap(), emptyList())
+      Assert.assertNull("layers have no maxBitrateBps", h.maxBitrateBps)
+      manager.setTrackBandwidth("track_id", TrackBandwidthLimit.BandwidthLimit(1000))
+      Assert.assertEquals("h layer has correct maxBitrateBps", 780190, h.maxBitrateBps)
+      Assert.assertEquals("m layer has correct maxBitrateBps", 195047, m.maxBitrateBps)
+      Assert.assertEquals("l layer has correct maxBitrateBps", 48761, l.maxBitrateBps)
+    }
 }

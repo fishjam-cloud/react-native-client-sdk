@@ -7,17 +7,16 @@ import com.fishjamdev.client.media.LocalScreencastTrack
 import com.fishjamdev.client.media.LocalVideoTrack
 import com.fishjamdev.client.media.createAudioDeviceModule
 import com.fishjamdev.client.models.EncoderOptions
-import com.fishjamdev.client.models.TrackEncoding
-import com.fishjamdev.client.models.TrackBandwidthLimit
-import com.fishjamdev.client.models.VideoParameters
-import com.fishjamdev.client.models.RTCStats
 import com.fishjamdev.client.models.Metadata
 import com.fishjamdev.client.models.Peer
+import com.fishjamdev.client.models.RTCStats
+import com.fishjamdev.client.models.TrackBandwidthLimit
+import com.fishjamdev.client.models.TrackEncoding
+import com.fishjamdev.client.models.VideoParameters
 import com.fishjamdev.client.ui.VideoTextureViewRenderer
 import com.fishjamdev.client.webrtc.PeerConnectionFactoryWrapper
 import com.fishjamdev.client.webrtc.PeerConnectionManager
 import com.fishjamdev.client.webrtc.RTCEngineCommunication
-import org.webrtc.EglBase
 import org.webrtc.Logging
 
 data class Config(
@@ -25,7 +24,10 @@ data class Config(
   val token: String
 )
 
-class FishjamClient(appContext: Context, listener: FishjamClientListener) {
+class FishjamClient(
+  appContext: Context,
+  listener: FishjamClientListener
+) {
   private val peerConnectionFactoryWrapper =
     PeerConnectionFactoryWrapper(EncoderOptions(), createAudioDeviceModule(appContext), appContext)
   private val peerConnectionManager = PeerConnectionManager(peerConnectionFactoryWrapper)
@@ -76,9 +78,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
     videoParameters: VideoParameters,
     metadata: Metadata,
     captureDeviceName: String? = null
-  ): LocalVideoTrack {
-    return client.createVideoTrack(videoParameters, metadata, captureDeviceName)
-  }
+  ): LocalVideoTrack = client.createVideoTrack(videoParameters, metadata, captureDeviceName)
 
   /**
    * Creates an audio track utilizing device's microphone.
@@ -88,9 +88,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * @param metadata the metadata that will be sent to the <strong>Membrane RTC Engine</strong> for media negotiation
    * @return an instance of the audio track
    */
-  suspend fun createAudioTrack(metadata: Metadata): LocalAudioTrack {
-    return client.createAudioTrack(metadata)
-  }
+  suspend fun createAudioTrack(metadata: Metadata): LocalAudioTrack = client.createAudioTrack(metadata)
 
   /**
    * Creates a screen track recording the entire device's screen.
@@ -108,8 +106,8 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
     videoParameters: VideoParameters,
     metadata: Metadata,
     onEnd: (() -> Unit)? = null
-  ): LocalScreencastTrack {
-    return client.createScreencastTrack(
+  ): LocalScreencastTrack =
+    client.createScreencastTrack(
       mediaProjectionPermission,
       videoParameters,
       metadata,
@@ -122,9 +120,7 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * @param trackId an id of a valid local track that has been created using the current client
    * @return a boolean whether the track has been successfully removed or not
    */
-  suspend fun removeTrack(trackId: String) {
-    return client.removeTrack(trackId)
-  }
+  suspend fun removeTrack(trackId: String) = client.removeTrack(trackId)
 
   /**
    * Sets track encoding that server should send to the client library.
@@ -235,20 +231,11 @@ class FishjamClient(appContext: Context, listener: FishjamClientListener) {
    * Returns current connection stats
    * @return a map containing statistics
    */
-  fun getStats(): Map<String, RTCStats> {
-    return client.getStats()
-  }
+  fun getStats(): Map<String, RTCStats> = client.getStats()
 
-  fun getRemotePeers(): List<Peer> {
-    return client.getRemotePeers()
-  }
+  fun getRemotePeers(): List<Peer> = client.getRemotePeers()
 
-  fun getLocalEndpoint(): Peer {
-    return client.getLocalEndpoint()
-  }
+  fun getLocalEndpoint(): Peer = client.getLocalEndpoint()
 
-  fun createVideoViewRenderer(): VideoTextureViewRenderer {
-    return client.createVideoViewRenderer()
-  }
-
+  fun createVideoViewRenderer(): VideoTextureViewRenderer = client.createVideoViewRenderer()
 }

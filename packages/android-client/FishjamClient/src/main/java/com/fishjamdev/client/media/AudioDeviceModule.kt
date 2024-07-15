@@ -5,7 +5,6 @@ import org.webrtc.audio.AudioDeviceModule
 import org.webrtc.audio.JavaAudioDeviceModule
 import timber.log.Timber
 
-
 fun createAudioDeviceModule(appContext: Context): AudioDeviceModule {
   val audioRecordErrorCallback =
     object : JavaAudioDeviceModule.AudioRecordErrorCallback {
@@ -67,7 +66,8 @@ fun createAudioDeviceModule(appContext: Context): AudioDeviceModule {
       }
     }
 
-  return JavaAudioDeviceModule.builder(appContext)
+  return JavaAudioDeviceModule
+    .builder(appContext)
     .setUseHardwareAcousticEchoCanceler(true)
     .setUseHardwareNoiseSuppressor(true)
     .setAudioRecordErrorCallback(audioRecordErrorCallback)
@@ -76,5 +76,3 @@ fun createAudioDeviceModule(appContext: Context): AudioDeviceModule {
     .setAudioTrackStateCallback(audioTrackStateCallback)
     .createAudioDeviceModule()
 }
-
-

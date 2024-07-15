@@ -1,14 +1,14 @@
 package com.fishjamdev.client.media
 
 import android.media.projection.MediaProjection
-import com.fishjamdev.client.models.VideoParameters
 import com.fishjamdev.client.models.Metadata
+import com.fishjamdev.client.models.VideoParameters
+import com.fishjamdev.client.utils.ClosableCoroutineScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import com.fishjamdev.client.utils.ClosableCoroutineScope
 import org.webrtc.ScreenCapturerAndroid
 import java.util.ArrayList
 
@@ -18,7 +18,8 @@ class LocalScreencastTrack(
   metadata: Metadata,
   private val capturer: ScreenCapturerAndroid,
   val videoParameters: VideoParameters
-) : LocalTrack, Track(videoTrack, endpointId, null, metadata) {
+) : Track(videoTrack, endpointId, null, metadata),
+  LocalTrack {
   private val mutex = Mutex()
   private val coroutineScope: CoroutineScope =
     ClosableCoroutineScope(SupervisorJob())
@@ -68,6 +69,4 @@ class LocalScreencastTrack(
       callbacks.add(callback)
     }
   }
-
-
 }
