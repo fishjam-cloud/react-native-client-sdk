@@ -36,10 +36,10 @@ export {
   updateVideoTrackMetadata,
 } from './common/metadata';
 
+export type { LoggingSeverity } from './common/webRTC';
 export {
   changeWebRTCLoggingSeverity,
   setTargetTrackEncoding,
-  LoggingSeverity,
 } from './common/webRTC';
 
 export { connect, leaveRoom } from './common/client';
