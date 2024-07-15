@@ -12,6 +12,13 @@ internal enum class CommandName {
   LEAVE,
 }
 
-internal data class Command(val commandName: CommandName, val command: () -> Unit = {}) {
+internal enum class ClientState {
+  CREATED,
+  CONNECTED,
+  JOINED
+}
+
+internal data class Command(val commandName: CommandName, val clientStateAfterCommand: ClientState?, val command: () -> Unit = {}) {
+  constructor(commandName: CommandName, command: () -> Unit = {}) : this(commandName, null, command)
   val job: CompletableJob = Job()
 }

@@ -44,8 +44,10 @@ const ConnectScreen = ({ navigation }: Props) => {
   const onTapConnectButton = async () => {
     try {
       setConnectionError(null);
-      await connect(fishjamUrl.trim(), peerToken.trim(), { name: 'RN mobile' });
-      navigation.navigate('Preview');
+      navigation.navigate('Preview', {
+        fishjamUrl: fishjamUrl.trim(),
+        peerToken: peerToken.trim(),
+      });
     } catch (e) {
       const message =
         'message' in (e as Error) ? (e as Error).message : 'Unknown error';

@@ -92,8 +92,25 @@ class RNFishjamClientModule : Module() {
           sendEvent(name, data)
         }
 
-      OnCreate {
-        rnFishjamClient.onModuleCreate(appContext)
+    OnCreate {
+      rnFishjamClient.onModuleCreate(appContext)
+    }
+
+    OnDestroy {
+      rnFishjamClient.onModuleDestroy()
+    }
+
+    OnActivityDestroys {
+      rnFishjamClient.leaveRoom()
+    }
+
+    OnActivityResult { _, result ->
+      rnFishjamClient.onActivityResult(result.requestCode, result.resultCode, result.data)
+    }
+
+    AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
+      CoroutineScope(Dispatchers.Main).launch {
+        rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
       }
 
       OnDestroy {

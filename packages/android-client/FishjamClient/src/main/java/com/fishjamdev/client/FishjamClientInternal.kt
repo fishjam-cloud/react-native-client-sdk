@@ -140,7 +140,7 @@ internal class FishjamClientInternal(
       }
     }
 
-    commandsQueue.addCommand(Command(CommandName.CONNECT) {
+    commandsQueue.addCommand(Command(CommandName.CONNECT, ClientState.CONNECTED) {
       val request = Request.Builder().url(config.websocketUrl).build()
       val webSocket =
         OkHttpClient().newWebSocket(
@@ -153,7 +153,7 @@ internal class FishjamClientInternal(
   }
 
   fun join(peerMetadata: Metadata = emptyMap()) {
-    commandsQueue.addCommand(Command(CommandName.JOIN) {
+    commandsQueue.addCommand(Command(CommandName.JOIN, ClientState.JOINED) {
       localEndpoint = localEndpoint.copy(metadata = peerMetadata)
       rtcEngineCommunication.connect(peerMetadata)
     })
@@ -191,6 +191,7 @@ internal class FishjamClientInternal(
       rtcEngineCommunication.removeListener(this@FishjamClientInternal)
       webSocket?.close(1000, null)
       webSocket = null
+      commandsQueue.clear()
     }
   }
 
@@ -217,7 +218,11 @@ internal class FishjamClientInternal(
 
       coroutineScope.launch {
         peerConnectionManager.addTrack(videoTrack)
-        rtcEngineCommunication.renegotiateTracks()
+        if(commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
+          rtcEngineCommunication.renegotiateTracks()
+        } else {
+          commandsQueue.finishCommand(CommandName.ADD_TRACK)
+        }
       }
     }).join()
 

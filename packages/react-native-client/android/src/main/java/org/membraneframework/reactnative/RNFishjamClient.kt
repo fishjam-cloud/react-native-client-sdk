@@ -70,7 +70,7 @@ class RNFishjamClient(
   fun onModuleCreate(appContext: AppContext) {
     this.appContext = appContext
     this.audioSwitchManager = AudioSwitchManager(appContext.reactContext!!)
-
+    create()
   }
 
   fun onModuleDestroy() {
@@ -117,7 +117,7 @@ class RNFishjamClient(
     return TrackBandwidthLimit.BandwidthLimit(maxBandwidthInt)
   }
 
-  fun create() {
+  private fun create() {
     audioSwitchManager = AudioSwitchManager(appContext?.reactContext!!)
     fishjamClient = FishjamClient(
       appContext = appContext?.reactContext!!, listener = this
@@ -229,18 +229,18 @@ class RNFishjamClient(
     if (isScreencastOn) {
       stopScreencast()
     }
+    isMicrophoneOn = false
+    isCameraOn = false
+    isScreencastOn = false
     fishjamClient?.leave()
-    fishjamClient = null
   }
 
   suspend fun startCamera(config: CameraConfig) {
-    ensureConnected()
     val cameraTrack = createCameraTrack(config) ?: return
     setCameraTrackState(cameraTrack, config.cameraEnabled)
   }
 
   private suspend fun createCameraTrack(config: CameraConfig): LocalVideoTrack? {
-    ensureConnected()
     val videoParameters = getVideoParametersFromOptions(config)
     videoSimulcastConfig = getSimulcastConfigFromOptions(config.simulcastConfig)
     return fishjamClient?.createVideoTrack(
@@ -250,11 +250,7 @@ class RNFishjamClient(
     )
   }
 
-  private fun setCameraTrackState(
-    cameraTrack: LocalVideoTrack,
-    isEnabled: Boolean
-  ) {
-    ensureConnected()
+  private fun setCameraTrackState(cameraTrack: LocalVideoTrack, isEnabled: Boolean) {
     cameraTrack.setEnabled(isEnabled)
     isCameraOn = isEnabled
     val eventName = EmitableEvents.IsCameraOn
@@ -279,17 +275,12 @@ class RNFishjamClient(
   }
 
   suspend fun startMicrophone(config: MicrophoneConfig) {
-    ensureConnected()
     val microphoneTrack = fishjamClient?.createAudioTrack(config.audioTrackMetadata)
       ?: throw CodedException("Failed to Create Track")
     setMicrophoneTrackState(microphoneTrack, config.microphoneEnabled)
   }
 
-  private fun setMicrophoneTrackState(
-    microphoneTrack: LocalAudioTrack,
-    isEnabled: Boolean
-  ) {
-    ensureConnected()
+  private fun setMicrophoneTrackState(microphoneTrack: LocalAudioTrack, isEnabled: Boolean) {
     microphoneTrack.setEnabled(isEnabled)
     isMicrophoneOn = isEnabled
     val eventName = EmitableEvents.IsMicrophoneOn
@@ -381,7 +372,7 @@ class RNFishjamClient(
             }
           }
         })
-    } ?: listOf()
+    }
   }
 
   fun getCaptureDevices(): List<Map<String, Any>> {

@@ -27,15 +27,17 @@ import java.util.UUID
 internal class PeerConnectionFactoryWrapper(
   encoderOptions: EncoderOptions,
   audioDeviceModule: AudioDeviceModule,
-  private val eglBase: EglBase,
   private val appContext: Context
 ) {
   private val peerConnectionFactory: PeerConnectionFactory
+  private val eglBase: EglBase
 
   init {
     PeerConnectionFactory.initialize(
       PeerConnectionFactory.InitializationOptions.builder(appContext).createInitializationOptions()
     )
+
+    eglBase = EglBase.create()
 
     peerConnectionFactory =
       PeerConnectionFactory.builder().setAudioDeviceModule(audioDeviceModule).setVideoEncoderFactory(

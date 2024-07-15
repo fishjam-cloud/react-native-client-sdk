@@ -5,6 +5,7 @@ import {
   useMicrophone,
   VideoQuality,
   VideoPreviewView,
+  connect,
 } from '@fishjam-dev/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -95,6 +96,9 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   }, []);
 
   const onJoinPressed = async () => {
+    await connect(route.params.fishjamUrl, route.params.peerToken, {
+      name: 'RN mobile',
+    });
     navigation.navigate('Room', {
       isCameraOn,
       isMicrophoneOn,

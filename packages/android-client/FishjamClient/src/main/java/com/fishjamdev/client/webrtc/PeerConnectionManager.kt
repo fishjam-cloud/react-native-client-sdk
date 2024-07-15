@@ -451,6 +451,15 @@ internal class PeerConnectionManager(
   suspend fun close() {
     peerConnectionMutex.withLock {
       peerConnection?.close()
+      peerConnection = null
+      peerConnectionStats.clear()
+
+      iceServers = null
+      config = null
+      queuedRemoteCandidates = null
+      midToTrackId = HashMap<String, String>()
+
+      streamIds = listOf(UUID.randomUUID().toString())
     }
   }
 

@@ -71,9 +71,11 @@ const ConnectScreen = ({ navigation }: Props) => {
         userName,
       );
 
-      await connect(fishjamUrl, token, { name: 'RN mobile' });
-
-      navigation.navigate('Preview', { userName });
+      navigation.navigate('Preview', {
+        userName,
+        fishjamUrl,
+        peerToken: token,
+      });
     } catch (e) {
       const message =
         'message' in (e as Error) ? (e as Error).message : 'Unknown error';

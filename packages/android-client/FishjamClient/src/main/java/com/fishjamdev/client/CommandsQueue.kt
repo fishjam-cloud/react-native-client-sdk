@@ -4,6 +4,7 @@ import kotlinx.coroutines.Job
 
 internal class CommandsQueue {
   private var commandsQueue: ArrayDeque<Command> = ArrayDeque()
+  var clientState: ClientState = ClientState.CREATED
 
   fun addCommand(command: Command): Job {
     commandsQueue.add(command)
@@ -14,8 +15,12 @@ internal class CommandsQueue {
   }
 
   fun finishCommand() {
-    val job = commandsQueue.first().job
+    val command = commandsQueue.first()
+    val job = command.job
     commandsQueue.removeFirst()
+    if(command.clientStateAfterCommand != null) {
+      clientState = command.clientStateAfterCommand
+    }
     job.complete()
     // TODO: make it iterative, not recursive?
     if (commandsQueue.isNotEmpty()) {
@@ -27,5 +32,10 @@ internal class CommandsQueue {
     if (commandsQueue.isNotEmpty() && commandsQueue.first().commandName == commandName) {
       finishCommand()
     }
+  }
+
+  fun clear() {
+    clientState = ClientState.CREATED
+    commandsQueue.clear()
   }
 }
