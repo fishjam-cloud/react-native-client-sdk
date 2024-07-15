@@ -1,10 +1,7 @@
 // global
 export type Metadata = { [key: string]: any };
 
-export enum VideoLayout {
-  FILL = 'FILL',
-  FIT = 'FIT',
-}
+export type VideoLayout = 'FILL' | 'FIT';
 
 export type TrackEncoding = 'l' | 'm' | 'h';
 

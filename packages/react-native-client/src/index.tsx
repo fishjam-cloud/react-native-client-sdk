@@ -1,10 +1,11 @@
-export type { Peer, Track } from './hooks/usePeers';
-export {
-  usePeers,
+export type {
+  Peer,
+  Track,
   TrackType,
   VadStatus,
   EncodingReason,
 } from './hooks/usePeers';
+export { usePeers } from './hooks/usePeers';
 
 export type {
   AudioOutputDevice,
@@ -64,5 +65,5 @@ export type {
   SimulcastBandwidthLimit,
   BandwidthLimit,
   SimulcastConfig,
+  VideoLayout,
 } from './types';
-export { VideoLayout } from './types';
