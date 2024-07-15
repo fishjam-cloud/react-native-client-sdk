@@ -2,14 +2,45 @@ import { useCallback, useEffect, useState } from 'react';
 
 import {
   BandwidthLimit,
-  IsScreencastOnEvent,
   Metadata,
-  ScreencastOptions,
   SimulcastConfig,
+  TrackBandwidthLimit,
   TrackEncoding,
 } from '../RNFishjamClient.types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+
+type IsScreencastOnEvent = { IsScreencastOn: boolean };
+
+export enum ScreencastQuality {
+  VGA = 'VGA',
+  HD5 = 'HD5',
+  HD15 = 'HD15',
+  FHD15 = 'FHD15',
+  FHD30 = 'FHD30',
+}
+
+export type ScreencastOptions<MetadataType extends Metadata> = {
+  /**
+   * Resolution + fps of screencast track, one of: `VGA`, `HD5`, `HD15`, `FHD15`, `FHD30`.
+   * Note that quality might be worse than specified due to device capabilities, internet
+   * connection etc.
+   * @default `HD15``
+   */
+  quality: ScreencastQuality;
+  /**
+   * a map `string -> any` containing screencast track metadata to be sent to the server
+   */
+  screencastMetadata: MetadataType;
+  /**
+   * SimulcastConfig of a screencast track. By default simulcast is disabled.
+   */
+  simulcastConfig: SimulcastConfig;
+  /**
+   *  bandwidth limit of a screencast track. By default there is no bandwidth limit.
+   */
+  maxBandwidth: TrackBandwidthLimit;
+};
 
 const defaultSimulcastConfig = () => ({
   enabled: false,

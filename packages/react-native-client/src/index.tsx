@@ -31,6 +31,11 @@ export type {
 export { useMicrophone } from './hooks/useMicrophone';
 
 export { useRTCStatistics } from './stats/useRTCStatistics';
+
+export type {
+  ScreencastQuality,
+  ScreencastOptions,
+} from './hooks/useScreencast';
 export { useScreencast } from './hooks/useScreencast';
 
 export {

@@ -2,20 +2,13 @@ import type { RTCStats } from './stats/types';
 import type { MicrophoneConfig } from './hooks/useMicrophone';
 import type { Endpoint } from './hooks/usePeers';
 import type { CameraConfig, CaptureDevice } from './hooks/useCamera';
+import { ScreencastOptions } from './hooks/useScreencast';
 // global
 export type Metadata = { [key: string]: any };
 
 export enum VideoLayout {
   FILL = 'FILL',
   FIT = 'FIT',
-}
-
-export enum ScreencastQuality {
-  VGA = 'VGA',
-  HD5 = 'HD5',
-  HD15 = 'HD15',
-  FHD15 = 'FHD15',
-  FHD30 = 'FHD30',
 }
 
 export type TrackEncoding = 'l' | 'm' | 'h';
@@ -53,32 +46,6 @@ export type SimulcastBandwidthLimit = Record<TrackEncoding, BandwidthLimit>;
  * A type describing bandwidth limitation of a track, including simulcast and non-simulcast tracks. Can be `BandwidthLimit` or `SimulcastBandwidthLimit`.
  */
 export type TrackBandwidthLimit = BandwidthLimit | SimulcastBandwidthLimit;
-
-export type ScreencastOptions<MetadataType extends Metadata> = {
-  /**
-   * Resolution + fps of screencast track, one of: `VGA`, `HD5`, `HD15`, `FHD15`, `FHD30`.
-   * Note that quality might be worse than specified due to device capabilities, internet
-   * connection etc.
-   * @default `HD15``
-   */
-  quality: ScreencastQuality;
-  /**
-   * a map `string -> any` containing screencast track metadata to be sent to the server
-   */
-  screencastMetadata: MetadataType;
-  /**
-   * SimulcastConfig of a screencast track. By default simulcast is disabled.
-   */
-  simulcastConfig: SimulcastConfig;
-  /**
-   *  bandwidth limit of a screencast track. By default there is no bandwidth limit.
-   */
-  maxBandwidth: TrackBandwidthLimit;
-};
-
-export type IsScreencastOnEvent = { IsScreencastOn: boolean };
-
-export type SimulcastConfigUpdateEvent = SimulcastConfig;
 
 export type RNFishjamClient = {
   connect: (

@@ -5,7 +5,6 @@ import {
   BandwidthLimit,
   Metadata,
   SimulcastConfig,
-  SimulcastConfigUpdateEvent,
   TrackBandwidthLimit,
   TrackEncoding,
 } from '../RNFishjamClient.types';
@@ -13,6 +12,7 @@ import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 type IsCameraOnEvent = { IsCameraOn: boolean };
+type SimulcastConfigUpdateEvent = SimulcastConfig;
 
 export type CaptureDevice = {
   id: string;
