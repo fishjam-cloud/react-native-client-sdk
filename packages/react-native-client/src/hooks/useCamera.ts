@@ -177,7 +177,7 @@ export function useCamera() {
    * @returns A promise that resolves when camera is toggled.
    */
   const flipCamera = useCallback(async () => {
-    return RNFishjamClientModule.flipCamera();
+    await RNFishjamClientModule.flipCamera();
   }, []);
 
   /**
@@ -185,16 +185,14 @@ export function useCamera() {
    * @returns A promise that resolves when camera is switched.
    */
   const switchCamera = useCallback(async (captureDeviceId: string) => {
-    return RNFishjamClientModule.switchCamera(captureDeviceId);
+    await RNFishjamClientModule.switchCamera(captureDeviceId);
   }, []);
 
   /** Function that queries available cameras.
    * @returns A promise that resolves to the list of available cameras.
    */
   const getCaptureDevices = useCallback(async () => {
-    return RNFishjamClientModule.getCaptureDevices() as Promise<
-      CaptureDevice[]
-    >;
+    return RNFishjamClientModule.getCaptureDevices();
   }, []);
 
   /**
