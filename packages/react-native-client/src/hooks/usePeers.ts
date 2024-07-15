@@ -128,5 +128,5 @@ export function usePeers<
     return () => eventListener.remove();
   }, []);
 
-  return peers;
+  return { peers };
 }
