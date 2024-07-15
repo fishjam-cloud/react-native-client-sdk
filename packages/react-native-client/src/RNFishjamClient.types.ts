@@ -218,14 +218,6 @@ export type CaptureDevice = {
   isBackFacing: boolean;
 };
 
-export enum LoggingSeverity {
-  Verbose = 'verbose',
-  Info = 'info',
-  Warning = 'warning',
-  Error = 'error',
-  None = 'none',
-}
-
 export type EndpointsUpdateEvent<
   MetadataType extends Metadata,
   VideoTrackMetadataType extends Metadata,

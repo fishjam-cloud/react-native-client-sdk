@@ -27,10 +27,13 @@ export {
   updatePeerMetadata,
   updateVideoTrackMetadata,
 } from './common/metadata';
+
+export type { LoggingSeverity } from './common/webRTC';
 export {
   changeWebRTCLoggingSeverity,
   setTargetTrackEncoding,
 } from './common/webRTC';
+
 export { connect, leaveRoom } from './common/client';
 
 export { VideoPreviewView } from './components/VideoPreviewView';
