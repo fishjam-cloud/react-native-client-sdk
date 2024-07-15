@@ -1,7 +1,7 @@
-import com.fishjamdev.client.Config
-import com.fishjamdev.client.FishjamClientInternal
-import com.fishjamdev.client.FishjamClientListener
-import com.fishjamdev.client.media.createAudioDeviceModule
+import com.fishjamcloud.client.Config
+import com.fishjamcloud.client.FishjamClientInternal
+import com.fishjamcloud.client.FishjamClientListener
+import com.fishjamcloud.client.media.createAudioDeviceModule
 import fishjam.PeerNotifications
 import fishjamdev.client.WebsocketMock
 import io.mockk.confirmVerified

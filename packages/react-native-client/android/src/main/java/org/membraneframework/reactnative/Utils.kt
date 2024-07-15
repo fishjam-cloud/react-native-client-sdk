@@ -1,6 +1,6 @@
 package org.membraneframework.reactnative
 
-import com.fishjamdev.client.models.TrackEncoding
+import com.fishjamcloud.client.models.TrackEncoding
 
 internal fun String.toTrackEncoding(): TrackEncoding =
   when (this) {

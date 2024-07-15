@@ -1,8 +1,8 @@
 package org.membraneframework.reactnative
 
 import android.content.Context
-import com.fishjamdev.client.media.LocalVideoTrack
-import com.fishjamdev.client.ui.VideoTextureViewRenderer
+import com.fishjamcloud.client.media.LocalVideoTrack
+import com.fishjamcloud.client.ui.VideoTextureViewRenderer
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import org.webrtc.RendererCommon

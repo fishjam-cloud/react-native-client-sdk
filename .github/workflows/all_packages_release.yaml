@@ -1,0 +1,68 @@
+name: Release all mobile packages
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+jobs:
+  release-mobile-packages:
+    runs-on: macOS-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check if tagged push to main
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" && ! -z "${{ github.event.push.tags }}" ]]; then
+            echo "Running on a tag push to main branch"
+            # Place steps or call other jobs/workflows here
+          else
+            echo "This workflow runs only on a tagged push to main branch"
+            exit 1  # Exiting with non-zero status will fail the job
+
+      - name: Get the tag name
+        id: tag_name
+        run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
+
+      - name: Git configuration
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Run CocoaPod publish check
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          pod lib lint FishjamCloudClient.podspec
+
+      - name: Run npm publish check
+        run: npm publish --dry-run --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./packages/react-native-client
+
+      - name: Publish to CocoaPod
+        env:
+          COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        run: |
+          pod trunk push FishjamCloudClient.podspec
+
+      - name: Publish to npm
+        run: npm publish --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: ./packages/react-native-client
+
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: 'Release ${{ steps.tag_name.outputs.TAG_NAME }}'
+          tag_name: ${{ steps.tag_name.outputs.TAG_NAME }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

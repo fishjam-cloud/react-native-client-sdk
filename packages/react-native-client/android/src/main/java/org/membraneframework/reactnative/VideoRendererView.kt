@@ -1,7 +1,7 @@
 package org.membraneframework.reactnative
 
 import android.content.Context
-import com.fishjamdev.client.media.VideoTrack
+import com.fishjamcloud.client.media.VideoTrack
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope

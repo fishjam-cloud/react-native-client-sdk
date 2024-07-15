@@ -1,4 +1,4 @@
-import { useAudioSettings } from '@fishjam-dev/react-native-client';
+import { useAudioSettings } from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import React, { RefObject, useCallback } from 'react';
 import { Platform } from 'react-native';

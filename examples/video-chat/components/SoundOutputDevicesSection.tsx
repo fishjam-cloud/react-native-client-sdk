@@ -3,7 +3,7 @@ import {
   AudioOutputDevice,
   AudioOutputDeviceType,
   useAudioSettings,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import React from 'react';
 import {
   Text,

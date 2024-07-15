@@ -1,19 +1,19 @@
 package fishjamdev.client
 
 import android.util.Log
-import com.fishjamdev.client.media.LocalAudioTrack
-import com.fishjamdev.client.media.LocalVideoTrack
-import com.fishjamdev.client.models.SimulcastConfig
-import com.fishjamdev.client.models.TrackBandwidthLimit
-import com.fishjamdev.client.models.TrackEncoding
-import com.fishjamdev.client.models.VideoParameters
-import com.fishjamdev.client.utils.addTransceiver
-import com.fishjamdev.client.utils.createOffer
-import com.fishjamdev.client.utils.getEncodings
-import com.fishjamdev.client.utils.setLocalDescription
-import com.fishjamdev.client.webrtc.PeerConnectionFactoryWrapper
-import com.fishjamdev.client.webrtc.PeerConnectionListener
-import com.fishjamdev.client.webrtc.PeerConnectionManager
+import com.fishjamcloud.client.media.LocalAudioTrack
+import com.fishjamcloud.client.media.LocalVideoTrack
+import com.fishjamcloud.client.models.SimulcastConfig
+import com.fishjamcloud.client.models.TrackBandwidthLimit
+import com.fishjamcloud.client.models.TrackEncoding
+import com.fishjamcloud.client.models.VideoParameters
+import com.fishjamcloud.client.utils.addTransceiver
+import com.fishjamcloud.client.utils.createOffer
+import com.fishjamcloud.client.utils.getEncodings
+import com.fishjamcloud.client.utils.setLocalDescription
+import com.fishjamcloud.client.webrtc.PeerConnectionFactoryWrapper
+import com.fishjamcloud.client.webrtc.PeerConnectionListener
+import com.fishjamcloud.client.webrtc.PeerConnectionManager
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -40,8 +40,8 @@ class EndpointConnectionManagerTest {
     val endpointConnectionListenerMock = mockk<PeerConnectionListener>(relaxed = true)
     val endpointConnectionFactoryMock = mockk<PeerConnectionFactoryWrapper>(relaxed = true)
 
-    mockkStatic("com.fishjamdev.client.utils.SuspendableSdpObserverKt")
-    mockkStatic("com.fishjamdev.client.utils.EndpointConnectionUtilsKt")
+    mockkStatic("com.fishjamcloud.client.utils.SuspendableSdpObserverKt")
+    mockkStatic("com.fishjamcloud.client.utils.EndpointConnectionUtilsKt")
 
     mockkStatic(Log::class)
     every { Log.v(any(), any()) } returns 0

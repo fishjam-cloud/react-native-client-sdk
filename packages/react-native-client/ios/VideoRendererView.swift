@@ -1,6 +1,6 @@
 import Combine
 import ExpoModulesCore
-import FishjamClient
+import FishjamCloudClient
 
 class VideoRendererView: ExpoView {
     var videoView: VideoView? = nil

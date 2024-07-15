@@ -1,4 +1,4 @@
-import { Metadata } from '../RNFishjamClient.types';
+import { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 
 /**

@@ -3,7 +3,7 @@ import {
   VideoRendererView,
   setTargetTrackEncoding,
   Metadata,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import Animated, {

@@ -1,4 +1,4 @@
-import { useMicrophone } from '@fishjam-dev/react-native-client';
+import { useMicrophone } from '@fishjam-cloud/react-native-client';
 import notifee, {
   AndroidImportance,
   AndroidColor,

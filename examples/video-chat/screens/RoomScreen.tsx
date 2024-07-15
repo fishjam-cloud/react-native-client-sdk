@@ -6,7 +6,7 @@ import {
   useCamera,
   useMicrophone,
   useAudioSettings,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import notifee from '@notifee/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
