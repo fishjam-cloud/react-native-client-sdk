@@ -40,8 +40,8 @@ class EndpointConnectionManagerTest {
     val endpointConnectionListenerMock = mockk<PeerConnectionListener>(relaxed = true)
     val endpointConnectionFactoryMock = mockk<PeerConnectionFactoryWrapper>(relaxed = true)
 
-    mockkStatic("org.membraneframework.rtc.utils.SuspendableSdpObserverKt")
-    mockkStatic("org.membraneframework.rtc.utils.EndpointConnectionUtilsKt")
+    mockkStatic("com.fishjamdev.client.utils.SuspendableSdpObserverKt")
+    mockkStatic("com.fishjamdev.client.utils.EndpointConnectionUtilsKt")
 
     mockkStatic(Log::class)
     every { Log.v(any(), any()) } returns 0
@@ -61,7 +61,8 @@ class EndpointConnectionManagerTest {
 
     every { endpointConnectionFactoryMock.createPeerConnection(any(), any()) } returns endpointConnectionMock
 
-    manager = PeerConnectionManager(endpointConnectionListenerMock, endpointConnectionFactoryMock)
+    manager = PeerConnectionManager(endpointConnectionFactoryMock)
+    manager.addListener(endpointConnectionListenerMock)
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -78,7 +79,7 @@ class EndpointConnectionManagerTest {
   @Test
   fun addsAudioTrack() =
     runTest {
-      val audioTrack = LocalAudioTrack(mockk(relaxed = true), mockk(relaxed = true), mockk(relaxed = true))
+      val audioTrack = LocalAudioTrack(mockk(relaxed = true), "endpoint-id", mockk(relaxed = true))
       manager.getSdpOffer(emptyList(), emptyMap(), listOf(audioTrack))
 
       verify(exactly = 1) {
@@ -105,7 +106,7 @@ class EndpointConnectionManagerTest {
       val videoTrack =
         LocalVideoTrack(
           mediaTrack,
-          mockk(relaxed = true),
+          "endpoint-id",
           mockk(relaxed = true),
           mockk(relaxed = true),
           VideoParameters.presetFHD169
@@ -146,7 +147,7 @@ class EndpointConnectionManagerTest {
       val videoTrack =
         LocalVideoTrack(
           mediaTrack,
-          mockk(relaxed = true),
+          "endpoint-id",
           mockk(relaxed = true),
           mockk(relaxed = true),
           videoParameters
