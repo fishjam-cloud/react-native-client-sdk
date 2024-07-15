@@ -48,10 +48,12 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   );
   const {
     startCamera,
+    toggleCamera,
     getCaptureDevices,
     isCameraOn,
     simulcastConfig,
     toggleVideoTrackEncoding,
+    switchCamera,
   } = useCamera();
   const { isMicrophoneOn: isMicrophoneAvailable } = useMicrophone();
   const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(
@@ -68,11 +70,14 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   };
 
   const toggleSwitchCamera = () => {
-    setCurrentCamera(
+    const camera =
       availableCameras.current.find(
         (device) => device.isFrontFacing !== currentCamera?.isFrontFacing,
-      ) || null,
-    );
+      ) || null;
+    if (camera) {
+      switchCamera(camera.id);
+      setCurrentCamera(camera);
+    }
   };
 
   useEffect(() => {
@@ -127,7 +132,10 @@ const PreviewScreen = ({ navigation, route }: Props) => {
           onPress={toggleMicrophone}
           accessibilityLabel={TOGGLE_MICROPHONE_BUTTON}
         />
-        <ToggleCameraButton toggleCamera={() => {}} isCameraOn={isCameraOn} />
+        <ToggleCameraButton
+          toggleCamera={toggleCamera}
+          isCameraOn={isCameraOn}
+        />
         <SwitchCameraButton switchCamera={toggleSwitchCamera} />
         <SwitchOutputDeviceButton bottomSheetRef={bottomSheetRef} />
       </View>
