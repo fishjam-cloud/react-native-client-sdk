@@ -51,6 +51,9 @@ export function useJoinRoom({
 
   const joinRoom = useCallback(async () => {
     await startForegroundService();
+
+    const devices = await getCaptureDevices();
+
     await startCamera({
       simulcastConfig: {
         enabled: true,
@@ -60,9 +63,7 @@ export function useJoinRoom({
       quality: VideoQuality.HD_169,
       maxBandwidth: { l: 150, m: 500, h: 1500 },
       videoTrackMetadata: { active: isCameraAvailable, type: 'camera' },
-      captureDeviceId: await getCaptureDevices().then(
-        (devices) => devices.find((device) => device.isFrontFacing)?.id,
-      ),
+      captureDeviceId: devices.find((device) => device.isFrontFacing)?.id,
       cameraEnabled: isCameraAvailable,
     });
 

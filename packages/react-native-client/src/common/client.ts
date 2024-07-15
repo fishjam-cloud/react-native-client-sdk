@@ -1,14 +1,14 @@
 import { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 
-export const connect = (
+export async function connect(
   url: string,
   peerToken: string,
   peerMetadata: Metadata,
-) => {
-  return RNFishjamClientModule.connect(url, peerToken, peerMetadata);
-};
+) {
+  await RNFishjamClientModule.connect(url, peerToken, peerMetadata);
+}
 
-export const leaveRoom = () => {
-  return RNFishjamClientModule.leaveRoom();
-};
+export async function leaveRoom() {
+  await RNFishjamClientModule.leaveRoom();
+}

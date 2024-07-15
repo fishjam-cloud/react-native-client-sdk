@@ -78,12 +78,14 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   };
 
   useEffect(() => {
-    getCaptureDevices().then((devices) => {
+    async function getCurrentCamera() {
+      const devices = await getCaptureDevices();
       availableCameras.current = devices;
       setCurrentCamera(devices.find((device) => device.isFrontFacing) || null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    }
+
+    getCurrentCamera();
+  }, [getCaptureDevices]);
 
   const onJoinPressed = async () => {
     navigation.navigate('Room', {

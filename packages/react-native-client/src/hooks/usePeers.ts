@@ -105,6 +105,15 @@ export function usePeers<
   >([]);
 
   useEffect(() => {
+    async function updateEndpoints() {
+      const endpoints = await RNFishjamClientModule.getEndpoints<
+        MetadataType,
+        VideoTrackMetadataType,
+        AudioTrackMetadataType
+      >();
+      setPeers(endpoints);
+    }
+
     const eventListener = eventEmitter.addListener<
       EndpointsUpdateEvent<
         MetadataType,
@@ -114,13 +123,8 @@ export function usePeers<
     >(ReceivableEvents.EndpointsUpdate, (event) => {
       setPeers(event.EndpointsUpdate);
     });
-    RNFishjamClientModule.getEndpoints<
-      MetadataType,
-      VideoTrackMetadataType,
-      AudioTrackMetadataType
-    >().then((endpoints) => {
-      setPeers(endpoints);
-    });
+
+    updateEndpoints();
     return () => eventListener.remove();
   }, []);
 
