@@ -77,8 +77,6 @@ const defaultSimulcastConfig = () => ({
   activeEncodings: [],
 });
 
-let videoSimulcastConfig: SimulcastConfig = defaultSimulcastConfig();
-
 /**
  * This hook can toggle camera on/off and provides current camera state.
  */
@@ -87,8 +85,9 @@ export function useCamera() {
     RNFishjamClientModule.isCameraOn,
   );
 
-  const [simulcastConfig, setSimulcastConfig] =
-    useState<SimulcastConfig>(videoSimulcastConfig);
+  const [simulcastConfig, setSimulcastConfig] = useState<SimulcastConfig>(
+    defaultSimulcastConfig(),
+  );
 
   useEffect(() => {
     const eventListener = eventEmitter.addListener<SimulcastConfigUpdateEvent>(
@@ -113,7 +112,7 @@ export function useCamera() {
    */
   const toggleVideoTrackEncoding = useCallback(
     async (encoding: TrackEncoding) => {
-      videoSimulcastConfig =
+      const videoSimulcastConfig =
         await RNFishjamClientModule.toggleVideoTrackEncoding(encoding);
       setSimulcastConfig(videoSimulcastConfig);
     },
@@ -153,7 +152,6 @@ export function useCamera() {
       config?: Partial<CameraConfig<CameraConfigMetadataType>>,
     ) => Promise<void>
   >(async (config = {}) => {
-    videoSimulcastConfig = config.simulcastConfig || defaultSimulcastConfig();
     // expo-modules on Android don't support Either type, so we workaround it
     if (Platform.OS === 'android') {
       if (typeof config.maxBandwidth === 'object') {
