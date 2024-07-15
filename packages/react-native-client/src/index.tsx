@@ -58,4 +58,12 @@ export { VideoPreviewView } from './components/VideoPreviewView';
 export type { VideoRendererProps } from './components/VideoRendererView';
 export { VideoRendererView } from './components/VideoRendererView';
 
-export * from './types';
+export {
+  Metadata,
+  VideoLayout,
+  TrackBandwidthLimit,
+  TrackEncoding,
+  SimulcastBandwidthLimit,
+  BandwidthLimit,
+  SimulcastConfig,
+} from './types';
