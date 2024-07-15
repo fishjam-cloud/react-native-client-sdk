@@ -16,8 +16,12 @@ export {
 export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
 
-export type { CaptureDevice, CameraConfig } from './hooks/useCamera';
-export { useCamera, VideoQuality } from './hooks/useCamera';
+export type {
+  CaptureDevice,
+  CameraConfig,
+  VideoQuality,
+} from './hooks/useCamera';
+export { useCamera } from './hooks/useCamera';
 
 export type {
   IsMicrophoneOnEvent,
