@@ -43,8 +43,6 @@ export type Track<MetadataType extends Metadata> = {
 };
 // global
 export type Metadata = { [key: string]: any };
-export type SocketConnectionParams = { [key: string]: any };
-export type SocketChannelParams = { [key: string]: any };
 
 export type Endpoint<
   MetadataType extends Metadata,
@@ -134,22 +132,6 @@ export type SimulcastBandwidthLimit = Record<TrackEncoding, BandwidthLimit>;
  * A type describing bandwidth limitation of a track, including simulcast and non-simulcast tracks. Can be `BandwidthLimit` or `SimulcastBandwidthLimit`.
  */
 export type TrackBandwidthLimit = BandwidthLimit | SimulcastBandwidthLimit;
-
-export type ConnectionOptions<MetadataType extends Metadata> = {
-  /**
-   * a map `string -> any` containing user metadata to be sent to the server. Use it to send for example user display name or other options.
-   */
-  endpointMetadata: MetadataType;
-
-  /**
-   *  a map `string -> any` containing connection params passed to the socket.
-   */
-  connectionParams: SocketConnectionParams;
-  /**
-   * a map `string -> any` containing params passed to the socket channel.
-   */
-  socketChannelParams: SocketChannelParams;
-};
 
 export type CameraConfig<MetadataType extends Metadata> = {
   /**
