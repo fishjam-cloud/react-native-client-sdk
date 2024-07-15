@@ -27,8 +27,11 @@ export { useMicrophone } from './hooks/useMicrophone';
 
 export { useRTCStatistics } from './stats/useRTCStatistics';
 
-export type { ScreencastOptions } from './hooks/useScreencast';
-export { useScreencast, ScreencastQuality } from './hooks/useScreencast';
+export type {
+  ScreencastOptions,
+  ScreencastQuality,
+} from './hooks/useScreencast';
+export { useScreencast } from './hooks/useScreencast';
 
 export {
   updateAudioTrackMetadata,
