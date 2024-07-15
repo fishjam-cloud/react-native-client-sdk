@@ -43,7 +43,7 @@ jobs:
         run: npm publish --dry-run --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./packages/android-client
+        working-directory: ./packages/react-native-client
 
       - name: Publish to CocoaPod
         env:
@@ -55,7 +55,7 @@ jobs:
         run: npm publish --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        working-directory: ./packages/android-client
+        working-directory: ./packages/react-native-client
 
 
       - name: Create GitHub release

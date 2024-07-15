@@ -49,10 +49,8 @@ target 'FishjamExample' do
       :mac_catalyst_enabled => false
     )
   end
-#   pod 'FishjamCloudClient'
   pod 'FishjamCloudClient', :path => '../../../'
 end
 target 'ScreenBroadcast' do
-#   pod 'FishjamCloudClient/Broadcast'
   pod 'FishjamCloudClient/Broadcast', :path => '../../../'
 end

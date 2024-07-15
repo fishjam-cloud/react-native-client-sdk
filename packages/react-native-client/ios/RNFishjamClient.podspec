@@ -23,8 +23,8 @@ Pod::Spec.new do |s|
     'SWIFT_COMPILATION_MODE' => 'wholemodule'
   }
 
-  s.source_files = "**/*.{h,m,swift}"
+  s.source_files = '**/*.{h,m,swift}'
 
-  s.dependency "FishjamCloudClient"
+  s.dependency 'FishjamCloudClient', '>= 0.1'
 
 end
