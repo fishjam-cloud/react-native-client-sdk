@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { Metadata } from '../types';
-import RNFishjamClientModule from '../FishjamClient';
+import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 export type MicrophoneConfig<MetadataType extends Metadata> = {

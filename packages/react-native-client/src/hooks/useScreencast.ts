@@ -7,7 +7,7 @@ import {
   TrackBandwidthLimit,
   TrackEncoding,
 } from '../types';
-import RNFishjamClientModule from '../FishjamClient';
+import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 type IsScreencastOnEvent = { IsScreencastOn: boolean };

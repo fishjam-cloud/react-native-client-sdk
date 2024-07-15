@@ -1,5 +1,5 @@
 import { Metadata } from '../types';
-import RNFishjamClientModule from '../FishjamClient';
+import RNFishjamClientModule from '../RNFishjamClientModule';
 
 /**
  * a function that updates endpoints's metadata on the server

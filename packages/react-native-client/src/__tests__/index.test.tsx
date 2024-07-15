@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import * as membraneWebRTC from '../index';
-import RNFishjamClientModule from '../FishjamClient';
+import RNFishjamClientModule from '../RNFishjamClientModule';
 
 jest.mock('expo-modules-core', () => ({
   EventEmitter: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock('react-native', () => ({
   })),
 }));
 
-jest.mock('../FishjamClient', () => ({
+jest.mock('../RNFishjamClientModule', () => ({
   getStatistics: jest.fn(),
   addListener: jest.fn(),
   removeEventListener: jest.fn(),

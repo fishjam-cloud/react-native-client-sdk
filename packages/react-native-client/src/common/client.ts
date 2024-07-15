@@ -1,5 +1,5 @@
 import { Metadata } from '../types';
-import RNFishjamClientModule from '../FishjamClient';
+import RNFishjamClientModule from '../RNFishjamClientModule';
 
 export const connect = (
   url: string,
