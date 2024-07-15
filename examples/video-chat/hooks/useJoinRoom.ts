@@ -57,7 +57,7 @@ export function useJoinRoom({
         activeEncodings:
           Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
       },
-      quality: VideoQuality.HD_169,
+      quality: 'HD169',
       maxBandwidth: { l: 150, m: 500, h: 1500 },
       videoTrackMetadata: { active: isCameraAvailable, type: 'camera' },
       captureDeviceId: await getCaptureDevices().then(
