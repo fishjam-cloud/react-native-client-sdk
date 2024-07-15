@@ -1,5 +1,13 @@
-import { LoggingSeverity, TrackEncoding } from '../RNFishjamClient.types';
+import { TrackEncoding } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
+
+export enum LoggingSeverity {
+  Verbose = 'verbose',
+  Info = 'info',
+  Warning = 'warning',
+  Error = 'error',
+  None = 'none',
+}
 
 /**
  * sets track encoding that server should send to the client library.

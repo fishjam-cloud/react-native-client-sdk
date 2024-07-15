@@ -3,16 +3,74 @@ import { Platform } from 'react-native';
 
 import {
   BandwidthLimit,
-  CameraConfig,
-  CaptureDevice,
-  IsCameraOnEvent,
   Metadata,
   SimulcastConfig,
-  SimulcastConfigUpdateEvent,
+  TrackBandwidthLimit,
   TrackEncoding,
-} from '../RNFishjamClient.types';
+} from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+
+type IsCameraOnEvent = { IsCameraOn: boolean };
+type SimulcastConfigUpdateEvent = SimulcastConfig;
+
+export type CaptureDevice = {
+  id: string;
+  name: string;
+  isFrontFacing: boolean;
+  isBackFacing: boolean;
+};
+
+export enum VideoQuality {
+  QVGA_169 = 'QVGA169',
+  VGA_169 = 'VGA169',
+  QHD_169 = 'QHD169',
+  HD_169 = 'HD169',
+  FHD_169 = 'FHD169',
+  QVGA_43 = 'QVGA43',
+  VGA_43 = 'VGA43',
+  QHD_43 = 'QHD43',
+  HD_43 = 'HD43',
+  FHD_43 = 'FHD43',
+}
+
+export type CameraConfig<MetadataType extends Metadata> = {
+  /**
+   * resolution + aspect ratio of local video track, one of: `QVGA_169`, `VGA_169`, `QHD_169`, `HD_169`,
+   * `FHD_169`, `QVGA_43`, `VGA_43`, `QHD_43`, `HD_43`, `FHD_43`. Note that quality might be worse than
+   * specified due to device capabilities, internet connection etc.
+   * @default `VGA_169`
+   */
+  quality: VideoQuality;
+  /**
+   * whether to flip the dimensions of the video, that is whether to film in vertical orientation.
+   * @default `true`
+   */
+  flipVideo: boolean;
+  /**
+   * a map `string -> any` containing video track metadata to be sent to the server.
+   */
+  videoTrackMetadata: MetadataType;
+  /**
+   *  SimulcastConfig of a video track. By default simulcast is disabled.
+   */
+  simulcastConfig: SimulcastConfig;
+  /**
+   *  bandwidth limit of a video track. By default there is no bandwidth limit.
+   */
+  maxBandwidth: TrackBandwidthLimit;
+  /**
+   * whether the camera track is initially enabled, you can toggle it on/off later with toggleCamera method
+   * @default `true`
+   */
+  cameraEnabled: boolean;
+  /**
+   * id of the camera to start capture with. Get available cameras with `getCaptureDevices()`.
+   * You can switch the cameras later with `flipCamera`/`switchCamera` functions.
+   * @default the first front camera
+   */
+  captureDeviceId: string;
+};
 
 const defaultSimulcastConfig = () => ({
   enabled: false,

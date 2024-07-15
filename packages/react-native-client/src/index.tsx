@@ -1,27 +1,61 @@
-export { usePeers } from './hooks/usePeers';
-export type { Peer } from './hooks/usePeers';
+export type { Peer, Track } from './hooks/usePeers';
+export {
+  usePeers,
+  TrackType,
+  VadStatus,
+  EncodingReason,
+} from './hooks/usePeers';
 
-export { useAudioSettings } from './hooks/useAudioSettings';
+export type { AudioOutputDevice } from './hooks/useAudioSettings';
+export {
+  useAudioSettings,
+  AudioOutputDeviceType,
+  AudioSessionMode,
+} from './hooks/useAudioSettings';
+
+export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';
-export { useCamera } from './hooks/useCamera';
+
+export type { CaptureDevice, CameraConfig } from './hooks/useCamera';
+export { useCamera, VideoQuality } from './hooks/useCamera';
+
+export type {
+  IsMicrophoneOnEvent,
+  MicrophoneConfig,
+} from './hooks/useMicrophone';
 export { useMicrophone } from './hooks/useMicrophone';
-export { useRTCStatistics } from './hooks/useRTCStatistics';
-export { useScreencast } from './hooks/useScreencast';
+
+export { useRTCStatistics } from './stats/useRTCStatistics';
+
+export type { ScreencastOptions } from './hooks/useScreencast';
+export { useScreencast, ScreencastQuality } from './hooks/useScreencast';
 
 export {
   updateAudioTrackMetadata,
   updatePeerMetadata,
   updateVideoTrackMetadata,
 } from './common/metadata';
+
 export {
   changeWebRTCLoggingSeverity,
   setTargetTrackEncoding,
+  LoggingSeverity,
 } from './common/webRTC';
+
 export { connect, leaveRoom } from './common/client';
 
-export { VideoPreviewView } from './components/VideoPreviewView';
 export type { VideoPreviewViewProps } from './components/VideoPreviewView';
-export { VideoRendererView } from './components/VideoRendererView';
-export type { VideoRendererProps } from './components/VideoRendererView';
+export { VideoPreviewView } from './components/VideoPreviewView';
 
-export * from './RNFishjamClient.types';
+export type { VideoRendererProps } from './components/VideoRendererView';
+export { VideoRendererView } from './components/VideoRendererView';
+
+export type {
+  Metadata,
+  TrackBandwidthLimit,
+  TrackEncoding,
+  SimulcastBandwidthLimit,
+  BandwidthLimit,
+  SimulcastConfig,
+} from './types';
+export { VideoLayout } from './types';
