@@ -1,6 +1,4 @@
-import android.content.Context
 import com.fishjamdev.client.Config
-import com.fishjamdev.client.FishjamClient
 import com.fishjamdev.client.FishjamClientInternal
 import com.fishjamdev.client.FishjamClientListener
 import com.fishjamdev.client.media.createAudioDeviceModule
