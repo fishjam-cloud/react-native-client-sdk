@@ -1,13 +1,25 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
-import {
-  AudioOutputDevice,
-  AudioOutputDeviceType,
-  AudioSessionMode,
-} from '../RNFishjamClient.types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+
+export enum AudioOutputDeviceType {
+  Bluetooth = 'bluetooth',
+  Headset = 'headset',
+  Speaker = 'speaker',
+  Earpiece = 'earpiece',
+}
+
+export enum AudioSessionMode {
+  VoiceChat = 'voiceChat',
+  VideoChat = 'videoChat',
+}
+
+export type AudioOutputDevice = {
+  type: AudioOutputDeviceType;
+  name: string;
+};
 
 type OnAudioDeviceEvent = {
   AudioDeviceUpdate: {
