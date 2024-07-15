@@ -34,6 +34,7 @@ import {
   displayIosSimulatorCameraAlert,
   isIosSimulator,
 } from '../../utils/deviceUtils';
+import { useToggleCamera } from '../../hooks/useToggleCamera';
 
 type Props = NativeStackScreenProps<AppRootStackParamList, 'Preview'>;
 const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON } = previewScreenLabels;
@@ -48,7 +49,6 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   );
   const {
     startCamera,
-    toggleCamera,
     getCaptureDevices,
     isCameraOn,
     simulcastConfig,
@@ -116,6 +116,8 @@ const PreviewScreen = ({ navigation, route }: Props) => {
       displayIosSimulatorCameraAlert();
     }
   }, []);
+
+  const { toggleCamera } = useToggleCamera();
 
   const body = (
     <SafeAreaView style={styles.container}>
