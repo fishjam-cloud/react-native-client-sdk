@@ -9,8 +9,8 @@ export type TrackType = 'Audio' | 'Video';
 /**
  * Type describing Voice Activity Detection statuses.
  *
- * SPEECH - voice activity has been detected
- * SILENCE - lack of voice activity has been detected
+ * speech - voice activity has been detected
+ * silence - lack of voice activity has been detected
  */
 export type VadStatus = 'silence' | 'speech';
 
@@ -30,11 +30,11 @@ export type Track<MetadataType extends Metadata> = {
 /**
  * Type describing possible reasons of currently selected encoding.
  *
- * - OTHER - the exact reason couldn't be determined
- * - ENCODING_INACTIVE - previously selected encoding became inactive
- * - LOW_BANDWIDTH - there is no longer enough bandwidth to maintain previously selected encoding
+ * - other - the exact reason couldn't be determined
+ * - encoding_inactive - previously selected encoding became inactive
+ * - low_bandwidth - there is no longer enough bandwidth to maintain previously selected encoding
  */
-export type EncodingReason = 'other' | 'encodingInactive' | 'lowBandwidth';
+export type EncodingReason = 'other' | 'encoding_inactive' | 'low_bandwidth';
 
 export type EndpointsUpdateEvent<
   MetadataType extends Metadata,
