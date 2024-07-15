@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
-import RNFishjamClientModule from '../RNFishjamClientModule';
+import RNFishjamClientModule from '../FishjamClient';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 export enum AudioOutputDeviceType {

@@ -1,11 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import {
-  Metadata,
-  SimulcastConfig,
-  TrackEncoding,
-} from '../RNFishjamClient.types';
-import RNFishjamClientModule from '../RNFishjamClientModule';
+import { Metadata, SimulcastConfig, TrackEncoding } from '../types';
+import RNFishjamClientModule from '../FishjamClient';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 export enum TrackType {

@@ -1,5 +1,5 @@
-import { TrackEncoding } from '../RNFishjamClient.types';
-import RNFishjamClientModule from '../RNFishjamClientModule';
+import { TrackEncoding } from '../types';
+import RNFishjamClientModule from '../FishjamClient';
 
 export enum LoggingSeverity {
   Verbose = 'verbose',

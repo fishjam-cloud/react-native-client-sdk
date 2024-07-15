@@ -2,7 +2,7 @@ import { requireNativeModule } from 'expo-modules-core';
 import { NativeModule } from 'react-native';
 
 import type { RTCStats } from './stats/types';
-import type { Metadata, SimulcastConfig } from './RNFishjamClient.types';
+import type { Metadata, SimulcastConfig } from './types';
 import type { CameraConfig, CaptureDevice } from './hooks/useCamera';
 import type { MicrophoneConfig } from './hooks/useMicrophone';
 import type { Endpoint } from './hooks/usePeers';
