@@ -6,12 +6,12 @@ export {
   EncodingReason,
 } from './hooks/usePeers';
 
-export type { AudioOutputDevice } from './hooks/useAudioSettings';
-export {
-  useAudioSettings,
+export type {
+  AudioOutputDevice,
   AudioOutputDeviceType,
   AudioSessionMode,
 } from './hooks/useAudioSettings';
+export { useAudioSettings } from './hooks/useAudioSettings';
 
 export type { BandwidthEstimationEvent } from './hooks/useBandwidthEstimation';
 export { useBandwidthEstimation } from './hooks/useBandwidthEstimation';

@@ -4,17 +4,13 @@ import { Platform } from 'react-native';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
-export enum AudioOutputDeviceType {
-  Bluetooth = 'bluetooth',
-  Headset = 'headset',
-  Speaker = 'speaker',
-  Earpiece = 'earpiece',
-}
+export type AudioOutputDeviceType =
+  | 'bluetooth'
+  | 'headset'
+  | 'speaker'
+  | 'earpiece';
 
-export enum AudioSessionMode {
-  VoiceChat = 'voiceChat',
-  VideoChat = 'videoChat',
-}
+export type AudioSessionMode = 'voiceChat' | 'videoChat';
 
 export type AudioOutputDevice = {
   type: AudioOutputDeviceType;
