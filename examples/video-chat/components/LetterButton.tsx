@@ -1,4 +1,4 @@
-import { TrackEncoding } from '@fishjam-dev/react-native-client';
+import { TrackEncoding } from '@fishjam-cloud/react-native-client';
 import React from 'react';
 import {
   type GestureResponderEvent,

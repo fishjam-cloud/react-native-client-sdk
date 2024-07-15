@@ -3,7 +3,7 @@ import {
   TrackEncoding,
   useCamera,
   useMicrophone,
-} from '@fishjam-dev/react-native-client';
+} from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useEffect, useRef, useState } from 'react';

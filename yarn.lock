@@ -2475,19 +2475,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fishjam-dev/js-server-sdk@npm:^0.1.0":
+"@fishjam-cloud/js-server-sdk@npm:^0.1.0":
   version: 0.1.0
-  resolution: "@fishjam-dev/js-server-sdk@npm:0.1.0"
+  resolution: "@fishjam-cloud/js-server-sdk@npm:0.1.0"
   dependencies:
     axios: "npm:^1.6.8"
     protobufjs: "npm:^7.2.6"
-  checksum: 10c0/41f03ab8ee89b6d75d6ba46f57362fee9b869aa621b840febf5edda98f192d50b6685726dc7c12f54ba65d64feb53e3209cdac32d4025b25e7fffc8ec7e82a77
+  checksum: 10c0/b3a1c74bb7f792dfea6f9e07fa9e52436d4ad51f18e7fb45254a86377635911c049d55bd2be32b166b3eeddd9866e0b4e5c6c7bb96b75117fcc63f6c67617499
   languageName: node
   linkType: hard
 
-"@fishjam-dev/react-native-client@npm:*, @fishjam-dev/react-native-client@workspace:packages/react-native-client":
+"@fishjam-cloud/react-native-client@npm:*, @fishjam-cloud/react-native-client@workspace:packages/react-native-client":
   version: 0.0.0-use.local
-  resolution: "@fishjam-dev/react-native-client@workspace:packages/react-native-client"
+  resolution: "@fishjam-cloud/react-native-client@workspace:packages/react-native-client"
   dependencies:
     "@testing-library/react": "npm:^14.0.0"
     "@types/lodash": "npm:^4.14.195"
@@ -18960,7 +18960,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.20.0"
     "@babel/runtime": "npm:^7.20.0"
     "@expo-google-fonts/noto-sans": "npm:^0.2.3"
-    "@fishjam-dev/react-native-client": "npm:*"
+    "@fishjam-cloud/react-native-client": "npm:*"
     "@gorhom/bottom-sheet": "npm:^4"
     "@notifee/react-native": "npm:^7.8.2"
     "@react-native/babel-preset": "npm:0.73.21"
@@ -19124,7 +19124,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "webdriverio-test@workspace:examples/webdriverio-test"
   dependencies:
-    "@fishjam-dev/js-server-sdk": "npm:^0.1.0"
+    "@fishjam-cloud/js-server-sdk": "npm:^0.1.0"
     "@wdio/appium-service": "npm:^8.24.2"
     "@wdio/cli": "npm:^8.24.2"
     "@wdio/local-runner": "npm:^8.24.2"

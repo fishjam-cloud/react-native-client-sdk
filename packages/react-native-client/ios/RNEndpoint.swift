@@ -1,4 +1,4 @@
-import FishjamClient
+import FishjamCloudClient
 
 struct RNEndpoint {
     let id: String
