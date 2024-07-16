@@ -13,12 +13,12 @@ import org.webrtc.ScreenCapturerAndroid
 import java.util.ArrayList
 
 class LocalScreencastTrack(
-  internal val videoTrack: org.webrtc.VideoTrack,
+  videoTrack: org.webrtc.VideoTrack,
   endpointId: String,
   metadata: Metadata,
   private val capturer: ScreenCapturerAndroid,
   val videoParameters: VideoParameters
-) : Track(videoTrack, endpointId, null, metadata),
+) : VideoTrack(videoTrack, endpointId, null, metadata),
   LocalTrack {
   private val mutex = Mutex()
   private val coroutineScope: CoroutineScope =

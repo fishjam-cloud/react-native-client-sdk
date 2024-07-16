@@ -34,6 +34,12 @@ internal class CommandsQueue {
     }
   }
 
+  fun finishCommand(commandNames: List<CommandName>) {
+    if (commandsQueue.isNotEmpty() && commandNames.contains(commandsQueue.first().commandName)) {
+      finishCommand()
+    }
+  }
+
   fun clear() {
     clientState = ClientState.CREATED
     commandsQueue.clear()

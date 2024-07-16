@@ -679,14 +679,24 @@ class RNFishjamClient(
     isScreencastOn = isEnabled
     val eventName = EmitableEvents.IsScreencastOn
     emitEvent(eventName, mapOf(eventName to isEnabled))
-    emitEndpoints()
   }
 
   private fun stopScreencast() {
     ensureScreencastTrack()
-    setScreencastTrackState(false)
-    screencastPromise?.resolve(isScreencastOn)
-    screencastPromise = null
+    coroutineScope.launch {
+      val screencastTrack =
+        fishjamClient?.getLocalEndpoint()?.tracks?.values?.first {
+            track ->
+          track is LocalScreencastTrack
+        } as? LocalScreencastTrack
+      if (screencastTrack != null) {
+        fishjamClient?.removeTrack(screencastTrack.id())
+      }
+      setScreencastTrackState(false)
+      emitEndpoints()
+      screencastPromise?.resolve(isScreencastOn)
+      screencastPromise = null
+    }
   }
 
   private fun emitEvent(

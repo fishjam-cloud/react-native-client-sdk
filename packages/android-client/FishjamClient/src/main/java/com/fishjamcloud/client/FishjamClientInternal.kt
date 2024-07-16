@@ -266,7 +266,7 @@ internal class FishjamClientInternal(
         }
       }
 
-      commandsQueue.finishCommand(CommandName.ADD_TRACK)
+      commandsQueue.finishCommand(listOf(CommandName.ADD_TRACK, CommandName.REMOVE_TRACK))
     }
   }
 
@@ -283,7 +283,11 @@ internal class FishjamClientInternal(
 
           coroutineScope.launch {
             peerConnectionManager.addTrack(audioTrack)
-            rtcEngineCommunication.renegotiateTracks()
+            if (commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
+              rtcEngineCommunication.renegotiateTracks()
+            } else {
+              commandsQueue.finishCommand(CommandName.ADD_TRACK)
+            }
           }
         }
       ).join()
