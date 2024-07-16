@@ -308,6 +308,7 @@ internal class FishjamClientInternal(
       )
     val screencastTrack =
       LocalScreencastTrack(webrtcTrack, localEndpoint.id, metadata, capturer, videoParameters)
+    screencastTrack.start()
     callback.addCallback {
       if (onEnd != null) {
         onEnd()

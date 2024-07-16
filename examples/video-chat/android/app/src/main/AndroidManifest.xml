@@ -30,6 +30,6 @@
         </activity>
         <service
           android:name="app.notifee.core.ForegroundService"
-          android:foregroundServiceType="camera|microphone" />
+          android:foregroundServiceType="camera|microphone|mediaProjection" />
     </application>
 </manifest>

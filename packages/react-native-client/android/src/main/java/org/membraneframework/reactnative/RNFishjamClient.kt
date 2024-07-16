@@ -28,8 +28,8 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.webrtc.Logging
 
 class RNFishjamClient(
@@ -85,12 +85,15 @@ class RNFishjamClient(
     audioSwitchManager?.stop()
   }
 
+  private val coroutineScope: CoroutineScope =
+    CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
   fun onActivityResult(
     requestCode: Int,
     resultCode: Int,
     data: Intent?
-  ) = runBlocking {
-    launch(Dispatchers.Main) {
+  ) {
+    coroutineScope.launch(Dispatchers.Main) {
       if (requestCode != SCREENCAST_REQUEST) return@launch
       if (resultCode != Activity.RESULT_OK) {
         screencastPromise?.resolve(false)
@@ -387,6 +390,13 @@ class RNFishjamClient(
                   "metadata" to track.metadata
                 )
 
+              is LocalScreencastTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata
+                )
+
               is LocalAudioTrack ->
                 mapOf(
                   "id" to track.id(),
@@ -641,6 +651,7 @@ class RNFishjamClient(
       screencastMetadata
     ) ?: throw CodedException("Failed to Create ScreenCast Track")
     setScreencastTrackState(true)
+    emitEndpoints()
 
     screencastPromise?.resolve(isScreencastOn)
     screencastPromise = null
