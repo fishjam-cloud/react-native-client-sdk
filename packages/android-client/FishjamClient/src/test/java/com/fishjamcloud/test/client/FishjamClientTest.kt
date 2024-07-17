@@ -5,7 +5,6 @@ import com.fishjamcloud.client.FishjamClientInternal
 import com.fishjamcloud.client.FishjamClientListener
 import com.fishjamcloud.client.media.createAudioDeviceModule
 import fishjam.PeerNotifications
-import fishjamdev.client.WebsocketMock
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk

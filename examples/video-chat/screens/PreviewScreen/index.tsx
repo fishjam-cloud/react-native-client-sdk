@@ -93,7 +93,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
             // so we limit simulcast layers to 2
             Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
         },
-        quality: 'HD_169',
+        quality: 'HD169',
         maxBandwidth: { l: 150, m: 500, h: 1500 },
         videoTrackMetadata: { active: true, type: 'camera' },
         captureDeviceId: captureDevice?.id,
