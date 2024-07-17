@@ -4,21 +4,15 @@ import { Metadata, SimulcastConfig, TrackEncoding } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
-export enum TrackType {
-  Audio = 'Audio',
-  Video = 'Video',
-}
+export type TrackType = 'Audio' | 'Video';
 
 /**
  * Type describing Voice Activity Detection statuses.
  *
- * SPEECH - voice activity has been detected
- * SILENCE - lack of voice activity has been detected
+ * speech - voice activity has been detected
+ * silence - lack of voice activity has been detected
  */
-export enum VadStatus {
-  Silence = 'silence',
-  Speech = 'speech',
-}
+export type VadStatus = 'silence' | 'speech';
 
 export type Track<MetadataType extends Metadata> = {
   id: string;
@@ -36,15 +30,11 @@ export type Track<MetadataType extends Metadata> = {
 /**
  * Type describing possible reasons of currently selected encoding.
  *
- * - OTHER - the exact reason couldn't be determined
- * - ENCODING_INACTIVE - previously selected encoding became inactive
- * - LOW_BANDWIDTH - there is no longer enough bandwidth to maintain previously selected encoding
+ * - other - the exact reason couldn't be determined
+ * - encoding_inactive - previously selected encoding became inactive
+ * - low_bandwidth - there is no longer enough bandwidth to maintain previously selected encoding
  */
-export enum EncodingReason {
-  Other = 'other',
-  EncodingInactive = 'encodingInactive',
-  LowBandwidth = 'lowBandwidth',
-}
+export type EncodingReason = 'other' | 'encoding_inactive' | 'low_bandwidth';
 
 export type EndpointsUpdateEvent<
   MetadataType extends Metadata,

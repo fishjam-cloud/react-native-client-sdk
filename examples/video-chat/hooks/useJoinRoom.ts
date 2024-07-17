@@ -1,8 +1,4 @@
-import {
-  useCamera,
-  useMicrophone,
-  VideoQuality,
-} from '@fishjam-cloud/react-native-client';
+import { useCamera, useMicrophone } from '@fishjam-cloud/react-native-client';
 import notifee, {
   AndroidImportance,
   AndroidColor,
@@ -60,7 +56,7 @@ export function useJoinRoom({
         activeEncodings:
           Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
       },
-      quality: VideoQuality.HD_169,
+      quality: 'HD169',
       maxBandwidth: { l: 150, m: 500, h: 1500 },
       videoTrackMetadata: { active: isCameraAvailable, type: 'camera' },
       captureDeviceId: devices.find((device) => device.isFrontFacing)?.id,
