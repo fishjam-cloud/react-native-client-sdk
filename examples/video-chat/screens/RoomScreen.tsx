@@ -2,7 +2,6 @@ import {
   leaveRoom,
   usePeers,
   useScreencast,
-  ScreencastQuality,
   useCamera,
   useMicrophone,
   useAudioSettings,

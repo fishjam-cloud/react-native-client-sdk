@@ -1,8 +1,4 @@
-import {
-  useCamera,
-  useMicrophone,
-  VideoQuality,
-} from '@fishjam-cloud/react-native-client';
+import { useCamera, useMicrophone } from '@fishjam-cloud/react-native-client';
 import notifee, {
   AndroidImportance,
   AndroidColor,
