@@ -16,8 +16,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Check if tagged push to main
+        id: check_tag
         run: |
+          echo "::set-output name=tagged_push::false"
           if [[ "${{ github.ref }}" == "refs/heads/main" && ! -z "${{ github.event.push.tags }}" ]]; then
+            echo "::set-output name=tagged_push::true"
             echo "Branch is main and tag is present"
           else
             echo "Branch is not main or tag did not trigger workflow"
@@ -25,33 +28,39 @@ jobs:
           fi
 
       - name: Get the tag name
+        if: steps.check_tag.outputs.tagged_push == 'true'
         id: tag_name
         run: echo "::set-output name=TAG_NAME::${GITHUB_REF#refs/tags/}"
 
       - name: Git configuration
+        if: steps.check_tag.outputs.tagged_push == 'true'
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
 
       - name: Run CocoaPod publish check
+        if: steps.check_tag.outputs.tagged_push == 'true'
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
           pod lib lint FishjamCloudClient.podspec
 
       - name: Run npm publish check
+        if: steps.check_tag.outputs.tagged_push == 'true'
         run: npm publish --dry-run --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: ./packages/react-native-client
 
       - name: Publish to CocoaPod
+        if: steps.check_tag.outputs.tagged_push == 'true'
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
           pod trunk push FishjamCloudClient.podspec
 
       - name: Publish to npm
+        if: steps.check_tag.outputs.tagged_push == 'true'
         run: npm publish --verbose --access public --tag ${{ steps.tag_name.outputs.TAG_NAME }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -59,6 +68,7 @@ jobs:
 
 
       - name: Create GitHub release
+        if: steps.check_tag.outputs.tagged_push == 'true'
         uses: softprops/action-gh-release@v2
         with:
           name: 'Release ${{ steps.tag_name.outputs.TAG_NAME }}'
