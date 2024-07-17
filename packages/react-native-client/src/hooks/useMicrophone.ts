@@ -8,12 +8,12 @@ export type MicrophoneConfig<MetadataType extends Metadata> = {
   /**
    * a map `string -> any` containing audio track metadata to be sent to the server.
    */
-  audioTrackMetadata: MetadataType;
+  audioTrackMetadata?: MetadataType;
   /**
    * whether the microphone is initially enabled, you can toggle it on/off later with toggleMicrophone method
    * @default `true`
    */
-  microphoneEnabled: boolean;
+  microphoneEnabled?: boolean;
 };
 export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
 
