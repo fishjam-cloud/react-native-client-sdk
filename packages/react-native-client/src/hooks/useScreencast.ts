@@ -12,13 +12,7 @@ import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
 
 type IsScreencastOnEvent = { IsScreencastOn: boolean };
 
-export enum ScreencastQuality {
-  VGA = 'VGA',
-  HD5 = 'HD5',
-  HD15 = 'HD15',
-  FHD15 = 'FHD15',
-  FHD30 = 'FHD30',
-}
+export type ScreencastQuality = 'VGA' | 'HD5' | 'HD15' | 'FHD15' | 'FHD30';
 
 export type ScreencastOptions<MetadataType extends Metadata> = {
   /**

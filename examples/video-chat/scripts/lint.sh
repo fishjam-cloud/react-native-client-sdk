@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-echo "Running eslint for react-native javascript files \n"
-eslint . --ext .ts,.tsx --fix
+echo "Running eslint for video-chat javascript files \n"
+eslint . --ext .ts,.tsx --fix --max-warnings 0
 
-echo "Running prettier for react-native javascript files \n"
+echo "Running prettier for video-chat javascript files \n"
 prettier --write . --ignore-path ./.eslintignore

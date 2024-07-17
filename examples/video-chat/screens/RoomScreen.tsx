@@ -2,7 +2,6 @@ import {
   leaveRoom,
   usePeers,
   useScreencast,
-  ScreencastQuality,
   useCamera,
   useMicrophone,
   useAudioSettings,
@@ -77,7 +76,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
         type: 'screensharing',
         active: !isScreencastOn,
       },
-      quality: ScreencastQuality.HD15,
+      quality: 'HD15',
     });
   }, [isScreencastOn, toggleScreencast]);
 
