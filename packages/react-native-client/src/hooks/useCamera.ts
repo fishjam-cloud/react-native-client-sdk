@@ -77,8 +77,6 @@ const defaultSimulcastConfig = () => ({
   activeEncodings: [],
 });
 
-let videoSimulcastConfig: SimulcastConfig = defaultSimulcastConfig();
-
 /**
  * This hook can toggle camera on/off and provides current camera state.
  */
@@ -87,8 +85,9 @@ export function useCamera() {
     RNFishjamClientModule.isCameraOn,
   );
 
-  const [simulcastConfig, setSimulcastConfig] =
-    useState<SimulcastConfig>(videoSimulcastConfig);
+  const [simulcastConfig, setSimulcastConfig] = useState<SimulcastConfig>(
+    defaultSimulcastConfig(),
+  );
 
   useEffect(() => {
     const eventListener = eventEmitter.addListener<SimulcastConfigUpdateEvent>(
@@ -113,7 +112,7 @@ export function useCamera() {
    */
   const toggleVideoTrackEncoding = useCallback(
     async (encoding: TrackEncoding) => {
-      videoSimulcastConfig =
+      const videoSimulcastConfig =
         await RNFishjamClientModule.toggleVideoTrackEncoding(encoding);
       setSimulcastConfig(videoSimulcastConfig);
     },
@@ -148,33 +147,37 @@ export function useCamera() {
    * @param config configuration of the camera capture
    * @returns A promise that resolves when camera is started.
    */
-  const startCamera = useCallback(
-    async <CameraConfigMetadataType extends Metadata>(
-      config: Partial<CameraConfig<CameraConfigMetadataType>> = {},
-    ) => {
-      videoSimulcastConfig = config.simulcastConfig || defaultSimulcastConfig();
-      // expo-modules on Android don't support Either type, so we workaround it
-      if (Platform.OS === 'android') {
-        if (typeof config.maxBandwidth === 'object') {
-          // @ts-expect-error we should update typings to make maxBandwidthMap available
-          config.maxBandwidthMap = config.maxBandwidth;
-        } else {
-          // @ts-expect-error we should update typings to make maxBandwidthInt available
-          config.maxBandwidthInt = config.maxBandwidth;
-        }
-        delete config.maxBandwidth;
+  const startCamera = useCallback<
+    <CameraConfigMetadataType extends Metadata>(
+      config?: Readonly<Partial<CameraConfig<CameraConfigMetadataType>>>,
+    ) => Promise<void>
+  >(async (config = {}) => {
+    // expo-modules on Android don't support Either type, so we workaround it
+    if (Platform.OS === 'android') {
+      if (typeof config.maxBandwidth === 'object') {
+        await RNFishjamClientModule.startCamera({
+          ...config,
+          maxBandwidth: undefined,
+          maxBandwidthMap: config.maxBandwidth,
+        });
+      } else {
+        await RNFishjamClientModule.startCamera({
+          ...config,
+          maxBandwidth: undefined,
+          maxBandwidthInt: config.maxBandwidth,
+        });
       }
+    } else {
       await RNFishjamClientModule.startCamera(config);
-    },
-    [],
-  );
+    }
+  }, []);
 
   /**
    * Function that toggles between front and back camera. By default the front camera is used.
    * @returns A promise that resolves when camera is toggled.
    */
   const flipCamera = useCallback(async () => {
-    return RNFishjamClientModule.flipCamera();
+    await RNFishjamClientModule.flipCamera();
   }, []);
 
   /**
@@ -182,16 +185,14 @@ export function useCamera() {
    * @returns A promise that resolves when camera is switched.
    */
   const switchCamera = useCallback(async (captureDeviceId: string) => {
-    return RNFishjamClientModule.switchCamera(captureDeviceId);
+    await RNFishjamClientModule.switchCamera(captureDeviceId);
   }, []);
 
   /** Function that queries available cameras.
    * @returns A promise that resolves to the list of available cameras.
    */
   const getCaptureDevices = useCallback(async () => {
-    return RNFishjamClientModule.getCaptureDevices() as Promise<
-      CaptureDevice[]
-    >;
+    return RNFishjamClientModule.getCaptureDevices();
   }, []);
 
   /**
