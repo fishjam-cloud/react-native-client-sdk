@@ -9433,7 +9433,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-font@npm:^11.10.2, expo-font@npm:~11.10.3":
+"expo-font@npm:^12.0.9":
+  version: 12.0.9
+  resolution: "expo-font@npm:12.0.9"
+  dependencies:
+    fontfaceobserver: "npm:^2.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10c0/9c7b63b3a3ee89bfcdbc1704451019b956b451208f0eca3bb1e57b53dd5dcdfb4d080d423583b92f864889a2a5d7624985c0e5103c54b36b8daf813471696b41
+  languageName: node
+  linkType: hard
+
+"expo-font@npm:~11.10.3":
   version: 11.10.3
   resolution: "expo-font@npm:11.10.3"
   dependencies:
@@ -18981,7 +18992,7 @@ __metadata:
     expo: "npm:^50.0.17"
     expo-camera: "npm:^14.0.4"
     expo-device: "npm:^5.9.3"
-    expo-font: "npm:^11.10.2"
+    expo-font: "npm:^12.0.9"
     jest: "npm:^29.6.3"
     lint-staged: "npm:^15.2.2"
     react: "npm:18.2.0"
