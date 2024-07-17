@@ -25,6 +25,7 @@ import com.fishjamcloud.client.events.UpdateTrackMetadata
 import com.fishjamcloud.client.events.VadNotification
 import com.fishjamcloud.client.events.gson
 import com.fishjamcloud.client.events.serializeToMap
+import com.fishjamcloud.client.models.EndpointType
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.SerializedMediaEvent
 import com.fishjamcloud.client.models.TrackEncoding
@@ -145,7 +146,7 @@ internal class RTCEngineCommunication {
         listeners.forEach { listener ->
           listener.onEndpointAdded(
             event.data.id,
-            event.data.type,
+            EndpointType.fromString(event.data.type),
             event.data.metadata
           )
         }

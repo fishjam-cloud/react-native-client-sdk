@@ -3,6 +3,7 @@ package com.fishjamcloud.client.webrtc
 import com.fishjamcloud.client.events.Endpoint
 import com.fishjamcloud.client.events.OfferData
 import com.fishjamcloud.client.events.TrackData
+import com.fishjamcloud.client.models.EndpointType
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.SerializedMediaEvent
 
@@ -16,7 +17,7 @@ internal interface RTCEngineListener {
 
   fun onEndpointAdded(
     endpointId: String,
-    type: String,
+    type: EndpointType,
     metadata: Metadata?
   )
 

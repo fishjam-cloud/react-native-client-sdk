@@ -18,7 +18,7 @@ class VideoRendererView(
   var trackId: String? = null
 
   private val videoView =
-    RNFishjamClient.fishjamClient!!.createVideoViewRenderer().also {
+    RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
       addView(it)
       RNFishjamClient.onTracksUpdateListeners.add(this)
     }
@@ -33,8 +33,8 @@ class VideoRendererView(
 
   private fun update() {
     CoroutineScope(Dispatchers.Main).launch {
-      val listOfPeers = RNFishjamClient.getAllPeers()
-      val endpoint = listOfPeers.firstOrNull { it.tracks[trackId] != null } ?: return@launch
+      val peers = RNFishjamClient.getAllPeers()
+      val endpoint = peers.firstOrNull { it.tracks[trackId] != null } ?: return@launch
       val videoTrack = endpoint.tracks[trackId] as? VideoTrack ?: return@launch
       setupTrack(videoTrack)
     }

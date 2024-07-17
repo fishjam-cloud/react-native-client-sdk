@@ -1,4 +1,4 @@
-package fishjamdev.client
+package com.fishjamcloud.test.client
 
 import android.util.Log
 import com.fishjamcloud.client.media.LocalAudioTrack

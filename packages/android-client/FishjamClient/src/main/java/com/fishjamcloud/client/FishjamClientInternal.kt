@@ -486,14 +486,14 @@ internal class FishjamClientInternal(
 
   override fun onEndpointAdded(
     endpointId: String,
-    type: String,
+    type: EndpointType,
     metadata: Metadata?
   ) {
     if (endpointId == this.localEndpoint.id) {
       return
     }
 
-    val endpoint = Endpoint(endpointId, EndpointType.fromString(type), metadata)
+    val endpoint = Endpoint(endpointId, type, metadata)
 
     remoteEndpoints[endpoint.id] = endpoint
 

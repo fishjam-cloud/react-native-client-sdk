@@ -9,7 +9,7 @@ internal class CommandsQueue {
   fun addCommand(command: Command): Job {
     commandsQueue.add(command)
     if (commandsQueue.size == 1) {
-      command.command()
+      command.execute()
     }
     return command.job
   }
@@ -24,7 +24,7 @@ internal class CommandsQueue {
     job.complete()
     // TODO: make it iterative, not recursive?
     if (commandsQueue.isNotEmpty()) {
-      commandsQueue.first().command()
+      commandsQueue.first().execute()
     }
   }
 

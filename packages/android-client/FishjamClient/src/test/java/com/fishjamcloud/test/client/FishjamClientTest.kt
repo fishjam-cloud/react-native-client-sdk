@@ -1,3 +1,5 @@
+package com.fishjamcloud.test.client
+
 import com.fishjamcloud.client.Config
 import com.fishjamcloud.client.FishjamClientInternal
 import com.fishjamcloud.client.FishjamClientListener

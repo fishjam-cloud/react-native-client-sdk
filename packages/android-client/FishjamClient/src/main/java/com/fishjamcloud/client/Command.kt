@@ -21,7 +21,7 @@ internal enum class ClientState {
 internal data class Command(
   val commandName: CommandName,
   val clientStateAfterCommand: ClientState?,
-  val command: () -> Unit = {}
+  val execute: () -> Unit = {}
 ) {
   constructor(commandName: CommandName, command: () -> Unit = {}) : this(commandName, null, command)
 

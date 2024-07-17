@@ -1,4 +1,4 @@
-package fishjamdev.client
+package com.fishjamcloud.test.client
 
 import com.google.protobuf.GeneratedMessage
 import io.mockk.every

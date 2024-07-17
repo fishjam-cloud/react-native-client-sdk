@@ -83,20 +83,24 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   useEffect(() => {
     getCaptureDevices().then((devices) => {
       availableCameras.current = devices;
+      const captureDevice = devices.find((device) => device.isFrontFacing);
 
       startCamera({
         simulcastConfig: {
           enabled: true,
           activeEncodings:
+            // iOS has a limit of 3 hardware encoders
+            // 3 simulcast layers + 1 screencast layer = 4, which is too much
+            // so we limit simulcast layers to 2
             Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
         },
         quality: VideoQuality.HD_169,
         maxBandwidth: { l: 150, m: 500, h: 1500 },
         videoTrackMetadata: { active: true, type: 'camera' },
-        captureDeviceId: devices.find((device) => device.isFrontFacing)?.id,
+        captureDeviceId: captureDevice?.id,
         cameraEnabled: true,
       });
-      setCurrentCamera(devices.find((device) => device.isFrontFacing) || null);
+      setCurrentCamera(captureDevice || null);
     });
   }, [getCaptureDevices, startCamera]);
 
