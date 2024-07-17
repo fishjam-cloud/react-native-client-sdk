@@ -8,6 +8,6 @@
 - update version to x.y.z in [package.json](./package.json)
 - update version to x.y.z in [build.gradle](./packages/react-native-client/android/build.gradle)
 - commit
-- create and push tag x.y.z
-- create merge request
+- create merge request and ( after checks etc) merge it
+- create tag x.y.z and push to origin
 
