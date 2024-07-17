@@ -24,7 +24,7 @@
     "@react-navigation/native-stack": "^6.9.17",
     "expo": "^50.0.17",
     "expo-camera": "^14.0.4",
-    "expo-device": "^5.9.3",
+    "expo-device": "^6.0.2",
     "expo-font": "^11.10.2",
     "react": "18.2.0",
     "react-native": "0.73.4",
