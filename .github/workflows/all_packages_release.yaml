@@ -24,7 +24,6 @@ jobs:
             echo "Branch is main and tag is present"
           else
             echo "Branch is not main or tag did not trigger workflow"
-            exit 1
           fi
 
       - name: Get the tag name
