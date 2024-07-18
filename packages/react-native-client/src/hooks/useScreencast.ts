@@ -140,6 +140,7 @@ export function useScreencast() {
     if (Platform.OS == 'android') {
       return await RNFishjamClientModule.handleScreencastPermission();
     }
+    return 'denied';
   }, []);
 
   return {
