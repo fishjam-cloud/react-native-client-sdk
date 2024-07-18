@@ -1,7 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
@@ -30,6 +32,8 @@
         </activity>
         <service
           android:name="app.notifee.core.ForegroundService"
-          android:foregroundServiceType="camera|microphone|mediaProjection" />
+          android:foregroundServiceType="camera|microphone|mediaProjection"
+          tools:replace="android:foregroundServiceType"
+          />
     </application>
 </manifest>

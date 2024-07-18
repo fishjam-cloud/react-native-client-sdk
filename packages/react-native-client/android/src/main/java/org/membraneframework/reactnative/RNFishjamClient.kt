@@ -43,7 +43,7 @@ class RNFishjamClient(
   var isConnected = false
 
   private var connectPromise: Promise? = null
-  private var screencastPromise: Promise? = null
+  private var screencastPermissionPromise: Promise? = null
 
   var videoSimulcastConfig: SimulcastConfig = SimulcastConfig()
   private var localUserMetadata: Metadata = mutableMapOf()
@@ -53,6 +53,8 @@ class RNFishjamClient(
   var screencastMaxBandwidth: TrackBandwidthLimit = TrackBandwidthLimit.BandwidthLimit(0)
 
   var screencastMetadata: Map<String, Any> = mutableMapOf()
+
+  private var mediaProjectionIntent: Intent? = null
 
   var audioSwitchManager: AudioSwitchManager? = null
 
@@ -95,14 +97,14 @@ class RNFishjamClient(
     coroutineScope.launch(Dispatchers.Main) {
       if (requestCode != SCREENCAST_REQUEST) return@launch
       if (resultCode != Activity.RESULT_OK) {
-        screencastPromise?.resolve(false)
-        screencastPromise = null
+        screencastPermissionPromise?.resolve("denied")
+        screencastPermissionPromise = null
         return@launch
       }
 
-      data?.let {
-        startScreencast(it)
-      }
+      mediaProjectionIntent = data
+      screencastPermissionPromise?.resolve("granted")
+      screencastPermissionPromise = null
     }
   }
 
@@ -318,20 +320,8 @@ class RNFishjamClient(
     return isMicrophoneOn
   }
 
-  fun toggleScreencast(
-    screencastOptions: ScreencastOptions,
-    promise: Promise
-  ) {
-    this.screencastMetadata = screencastOptions.screencastMetadata
-    this.screencastQuality = screencastOptions.quality
-    this.screencastSimulcastConfig =
-      getSimulcastConfigFromOptions(screencastOptions.simulcastConfig)
-    this.screencastMaxBandwidth =
-      getMaxBandwidthFromOptions(
-        screencastOptions.maxBandwidthMap,
-        screencastOptions.maxBandwidthInt
-      )
-    screencastPromise = promise
+  fun handleScreencastPermission(promise: Promise) {
+    screencastPermissionPromise = promise
     if (!isScreencastOn) {
       ensureConnected()
       val currentActivity = appContext?.currentActivity ?: throw ActivityNotFoundException()
@@ -342,6 +332,22 @@ class RNFishjamClient(
         ) as MediaProjectionManager
       val intent = mediaProjectionManager.createScreenCaptureIntent()
       currentActivity.startActivityForResult(intent, SCREENCAST_REQUEST)
+    }
+  }
+
+  suspend fun toggleScreencast(screencastOptions: ScreencastOptions) {
+    this.screencastMetadata = screencastOptions.screencastMetadata
+    this.screencastQuality = screencastOptions.quality
+    this.screencastSimulcastConfig =
+      getSimulcastConfigFromOptions(screencastOptions.simulcastConfig)
+    this.screencastMaxBandwidth =
+      getMaxBandwidthFromOptions(
+        screencastOptions.maxBandwidthMap,
+        screencastOptions.maxBandwidthInt
+      )
+    if (!isScreencastOn) {
+      ensureConnected()
+      startScreencast()
     } else {
       stopScreencast()
     }
@@ -633,18 +639,20 @@ class RNFishjamClient(
     return newMap
   }
 
-  private suspend fun startScreencast(mediaProjectionPermission: Intent) {
+  private suspend fun startScreencast() {
     val videoParameters = getScreencastVideoParameters()
+    if (mediaProjectionIntent == null) {
+      throw CodedException("No permission to start screencast, call handleScreencastPermission first.")
+    }
     fishjamClient.createScreencastTrack(
-      mediaProjectionPermission,
+      mediaProjectionIntent!!,
       videoParameters,
       screencastMetadata
     )
+    mediaProjectionIntent = null
+
     setScreencastTrackState(true)
     emitEndpoints()
-
-    screencastPromise?.resolve(isScreencastOn)
-    screencastPromise = null
   }
 
   private fun getScreencastVideoParameters(): VideoParameters {
@@ -683,8 +691,6 @@ class RNFishjamClient(
       }
       setScreencastTrackState(false)
       emitEndpoints()
-      screencastPromise?.resolve(isScreencastOn)
-      screencastPromise = null
     }
   }
 

@@ -9,6 +9,7 @@ import {
 } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+import { Platform } from 'react-native';
 
 type IsScreencastOnEvent = { IsScreencastOn: boolean };
 
@@ -135,6 +136,12 @@ export function useScreencast() {
     [],
   );
 
+  const handleScreencastPermission = useCallback(async () => {
+    if (Platform.OS == 'android') {
+      return await RNFishjamClientModule.handleScreencastPermission();
+    }
+  }, []);
+
   return {
     isScreencastOn,
     toggleScreencast,
@@ -143,5 +150,6 @@ export function useScreencast() {
     simulcastConfig,
     setScreencastTrackEncodingBandwidth,
     setScreencastTrackBandwidth,
+    handleScreencastPermission,
   };
 }
