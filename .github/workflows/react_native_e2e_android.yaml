@@ -17,7 +17,7 @@ jobs:
         env:
           FJ_CHECK_ORIGIN: false
           FJ_HOST: localhost:5002
-          FJ_PORT: '5002'
+          FJ_PORT: "5002"
           FJ_WEBRTC_USED: true
           FJ_WEBRTC_TURN_PORT_RANGE: 50000-50050
           FJ_WEBRTC_TURN_IP: 127.0.0.1
@@ -27,20 +27,19 @@ jobs:
           - 5002:5002
           - 50000-50050:50000-50050/udp
     env:
-      ARCH: 'x86_64'
-      TARGET: 'default'
-      API_LEVEL: '33'
-      BUILD_TOOLS: '33.0.0'
+      ARCH: "x86_64"
+      TARGET: "default"
+      API_LEVEL: "33"
+      BUILD_TOOLS: "33.0.0"
       ANDROID_API_LEVEL: android;33
       ANDROID_APIS: google_apis;x86_64
       EMULATOR_PACKAGE: system-images;android-33;default;x86_64
-      EMULATOR_NAME: 'nexus'
-      EMULATOR_DEVICE: 'Nexus 6'
+      EMULATOR_NAME: "nexus"
+      EMULATOR_DEVICE: "Nexus 6"
       PLATFORM_VERSION: platforms;android-33
-      BUILD_TOOL: 'build-tools;33.0.0'
-      ANDROID_CMD: 'commandlinetools-linux-10406996_latest.zip'
-      ANDROID_APP_PATH:
-        ${{ github.workspace
+      BUILD_TOOL: "build-tools;33.0.0"
+      ANDROID_CMD: "commandlinetools-linux-10406996_latest.zip"
+      ANDROID_APP_PATH: ${{ github.workspace
         }}/examples/video-chat/android/app/build/outputs/apk/release/app-release.apk
 
     steps:
@@ -73,14 +72,14 @@ jobs:
           sudo apt-get update && sudo apt install -y curl sudo wget unzip bzip2
           libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libnss3
           libxcursor1 libpulse-dev libxshmfence-dev xauth xvfb x11vnc fluxbox
-          wmctrl libdbus-glib-1-2 xvfb
+          wmctrl libdbus-glib-1-2 xvfb && npm install -g genversion typescript
 
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.12.x'
-          yarn-version: '1.22.x'
-          cache: 'yarn'
+          node-version: "18.12.x"
+          yarn-version: "1.22.x"
+          cache: "yarn"
 
       - name: Run yarn install in root directory
         run: |
@@ -105,9 +104,9 @@ jobs:
       - name: Setup Java 18
         uses: actions/setup-java@v4
         with:
-          java-version: '18'
-          distribution: 'zulu'
-          cache: 'gradle'
+          java-version: "18"
+          distribution: "zulu"
+          cache: "gradle"
           cache-dependency-path: |
             /home/runner/work/mobile-client-sdk/mobile-client-sdk/yarn.lock
 
@@ -129,8 +128,7 @@ jobs:
         run: echo "y" | sdkmanager --verbose --no_https $BUILD_TOOL
 
       - name: Setup environment and create AVD
-        run:
-          echo "y" | avdmanager --verbose create avd --force --name "nexus"
+        run: echo "y" | avdmanager --verbose create avd --force --name "nexus"
           --device "Nexus 6" --package "$EMULATOR_PACKAGE"
 
       - name: Start emulator
