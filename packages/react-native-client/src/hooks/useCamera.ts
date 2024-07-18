@@ -40,36 +40,40 @@ export type CameraConfig<MetadataType extends Metadata> = {
    * specified due to device capabilities, internet connection etc.
    * @default `VGA_169`
    */
-  quality: VideoQuality;
+  quality?: VideoQuality;
   /**
    * whether to flip the dimensions of the video, that is whether to film in vertical orientation.
    * @default `true`
    */
-  flipVideo: boolean;
+  flipVideo?: boolean;
   /**
    * a map `string -> any` containing video track metadata to be sent to the server.
    */
-  videoTrackMetadata: MetadataType;
+  videoTrackMetadata?: MetadataType;
   /**
    *  SimulcastConfig of a video track. By default simulcast is disabled.
    */
-  simulcastConfig: SimulcastConfig;
+  simulcastConfig?: SimulcastConfig;
   /**
    *  bandwidth limit of a video track. By default there is no bandwidth limit.
    */
-  maxBandwidth: TrackBandwidthLimit;
+  maxBandwidth?: TrackBandwidthLimit;
   /**
    * whether the camera track is initially enabled, you can toggle it on/off later with toggleCamera method
    * @default `true`
    */
-  cameraEnabled: boolean;
+  cameraEnabled?: boolean;
   /**
    * id of the camera to start capture with. Get available cameras with `getCaptureDevices()`.
    * You can switch the cameras later with `flipCamera`/`switchCamera` functions.
    * @default the first front camera
    */
-  captureDeviceId: string;
+  captureDeviceId?: string;
 };
+
+type StartCameraConfig = <CameraConfigMetadataType extends Metadata>(
+  config?: Readonly<CameraConfig<CameraConfigMetadataType>>,
+) => Promise<void>;
 
 const defaultSimulcastConfig = () => ({
   enabled: false,
@@ -146,11 +150,8 @@ export function useCamera() {
    * @param config configuration of the camera capture
    * @returns A promise that resolves when camera is started.
    */
-  const startCamera = useCallback<
-    <CameraConfigMetadataType extends Metadata>(
-      config?: Readonly<Partial<CameraConfig<CameraConfigMetadataType>>>,
-    ) => Promise<void>
-  >(async (config = {}) => {
+
+  const startCamera = useCallback<StartCameraConfig>(async (config = {}) => {
     // expo-modules on Android don't support Either type, so we workaround it
     if (Platform.OS === 'android') {
       if (typeof config.maxBandwidth === 'object') {
