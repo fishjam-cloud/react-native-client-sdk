@@ -53,7 +53,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
     joinRoom();
   }, [joinRoom]);
 
-  const peers = usePeers();
+  const { peers } = usePeers();
 
   const tracks = useMemo(
     () =>

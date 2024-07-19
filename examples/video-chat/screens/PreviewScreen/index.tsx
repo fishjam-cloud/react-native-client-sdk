@@ -80,8 +80,10 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   };
 
   useEffect(() => {
-    getCaptureDevices().then((devices) => {
+    async function setupCamera() {
+      const devices = await getCaptureDevices();
       availableCameras.current = devices;
+
       const captureDevice = devices.find((device) => device.isFrontFacing);
 
       startCamera({
@@ -99,8 +101,11 @@ const PreviewScreen = ({ navigation, route }: Props) => {
         captureDeviceId: captureDevice?.id,
         cameraEnabled: true,
       });
+
       setCurrentCamera(captureDevice || null);
-    });
+    }
+
+    setupCamera();
   }, [getCaptureDevices, startCamera]);
 
   const onJoinPressed = async () => {
