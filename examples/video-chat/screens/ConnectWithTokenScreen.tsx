@@ -35,10 +35,10 @@ const ConnectScreen = ({ navigation }: Props) => {
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const [peerToken, onChangePeerToken] = useState(
-    'SFMyNTY.g2gDdAAAAAJkAAdwZWVyX2lkbQAAACQxN2YwYTZlMy1kMzkzLTRkYzItYjg1MS00YjA4MjkwZWRlMTJkAAdyb29tX2lkbQAAAAI1MW4GALeEj8WQAWIAAVGA.XlK-DiP5RGkuRNQnnizuxbDHEcY8SPNXX9sYFf6zlLg',
+    'SFMyNTY.g2gDdAAAAAJkAAdwZWVyX2lkbQAAACQxMTIxMjYzYy0wMDhiLTQzNTYtYjI0NS0xNWRhMjUyMTliNWJkAAdyb29tX2lkbQAAAAI1M24GAILx6cqQAWIAAVGA.To7NaoMg4keqwHMcB286AkGf44XC16KOnvXHbxtlrRY',
   );
   const [fishjamUrl, onChangeFishjamUrl] = useState(
-    'ws://192.168.1.57:5002/socket/peer/websocket',
+    'ws://192.168.82.181:5002/socket/peer/websocket',
   );
 
   usePermissionCheck();

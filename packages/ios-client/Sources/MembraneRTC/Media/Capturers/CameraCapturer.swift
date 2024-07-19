@@ -28,8 +28,6 @@ class CameraCapturer: VideoCapturer {
 
         device = devices.first(where: { $0.position == position })
 
-        mirrorVideo(isFront)
-
         startCapture()
     }
 
@@ -41,8 +39,6 @@ class CameraCapturer: VideoCapturer {
 
         isFront = device?.position == .front
 
-        mirrorVideo(isFront)
-
         startCapture()
     }
 
@@ -50,8 +46,6 @@ class CameraCapturer: VideoCapturer {
         if device == nil {
             device = RTCCameraVideoCapturer.captureDevices().first(where: { $0.position == .front })
         }
-
-        mirrorVideo(isFront)
 
         guard let device = device else {
             return
@@ -99,6 +93,10 @@ class CameraCapturer: VideoCapturer {
         capturer.startCapture(
             with: device,
             format: selectedFormat,
-            fps: fps)
+            fps: fps,
+            completionHandler: { _ in
+                self.mirrorVideo(self.isFront)
+            }
+        )
     }
 }
