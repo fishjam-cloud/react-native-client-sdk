@@ -166,8 +166,39 @@ public class VideoView: UIView {
 
     private func update(mirror: Bool) {
         let mirrorTransform = CGAffineTransform(scaleX: -1.0, y: 1.0)
+
         DispatchQueue.main.async {
-            self.layer.setAffineTransform(mirror ? mirrorTransform : .identity)
+            let blurEffect = UIBlurEffect(style: .systemThickMaterial)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView.frame = self.bounds
+            blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            blurEffectView.alpha = 0
+            self.addSubview(blurEffectView)
+
+            UIView.animate(withDuration: 0.1) {
+                blurEffectView.alpha = 1
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+
+                if mirror {
+                    self.transform = mirrorTransform
+                } else {
+                    self.transform = .identity
+                }
+
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                UIView.animate(
+                    withDuration: 0.1,
+                    animations: {
+                        blurEffectView.alpha = 0
+                    }
+                ) { _ in
+                    blurEffectView.removeFromSuperview()
+                }
+            }
         }
     }
 
