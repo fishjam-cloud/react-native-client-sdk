@@ -14,7 +14,7 @@ export function useRTCStatistics(refreshInterval: number) {
   // Calculates diff between pervious and current stats,
   // providing end users with a per second metric.
   const processIncomingStats = useCallback(
-    (statistics: RTCStats[], stats: RTCStats) => {
+    (statistics: ReadonlyArray<RTCStats>, stats: Readonly<RTCStats>) => {
       Object.keys(stats).forEach((obj) => {
         if (obj.includes('Inbound')) {
           const rtcStats = stats[obj] as RTCInboundStats;

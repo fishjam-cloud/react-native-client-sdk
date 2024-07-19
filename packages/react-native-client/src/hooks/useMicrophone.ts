@@ -8,14 +8,18 @@ export type MicrophoneConfig<MetadataType extends Metadata> = {
   /**
    * a map `string -> any` containing audio track metadata to be sent to the server.
    */
-  audioTrackMetadata: MetadataType;
+  audioTrackMetadata?: MetadataType;
   /**
    * whether the microphone is initially enabled, you can toggle it on/off later with toggleMicrophone method
    * @default `true`
    */
-  microphoneEnabled: boolean;
+  microphoneEnabled?: boolean;
 };
 export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
+
+type StartMicorphoneConfig = <MicrophoneConfigMetadataType extends Metadata>(
+  config?: Readonly<Partial<MicrophoneConfig<MicrophoneConfigMetadataType>>>,
+) => Promise<void>;
 
 /**
  * This hook can toggle microphone on/off and provides current microphone state.
@@ -47,10 +51,8 @@ export function useMicrophone() {
    * @param config configuration of the microphone capture
    * @returns A promise that resolves when microphone capturing is started.
    */
-  const startMicrophone = useCallback(
-    async <MicrophoneConfigMetadataType extends Metadata>(
-      config: Partial<MicrophoneConfig<MicrophoneConfigMetadataType>> = {},
-    ) => {
+  const startMicrophone = useCallback<StartMicorphoneConfig>(
+    async (config = {}) => {
       await RNFishjamClientModule.startMicrophone(config);
     },
     [],
