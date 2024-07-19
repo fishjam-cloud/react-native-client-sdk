@@ -1,5 +1,6 @@
 package com.fishjamcloud.client
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 
 internal class CommandsQueue {
@@ -40,8 +41,9 @@ internal class CommandsQueue {
     }
   }
 
-  fun clear() {
+  fun clear(cause: String) {
     clientState = ClientState.CREATED
+    commandsQueue.forEach { command -> command.job.cancel(CancellationException(cause)) }
     commandsQueue.clear()
   }
 }

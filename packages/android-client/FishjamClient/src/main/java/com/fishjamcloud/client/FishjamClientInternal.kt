@@ -99,6 +99,7 @@ internal class FishjamClientInternal(
           reason: String
         ) {
           listener.onSocketClose(code, reason)
+          commandsQueue.clear("Websocket was closed")
         }
 
         override fun onMessage(
@@ -142,6 +143,7 @@ internal class FishjamClientInternal(
           response: Response?
         ) {
           listener.onSocketError(t, response)
+          commandsQueue.clear("Socket error")
         }
       }
 
@@ -200,7 +202,7 @@ internal class FishjamClientInternal(
       rtcEngineCommunication.removeListener(this@FishjamClientInternal)
       webSocket?.close(1000, null)
       webSocket = null
-      commandsQueue.clear()
+      commandsQueue.clear("Client disconnected")
     }
   }
 
