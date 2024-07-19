@@ -64,6 +64,11 @@ public class VideoView: UIView {
     /// To avoid leaking resources the old renderer gets removed from the old track.
     public var track: VideoTrack? {
         didSet {
+            if let localCameraTrack = track as? LocalCameraVideoTrack {
+                localCameraTrack.mirrorVideo = { shouldMirror in
+                    self.update(mirror: shouldMirror)
+                }
+            }
             if let oldValue = oldValue,
                 let rendererView = rendererView,
                 let rtcVideoTrack = oldValue.rtcTrack() as? RTCVideoTrack
@@ -161,8 +166,9 @@ public class VideoView: UIView {
 
     private func update(mirror: Bool) {
         let mirrorTransform = CGAffineTransform(scaleX: -1.0, y: 1.0)
-
-        layer.setAffineTransform(mirror ? mirrorTransform : .identity)
+        DispatchQueue.main.async {
+            self.layer.setAffineTransform(mirror ? mirrorTransform : .identity)
+        }
     }
 
     public static func isMetalAvailable() -> Bool {

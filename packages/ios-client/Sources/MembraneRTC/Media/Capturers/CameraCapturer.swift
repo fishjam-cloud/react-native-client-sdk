@@ -6,6 +6,7 @@ class CameraCapturer: VideoCapturer {
     private let capturer: RTCCameraVideoCapturer
     private var isFront: Bool = true
     private var device: AVCaptureDevice? = nil
+    internal var mirrorVideo: (_ shouldMirror: Bool) -> Void = { _ in }
 
     init(videoParameters: VideoParameters, delegate: RTCVideoCapturerDelegate) {
         self.videoParameters = videoParameters
@@ -27,6 +28,8 @@ class CameraCapturer: VideoCapturer {
 
         device = devices.first(where: { $0.position == position })
 
+        mirrorVideo(isFront)
+
         startCapture()
     }
 
@@ -38,6 +41,8 @@ class CameraCapturer: VideoCapturer {
 
         isFront = device?.position == .front
 
+        mirrorVideo(isFront)
+
         startCapture()
     }
 
@@ -45,6 +50,9 @@ class CameraCapturer: VideoCapturer {
         if device == nil {
             device = RTCCameraVideoCapturer.captureDevices().first(where: { $0.position == .front })
         }
+
+        mirrorVideo(isFront)
+
         guard let device = device else {
             return
         }
