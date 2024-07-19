@@ -3209,12 +3209,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@notifee/react-native@npm:^7.8.2":
+"@notifee/react-native@https://gitpkg.vercel.app/invertase/notifee/packages/react-native?9957a6a8e4f5b9d95c3418705e2ed7a5ad6dfb19&scripts.postinstall=genversion%20--es6%20--semi%20src%2Fversion.ts%20%26%26%20tsc%20%7C%7C%20exit%200":
   version: 7.8.2
-  resolution: "@notifee/react-native@npm:7.8.2"
+  resolution: "@notifee/react-native@https://gitpkg.vercel.app/invertase/notifee/packages/react-native?9957a6a8e4f5b9d95c3418705e2ed7a5ad6dfb19&scripts.postinstall=genversion%20--es6%20--semi%20src%2Fversion.ts%20%26%26%20tsc%20%7C%7C%20exit%200"
   peerDependencies:
     react-native: "*"
-  checksum: 10c0/1559caa74ccc057aa4a4a6fe15bcaf0fe0371ece045a0923c051fcef312e4c2b3e2f38e5032a15d2be327fd707492d014f2f074405123ed561ba368906413f29
+  checksum: 10c0/77d21164de6dfcc1c773f37bf7a4e9fa930c4f71a1e342381e98b6e87d728fd8672be536ae72d237a2b3175fe2051c47d47eb1421ea66b32371201f2e26878b7
   languageName: node
   linkType: hard
 
@@ -18962,7 +18962,7 @@ __metadata:
     "@expo-google-fonts/noto-sans": "npm:^0.2.3"
     "@fishjam-cloud/react-native-client": "npm:*"
     "@gorhom/bottom-sheet": "npm:^4"
-    "@notifee/react-native": "npm:^7.8.2"
+    "@notifee/react-native": "https://gitpkg.vercel.app/invertase/notifee/packages/react-native?9957a6a8e4f5b9d95c3418705e2ed7a5ad6dfb19&scripts.postinstall=genversion%20--es6%20--semi%20src%2Fversion.ts%20%26%26%20tsc%20%7C%7C%20exit%200"
     "@react-native/babel-preset": "npm:0.73.21"
     "@react-native/eslint-config": "npm:0.73.2"
     "@react-native/metro-config": "npm:0.73.5"

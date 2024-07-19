@@ -18,7 +18,7 @@
     "@expo-google-fonts/noto-sans": "^0.2.3",
     "@fishjam-cloud/react-native-client": "*",
     "@gorhom/bottom-sheet": "^4",
-    "@notifee/react-native": "^7.8.2",
+    "@notifee/react-native": "https://gitpkg.vercel.app/invertase/notifee/packages/react-native?9957a6a8e4f5b9d95c3418705e2ed7a5ad6dfb19&scripts.postinstall=genversion%20--es6%20--semi%20src%2Fversion.ts%20%26%26%20tsc%20%7C%7C%20exit%200",
     "@react-navigation/bottom-tabs": "^6.5.20",
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.17",

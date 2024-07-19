@@ -14,8 +14,10 @@ import { AdditionalColors, BrandColors } from '../utils/Colors';
 
 export type AppRootStackParamList = {
   Home: undefined;
-  Preview?: {
+  Preview: {
     userName?: string;
+    fishjamUrl: string;
+    peerToken: string;
   };
   Room: {
     isCameraOn: boolean;

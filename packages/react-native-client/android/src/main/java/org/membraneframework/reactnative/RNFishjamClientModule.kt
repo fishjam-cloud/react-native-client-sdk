@@ -110,7 +110,6 @@ class RNFishjamClientModule : Module() {
 
       AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
         CoroutineScope(Dispatchers.Main).launch {
-          rnFishjamClient.create()
           rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
         }
       }
@@ -171,9 +170,15 @@ class RNFishjamClientModule : Module() {
         }
       }
 
-      AsyncFunction("toggleScreencast") { screencastOptions: ScreencastOptions, promise: Promise ->
+      AsyncFunction("handleScreencastPermission") { promise: Promise ->
         CoroutineScope(Dispatchers.Main).launch {
-          rnFishjamClient.toggleScreencast(screencastOptions, promise)
+          rnFishjamClient.handleScreencastPermission(promise)
+        }
+      }
+
+      AsyncFunction("toggleScreencast") Coroutine { screencastOptions: ScreencastOptions ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleScreencast(screencastOptions)
         }
       }
 

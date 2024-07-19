@@ -1,7 +1,8 @@
 package com.fishjamcloud.client
 
+import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.Peer
 import okhttp3.Response
-import org.membraneframework.rtc.models.TrackContext
 import timber.log.Timber
 
 interface FishjamClientListener {
@@ -47,7 +48,7 @@ interface FishjamClientListener {
    */
   fun onJoined(
     peerID: String,
-    peersInRoom: List<Peer>
+    peersInRoom: MutableMap<String, Peer>
   )
 
   /**
@@ -83,14 +84,14 @@ interface FishjamClientListener {
    * This callback is always called after {@link FishjamClientListener.onTrackAdded}.
    * It informs user that data related to the given track arrives and can be played or displayed.
    */
-  fun onTrackReady(ctx: TrackContext)
+  fun onTrackReady(track: Track)
 
   /**
    * Called each time the peer which was already in the room, adds new track. Fields track and stream will be set to null.
    * These fields will be set to non-null value in {@link FishjamClientListener.onTrackReady}
    */
-  fun onTrackAdded(ctx: TrackContext) {
-    Timber.i("Track ${ctx.trackId} added")
+  fun onTrackAdded(track: Track) {
+    Timber.i("Track ${track.id()} added")
   }
 
   /**
@@ -98,13 +99,13 @@ interface FishjamClientListener {
    *
    * It will also be called before {@link FishjamClientListener.onPeerLeft} for each track of this peer.
    */
-  fun onTrackRemoved(ctx: TrackContext)
+  fun onTrackRemoved(track: Track)
 
   /**
    * Called each time peer has its track metadata updated.
    */
-  fun onTrackUpdated(ctx: TrackContext) {
-    Timber.i("Track ${ctx.trackId} updated")
+  fun onTrackUpdated(track: Track) {
+    Timber.i("Track ${track.id()} updated")
   }
 
   /**

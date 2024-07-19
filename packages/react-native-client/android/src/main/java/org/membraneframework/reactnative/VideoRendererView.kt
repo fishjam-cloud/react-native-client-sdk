@@ -1,13 +1,12 @@
 package org.membraneframework.reactnative
 
 import android.content.Context
+import com.fishjamcloud.client.media.VideoTrack
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.membraneframework.rtc.media.VideoTrack
-import org.membraneframework.rtc.ui.VideoTextureViewRenderer
 import org.webrtc.RendererCommon
 
 class VideoRendererView(
@@ -15,12 +14,11 @@ class VideoRendererView(
   appContext: AppContext
 ) : ExpoView(context, appContext),
   RNFishjamClient.OnTrackUpdateListener {
-  var isInitialized = false
   var activeVideoTrack: VideoTrack? = null
   var trackId: String? = null
 
   private val videoView =
-    VideoTextureViewRenderer(context).also {
+    RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
       addView(it)
       RNFishjamClient.onTracksUpdateListeners.add(this)
     }
@@ -35,15 +33,9 @@ class VideoRendererView(
 
   private fun update() {
     CoroutineScope(Dispatchers.Main).launch {
-      val endpoint =
-        RNFishjamClient.endpoints.values.firstOrNull {
-          it.videoTracks[trackId] != null
-        }
-      val videoTrack = endpoint?.videoTracks?.get(trackId) ?: return@launch
-      if (!isInitialized) {
-        isInitialized = true
-        videoView.init(videoTrack.eglContext, null)
-      }
+      val peers = RNFishjamClient.getAllPeers()
+      val endpoint = peers.firstOrNull { it.tracks[trackId] != null } ?: return@launch
+      val videoTrack = endpoint.tracks[trackId] as? VideoTrack ?: return@launch
       setupTrack(videoTrack)
     }
   }

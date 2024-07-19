@@ -7,7 +7,10 @@ import {
   useAudioSettings,
 } from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
-import notifee from '@notifee/react-native';
+import notifee, {
+  AndroidColor,
+  AndroidForegroundServiceType,
+} from '@notifee/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
@@ -33,16 +36,12 @@ const {
 } = roomScreenLabels;
 
 const RoomScreen = ({ navigation, route }: Props) => {
-  const {
-    isCameraOn: isCameraAvailable,
-    isMicrophoneOn: isMicrophoneAvailable,
-    userName,
-  } = route?.params ?? {};
+  const { isMicrophoneOn: isMicrophoneAvailable, userName } =
+    route?.params ?? {};
   usePreventBackButton();
   const audioSettings = useAudioSettings();
 
   const { joinRoom } = useJoinRoom({
-    isCameraAvailable,
     isMicrophoneAvailable,
   });
   const { isCameraOn, flipCamera } = useCamera();
@@ -66,15 +65,41 @@ const RoomScreen = ({ navigation, route }: Props) => {
     [peers],
   );
 
-  const { toggleScreencast, isScreencastOn } = useScreencast();
+  const { toggleScreencast, isScreencastOn, handleScreencastPermission } =
+    useScreencast();
 
   const onDisconnectPress = useCallback(() => {
     leaveRoom();
     navigation.navigate('Home');
   }, [navigation]);
 
-  const onToggleScreenCast = useCallback(() => {
-    toggleScreencast({
+  const onToggleScreenCast = useCallback(async () => {
+    if (!isScreencastOn && Platform.OS == 'android') {
+      if ((await handleScreencastPermission()) != 'granted') {
+        return;
+      }
+      await notifee.displayNotification({
+        title: 'Your video call is ongoing',
+        body: 'Tap to return to the call.',
+        id: 'video_notification',
+        android: {
+          channelId: 'video_call',
+          asForegroundService: true,
+          foregroundServiceTypes: [
+            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_CAMERA,
+            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MICROPHONE,
+            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
+          ],
+          ongoing: true,
+          color: AndroidColor.BLUE,
+          colorized: true,
+          pressAction: {
+            id: 'default',
+          },
+        },
+      });
+    }
+    await toggleScreencast({
       screencastMetadata: {
         displayName: 'presenting',
         type: 'screensharing',
@@ -82,7 +107,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
       },
       quality: 'HD15',
     });
-  }, [isScreencastOn, toggleScreencast]);
+  }, [isScreencastOn, toggleScreencast, handleScreencastPermission]);
 
   const bottomSheetRef = useRef<BottomSheet>(null);
 

@@ -41,6 +41,7 @@ type RNFishjamClient = {
   flipCamera: () => Promise<void>;
   switchCamera: (captureDeviceId: string) => Promise<void>;
   getCaptureDevices: () => Promise<CaptureDevice[]>;
+  handleScreencastPermission: () => Promise<'granted' | 'denied'>;
   toggleScreencast: <MetadataType extends Metadata>(
     screencastOptions: Partial<ScreencastOptions<MetadataType>>,
   ) => Promise<void>;
