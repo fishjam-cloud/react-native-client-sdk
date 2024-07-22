@@ -1,8 +1,10 @@
 package org.membraneframework.reactnative
 
 import android.content.Context
+import com.fishjamcloud.client.media.CameraCapturer
 import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.ui.VideoTextureViewRenderer
+import com.fishjamcloud.client.utils.getEnumerator
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
 import org.webrtc.RendererCommon
@@ -30,6 +32,13 @@ class VideoPreviewView(
           track ->
         track is LocalVideoTrack
       } as? LocalVideoTrack?
+    if (localVideoTrack?.capturer is CameraCapturer) {
+      (localVideoTrack!!.capturer as CameraCapturer).setMirrorVideo = { camera ->
+        setMirrorVideo(camera)
+      }
+      setMirrorVideo(getEnumerator(context).isFrontFacing((localVideoTrack!!.capturer as CameraCapturer).cameraName))
+    }
+
     videoView?.let { localVideoTrack?.addRenderer(it) }
   }
 

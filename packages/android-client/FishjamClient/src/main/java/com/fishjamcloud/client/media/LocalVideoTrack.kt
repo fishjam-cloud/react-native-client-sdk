@@ -3,8 +3,7 @@ package com.fishjamcloud.client.media
 import android.content.Context
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.VideoParameters
-import org.webrtc.Camera1Enumerator
-import org.webrtc.Camera2Enumerator
+import com.fishjamcloud.client.utils.getEnumerator
 import org.webrtc.CameraEnumerationAndroid
 import org.webrtc.CameraVideoCapturer
 import org.webrtc.EglBase
@@ -18,7 +17,7 @@ class LocalVideoTrack(
   mediaTrack: org.webrtc.VideoTrack,
   endpointId: String,
   metadata: Metadata,
-  private val capturer: Capturer,
+  public val capturer: Capturer,
   val videoParameters: VideoParameters
 ) : VideoTrack(mediaTrack, endpointId, rtcEngineId = null, metadata),
   LocalTrack {
@@ -30,12 +29,7 @@ class LocalVideoTrack(
 
   companion object {
     fun getCaptureDevices(context: Context): List<CaptureDevice> {
-      val enumerator =
-        if (Camera2Enumerator.isSupported(context)) {
-          Camera2Enumerator(context)
-        } else {
-          Camera1Enumerator(true)
-        }
+      val enumerator = getEnumerator(context)
       return enumerator.deviceNames.map { name ->
         CaptureDevice(
           name,
@@ -76,12 +70,13 @@ class CameraCapturer(
   private val source: VideoSource,
   private val rootEglBase: EglBase,
   private val videoParameters: VideoParameters,
-  cameraName: String?
+  public var cameraName: String?
 ) : Capturer,
   CameraVideoCapturer.CameraSwitchHandler {
   private lateinit var cameraCapturer: CameraVideoCapturer
   private lateinit var size: Size
   private var isCapturing = false
+  public var setMirrorVideo: (Boolean) -> Unit = { _ -> }
 
   init {
     createCapturer(cameraName)
@@ -91,6 +86,7 @@ class CameraCapturer(
 
   override fun startCapture() {
     isCapturing = true
+    setMirrorVideo(getEnumerator(context).isFrontFacing(cameraName))
     cameraCapturer.startCapture(size.width, size.height, videoParameters.maxFps)
   }
 
@@ -101,20 +97,28 @@ class CameraCapturer(
   }
 
   fun flipCamera() {
+    val enumerator = getEnumerator(context)
+    val wasFrontFacing = if (cameraName != null) enumerator.isFrontFacing(cameraName) else false
+
+    for (name in enumerator.deviceNames) {
+      if (wasFrontFacing && enumerator.isBackFacing(name) || !wasFrontFacing && enumerator.isFrontFacing(name)) {
+        cameraName = name
+        break
+      }
+    }
+    setMirrorVideo(!wasFrontFacing)
     cameraCapturer.switchCamera(this)
   }
 
   fun switchCamera(deviceName: String) {
+    val enumerator = getEnumerator(context)
+    cameraName = deviceName
+    setMirrorVideo(enumerator.isFrontFacing(deviceName))
     cameraCapturer.switchCamera(this, deviceName)
   }
 
   private fun createCapturer(providedDeviceName: String?) {
-    val enumerator =
-      if (Camera2Enumerator.isSupported(context)) {
-        Camera2Enumerator(context)
-      } else {
-        Camera1Enumerator(true)
-      }
+    val enumerator = getEnumerator(context)
 
     var deviceName = providedDeviceName
 
@@ -126,6 +130,9 @@ class CameraCapturer(
         }
       }
     }
+
+    cameraName = deviceName
+    setMirrorVideo(enumerator.isFrontFacing(deviceName))
 
     this.cameraCapturer = enumerator.createCapturer(deviceName, null)
 
