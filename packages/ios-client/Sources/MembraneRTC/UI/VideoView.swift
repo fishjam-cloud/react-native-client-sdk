@@ -64,6 +64,11 @@ public class VideoView: UIView {
     /// To avoid leaking resources the old renderer gets removed from the old track.
     public var track: VideoTrack? {
         didSet {
+            if let localCameraTrack = track as? LocalCameraVideoTrack {
+                localCameraTrack.mirrorVideo = { shouldMirror in
+                    self.update(mirror: shouldMirror)
+                }
+            }
             if let oldValue = oldValue,
                 let rendererView = rendererView,
                 let rtcVideoTrack = oldValue.rtcTrack() as? RTCVideoTrack
@@ -162,7 +167,39 @@ public class VideoView: UIView {
     private func update(mirror: Bool) {
         let mirrorTransform = CGAffineTransform(scaleX: -1.0, y: 1.0)
 
-        layer.setAffineTransform(mirror ? mirrorTransform : .identity)
+        DispatchQueue.main.async {
+            let blurEffect = UIBlurEffect(style: .systemThickMaterial)
+            let blurEffectView = UIVisualEffectView(effect: blurEffect)
+            blurEffectView.frame = self.bounds
+            blurEffectView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+            blurEffectView.alpha = 0
+            self.addSubview(blurEffectView)
+
+            UIView.animate(withDuration: 0.1) {
+                blurEffectView.alpha = 1
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+
+                if mirror {
+                    self.transform = mirrorTransform
+                } else {
+                    self.transform = .identity
+                }
+
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                UIView.animate(
+                    withDuration: 0.1,
+                    animations: {
+                        blurEffectView.alpha = 0
+                    }
+                ) { _ in
+                    blurEffectView.removeFromSuperview()
+                }
+            }
+        }
     }
 
     public static func isMetalAvailable() -> Bool {
