@@ -70,13 +70,13 @@ class CameraCapturer(
   private val source: VideoSource,
   private val rootEglBase: EglBase,
   private val videoParameters: VideoParameters,
-  public var cameraName: String?
+  var cameraName: String?
 ) : Capturer,
   CameraVideoCapturer.CameraSwitchHandler {
   private lateinit var cameraCapturer: CameraVideoCapturer
   private lateinit var size: Size
   private var isCapturing = false
-  public var setMirrorVideo: (Boolean) -> Unit = { _ -> }
+  var setMirrorVideo: (Boolean) -> Unit = { _ -> }
 
   init {
     createCapturer(cameraName)
