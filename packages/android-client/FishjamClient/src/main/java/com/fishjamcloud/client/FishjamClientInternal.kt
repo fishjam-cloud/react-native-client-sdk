@@ -10,6 +10,7 @@ import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.media.RemoteAudioTrack
 import com.fishjamcloud.client.media.RemoteVideoTrack
 import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.AuthError
 import com.fishjamcloud.client.models.EncodingReason
 import com.fishjamcloud.client.models.Endpoint
 import com.fishjamcloud.client.models.EndpointType
@@ -100,6 +101,18 @@ internal class FishjamClientInternal(
         ) {
           listener.onSocketClose(code, reason)
           commandsQueue.clear("Websocket was closed")
+        }
+
+        override fun onClosing(
+          webSocket: WebSocket,
+          code: Int,
+          reason: String
+        ) {
+          if (AuthError.isAuthError(reason)) {
+            listener.onAuthError(AuthError.fromString(reason))
+          }
+          commandsQueue.clear("Websocket was closed, reason: $reason")
+          webSocket.close(code, reason)
         }
 
         override fun onMessage(

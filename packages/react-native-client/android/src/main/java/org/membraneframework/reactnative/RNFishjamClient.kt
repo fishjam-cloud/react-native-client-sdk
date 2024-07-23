@@ -14,6 +14,7 @@ import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.media.RemoteAudioTrack
 import com.fishjamcloud.client.media.RemoteVideoTrack
 import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.AuthError
 import com.fishjamcloud.client.models.Endpoint
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.Peer
@@ -221,9 +222,9 @@ class RNFishjamClient(
     }
   }
 
-  override fun onAuthError() {
+  override fun onAuthError(reason: AuthError) {
     CoroutineScope(Dispatchers.Main).launch {
-      connectPromise?.reject(CodedException("Connection error"))
+      connectPromise?.reject(CodedException("Connection error: ${reason.error}"))
       connectPromise = null
     }
   }

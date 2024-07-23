@@ -1,6 +1,7 @@
 package com.fishjamcloud.client
 
 import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.AuthError
 import com.fishjamcloud.client.models.Peer
 import okhttp3.Response
 import timber.log.Timber
@@ -41,7 +42,7 @@ interface FishjamClientListener {
   /**
    * Emitted when authentication fails
    */
-  fun onAuthError()
+  fun onAuthError(reason: AuthError)
 
   /**
    * Emitted when local user is connected to fishjam.

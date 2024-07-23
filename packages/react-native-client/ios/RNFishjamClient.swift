@@ -271,9 +271,9 @@ class RNFishjamClient: FishjamClientListener {
         joinRoom()
     }
 
-    func onAuthError() {
+    func onAuthError(reason: AuthError) {
         if let connectPromise = connectPromise {
-            connectPromise.reject("E_MEMBRANE_CONNECT", "Failed to connect: socket error")
+            connectPromise.reject("E_MEMBRANE_CONNECT", "Failed to connect: \(reason.rawValue)")
         }
         connectPromise = nil
     }
