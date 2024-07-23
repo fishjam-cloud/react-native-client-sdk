@@ -101,7 +101,7 @@ class CameraCapturer(
     val wasFrontFacing = if (cameraName != null) enumerator.isFrontFacing(cameraName) else false
 
     for (name in enumerator.deviceNames) {
-      if (wasFrontFacing && enumerator.isBackFacing(name) || !wasFrontFacing && enumerator.isFrontFacing(name)) {
+      if ((wasFrontFacing && enumerator.isBackFacing(name)) || (!wasFrontFacing && enumerator.isFrontFacing(name))) {
         cameraName = name
         break
       }
