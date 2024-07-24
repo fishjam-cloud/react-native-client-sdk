@@ -42,9 +42,12 @@ class VideoRendererView(
     if (videoTrack is LocalVideoTrack && videoTrack.capturer is CameraCapturer) {
       foreground = ColorDrawable(Color.BLACK)
       (videoTrack.capturer as CameraCapturer).setMirrorVideo = { isFrontCamera ->
-        setMirrorVideo(null, isFrontCamera)
+        setMirrorVideo(isFrontCamera = isFrontCamera, isInitialCall = false)
       }
-      initialSetMirrorVideo(getEnumerator(context).isFrontFacing((videoTrack.capturer as CameraCapturer).cameraName))
+      setMirrorVideo(
+        isFrontCamera = getEnumerator(context).isFrontFacing((videoTrack.capturer as CameraCapturer).cameraName),
+        isInitialCall = true
+      )
     }
 
     videoTrack.addRenderer(videoView)

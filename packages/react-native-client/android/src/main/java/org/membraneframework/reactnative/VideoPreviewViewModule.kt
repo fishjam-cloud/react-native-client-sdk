@@ -12,10 +12,6 @@ class VideoPreviewViewModule : Module() {
         Prop("videoLayout") { view: VideoPreviewView, videoLayout: String ->
           view.setVideoLayout(videoLayout)
         }
-
-        Prop("mirrorVideo") { view: VideoPreviewView, mirrorVideo: Boolean ->
-          view.setMirrorVideo(mirrorVideo, null)
-        }
       }
     }
 }

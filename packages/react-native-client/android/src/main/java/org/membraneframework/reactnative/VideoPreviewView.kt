@@ -39,9 +39,12 @@ class VideoPreviewView(
       } as? LocalVideoTrack?
     if (localVideoTrack?.capturer is CameraCapturer) {
       (localVideoTrack!!.capturer as CameraCapturer).setMirrorVideo = { isFrontCamera ->
-        setMirrorVideo(null, isFrontCamera)
+        setMirrorVideo(isFrontCamera = isFrontCamera, isInitialCall = false)
       }
-      initialSetMirrorVideo(getEnumerator(context).isFrontFacing((localVideoTrack!!.capturer as CameraCapturer).cameraName))
+      setMirrorVideo(
+        isFrontCamera = getEnumerator(context).isFrontFacing((localVideoTrack!!.capturer as CameraCapturer).cameraName),
+        isInitialCall = true
+      )
     }
 
     videoView?.let { localVideoTrack?.addRenderer(it) }

@@ -36,8 +36,7 @@ import {
 import { useToggleCamera } from '../../hooks/useToggleCamera';
 
 type Props = NativeStackScreenProps<AppRootStackParamList, 'Preview'>;
-const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON, MIRROR_PREVIEW_BUTTON } =
-  previewScreenLabels;
+const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON } = previewScreenLabels;
 
 const PreviewScreen = ({ navigation, route }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -68,8 +67,6 @@ const PreviewScreen = ({ navigation, route }: Props) => {
   const toggleMicrophone = () => {
     setIsMicrophoneOn(!isMicrophoneOn);
   };
-
-  const [mirrorPreview, setMirrorPreview] = useState(false);
 
   const toggleSwitchCamera = () => {
     const camera =
@@ -134,20 +131,12 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.cameraPreview}>
         {!isIosSimulator && isCameraOn ? (
-          <VideoPreviewView
-            style={styles.cameraPreviewView}
-            mirrorVideo={mirrorPreview}
-          />
+          <VideoPreviewView style={styles.cameraPreviewView} />
         ) : (
           <NoCameraView username={route?.params?.userName || 'RN Mobile'} />
         )}
       </View>
       <View style={styles.mediaButtonsWrapper}>
-        <InCallButton
-          iconName={mirrorPreview ? 'keyboard-tab' : 'keyboard-tab-reverse'}
-          onPress={() => setMirrorPreview((prev) => !prev)}
-          accessibilityLabel={MIRROR_PREVIEW_BUTTON}
-        />
         <InCallButton
           iconName={isMicrophoneOn ? 'microphone' : 'microphone-off'}
           onPress={toggleMicrophone}

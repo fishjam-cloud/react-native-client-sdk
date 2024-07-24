@@ -15,35 +15,26 @@ abstract class MirrorableView(
   context: Context,
   appContext: AppContext
 ) : ExpoView(context, appContext) {
-  private var mirrorVideo: Boolean = false
-  private var isFrontCamera: Boolean = false
+  protected var isFrontCamera: Boolean = false
   var isInitialized: Boolean = false
   val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
-  abstract val fadeAnimation: ValueAnimator
-  abstract val videoView: VideoTextureViewRenderer?
+  protected abstract val fadeAnimation: ValueAnimator
+  protected abstract val videoView: VideoTextureViewRenderer?
 
   fun setMirrorVideo(
-    mirrorVideo: Boolean?,
-    isFrontCamera: Boolean?
+    isFrontCamera: Boolean?,
+    isInitialCall: Boolean
   ) {
-    if (this.mirrorVideo == mirrorVideo && this.isFrontCamera == isFrontCamera) return
-    this.mirrorVideo = mirrorVideo ?: this.mirrorVideo
+    if (this.isFrontCamera == isFrontCamera) return
     this.isFrontCamera = isFrontCamera ?: this.isFrontCamera
-    if (!isInitialized) return
+    if (!(isInitialCall || isInitialized)) return
 
     coroutineScope.launch {
-      fadeAnimation.start()
-      delay(200)
-      videoView?.setMirror(this@MirrorableView.mirrorVideo xor this@MirrorableView.isFrontCamera)
-      delay(800)
-      fadeAnimation.reverse()
-    }
-  }
-
-  fun initialSetMirrorVideo(isFrontCamera: Boolean) {
-    this.isFrontCamera = isFrontCamera
-    coroutineScope.launch {
-      videoView?.setMirror(this@MirrorableView.mirrorVideo xor this@MirrorableView.isFrontCamera)
+      if (!isInitialCall) {
+        fadeAnimation.start()
+        delay(200)
+      }
+      videoView?.setMirror(this@MirrorableView.isFrontCamera)
       delay(800)
       fadeAnimation.reverse()
     }
