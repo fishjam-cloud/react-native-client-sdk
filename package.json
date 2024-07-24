@@ -19,6 +19,7 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-react-hooks": "^4.6.2",
+    "patch-package": "8.0.0",
     "prettier": "^3.3.2"
   },
   "scripts": {
@@ -26,6 +27,7 @@
     "build": "yarn workspace @fishjam-cloud/react-native-client run tsc",
     "tsc": "yarn workspaces foreach -A -p run tsc",
     "lint": "yarn workspaces foreach -A -p run lint",
-    "lint:check": "yarn workspaces foreach -A -p run lint:check"
+    "lint:check": "yarn workspaces foreach -A -p run lint:check",
+    "postinstall": "patch-package"
   }
 }
