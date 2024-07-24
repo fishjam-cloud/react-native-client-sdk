@@ -4,40 +4,23 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.view.animation.LinearInterpolator
 import com.fishjamcloud.client.media.CameraCapturer
 import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.ui.VideoTextureViewRenderer
 import com.fishjamcloud.client.utils.getEnumerator
 import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.views.ExpoView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
 
 class VideoPreviewView(
   context: Context,
   appContext: AppContext
-) : ExpoView(context, appContext) {
+) : MirrorableView(context, appContext) {
   private var localVideoTrack: LocalVideoTrack? = null
-  private var isInitialized: Boolean = false
-  private var mirrorVideo: Boolean = false
-  private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
-
-  private var videoView: VideoTextureViewRenderer? = null
-
-  private var fadeAnimation: ValueAnimator =
-    ValueAnimator.ofArgb(Color.TRANSPARENT, Color.BLACK).apply {
-      duration = 100
-      interpolator = LinearInterpolator()
-      addUpdateListener {
-        val colorValue = it.animatedValue as Int
-        foreground = ColorDrawable(colorValue)
-      }
+  override var videoView: VideoTextureViewRenderer? = null
+  override val fadeAnimation: ValueAnimator =
+    getVideoViewFadeAnimator { color ->
+      foreground = ColorDrawable(color)
     }
 
   private fun initialize() {
@@ -56,7 +39,7 @@ class VideoPreviewView(
       } as? LocalVideoTrack?
     if (localVideoTrack?.capturer is CameraCapturer) {
       (localVideoTrack!!.capturer as CameraCapturer).setMirrorVideo = { isFrontCamera ->
-        setMirrorVideo(isFrontCamera)
+        setMirrorVideo(null, isFrontCamera)
       }
       initialSetMirrorVideo(getEnumerator(context).isFrontFacing((localVideoTrack!!.capturer as CameraCapturer).cameraName))
     }
@@ -73,27 +56,6 @@ class VideoPreviewView(
       }
     videoView?.setScalingType(scalingType)
     videoView?.setEnableHardwareScaler(true)
-  }
-
-  fun setMirrorVideo(mirrorVideo: Boolean) {
-    if (this.mirrorVideo == mirrorVideo) return
-    this.mirrorVideo = mirrorVideo
-    coroutineScope.launch {
-      fadeAnimation.start()
-      delay(200)
-      videoView?.setMirror(mirrorVideo)
-      delay(200)
-      fadeAnimation.reverse()
-    }
-  }
-
-  private fun initialSetMirrorVideo(mirrorVideo: Boolean) {
-    this.mirrorVideo = mirrorVideo
-    coroutineScope.launch {
-      videoView?.setMirror(mirrorVideo)
-      delay(200)
-      fadeAnimation.reverse()
-    }
   }
 
   private fun dispose() {

@@ -4,58 +4,47 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.view.animation.LinearInterpolator
 import com.fishjamcloud.client.media.CameraCapturer
 import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.media.VideoTrack
 import com.fishjamcloud.client.utils.getEnumerator
 import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
 
 class VideoRendererView(
   context: Context,
   appContext: AppContext
-) : ExpoView(context, appContext),
+) : MirrorableView(context, appContext),
   RNFishjamClient.OnTrackUpdateListener {
-  var activeVideoTrack: VideoTrack? = null
-  var trackId: String? = null
-  private var mirrorVideo: Boolean = false
-  private val coroutineScope = CoroutineScope(Dispatchers.Main + Job())
+  private var activeVideoTrack: VideoTrack? = null
+  private var trackId: String? = null
+  override val fadeAnimation: ValueAnimator =
+    getVideoViewFadeAnimator { color ->
+      foreground = ColorDrawable(color)
+    }
 
-  private val videoView =
+  override val videoView =
     RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
       addView(it)
       RNFishjamClient.onTracksUpdateListeners.add(this)
     }
 
-  private var fadeAnimation: ValueAnimator =
-    ValueAnimator.ofArgb(Color.TRANSPARENT, Color.BLACK).apply {
-      duration = 100
-      interpolator = LinearInterpolator()
-      addUpdateListener {
-        val colorValue = it.animatedValue as Int
-        foreground = ColorDrawable(colorValue)
-      }
-    }
-
   private fun setupTrack(videoTrack: VideoTrack) {
     if (activeVideoTrack == videoTrack) return
+    foreground = ColorDrawable(Color.BLACK)
 
     activeVideoTrack?.removeRenderer(videoView)
     activeVideoTrack = videoTrack
-
     if (videoTrack is LocalVideoTrack && videoTrack.capturer is CameraCapturer) {
+      foreground = ColorDrawable(Color.BLACK)
       (videoTrack.capturer as CameraCapturer).setMirrorVideo = { isFrontCamera ->
-        setMirrorVideo(isFrontCamera)
+        setMirrorVideo(null, isFrontCamera)
       }
-      setMirrorVideo(getEnumerator(context).isFrontFacing((videoTrack.capturer as CameraCapturer).cameraName))
+      initialSetMirrorVideo(getEnumerator(context).isFrontFacing((videoTrack.capturer as CameraCapturer).cameraName))
     }
 
     videoTrack.addRenderer(videoView)
@@ -72,7 +61,9 @@ class VideoRendererView(
 
   fun init(trackId: String) {
     this.trackId = trackId
+    isInitialized = false
     update()
+    isInitialized = true
   }
 
   fun dispose() {
@@ -95,17 +86,5 @@ class VideoRendererView(
       }
     videoView.setScalingType(scalingType)
     videoView.setEnableHardwareScaler(true)
-  }
-
-  fun setMirrorVideo(mirrorVideo: Boolean) {
-    if (this.mirrorVideo == mirrorVideo) return
-    this.mirrorVideo = mirrorVideo
-    coroutineScope.launch {
-      fadeAnimation.start()
-      delay(200)
-      videoView.setMirror(mirrorVideo)
-      delay(200)
-      fadeAnimation.reverse()
-    }
   }
 }

@@ -22,7 +22,7 @@ class VideoRendererViewModule : Module() {
         }
 
         Prop("mirrorVideo") { view: VideoRendererView, mirrorVideo: Boolean ->
-          view.setMirrorVideo(mirrorVideo)
+          view.setMirrorVideo(mirrorVideo, null)
         }
       }
     }
