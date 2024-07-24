@@ -22,10 +22,6 @@ class VideoRendererView(
   RNFishjamClient.OnTrackUpdateListener {
   private var activeVideoTrack: VideoTrack? = null
   private var trackId: String? = null
-  override val fadeAnimation: ValueAnimator =
-    getVideoViewFadeAnimator { color ->
-      foreground = ColorDrawable(color)
-    }
 
   override val videoView =
     RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
@@ -35,7 +31,6 @@ class VideoRendererView(
 
   private fun setupTrack(videoTrack: VideoTrack) {
     if (activeVideoTrack == videoTrack) return
-    foreground = ColorDrawable(Color.BLACK)
 
     activeVideoTrack?.removeRenderer(videoView)
     activeVideoTrack = videoTrack
@@ -64,6 +59,7 @@ class VideoRendererView(
 
   fun init(trackId: String) {
     this.trackId = trackId
+    foreground = ColorDrawable(Color.BLACK)
     isInitialized = false
     update()
     isInitialized = true

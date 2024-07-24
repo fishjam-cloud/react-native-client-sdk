@@ -18,10 +18,6 @@ class VideoPreviewView(
 ) : MirrorableView(context, appContext) {
   private var localVideoTrack: LocalVideoTrack? = null
   override var videoView: VideoTextureViewRenderer? = null
-  override val fadeAnimation: ValueAnimator =
-    getVideoViewFadeAnimator { color ->
-      foreground = ColorDrawable(color)
-    }
 
   private fun initialize() {
     if (isInitialized) return

@@ -2,6 +2,7 @@ package org.membraneframework.reactnative
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import com.fishjamcloud.client.ui.VideoTextureViewRenderer
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.views.ExpoView
@@ -18,16 +19,19 @@ abstract class MirrorableView(
   protected var isFrontCamera: Boolean = false
   var isInitialized: Boolean = false
   val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.Main + Job())
-  protected abstract val fadeAnimation: ValueAnimator
+  private val fadeAnimation: ValueAnimator =  getVideoViewFadeAnimator { color ->
+    foreground = ColorDrawable(color)
+  }
+
   protected abstract val videoView: VideoTextureViewRenderer?
 
   fun setMirrorVideo(
-    isFrontCamera: Boolean?,
+    isFrontCamera: Boolean,
     isInitialCall: Boolean
   ) {
-    if (this.isFrontCamera == isFrontCamera) return
-    this.isFrontCamera = isFrontCamera ?: this.isFrontCamera
-    if (!(isInitialCall || isInitialized)) return
+    if (this.isFrontCamera == isFrontCamera && !isInitialCall) return
+    this.isFrontCamera = isFrontCamera
+    if (!isInitialCall && !isInitialized) return
 
     coroutineScope.launch {
       if (!isInitialCall) {
@@ -35,7 +39,7 @@ abstract class MirrorableView(
         delay(200)
       }
       videoView?.setMirror(this@MirrorableView.isFrontCamera)
-      delay(800)
+      delay(600)
       fadeAnimation.reverse()
     }
   }
