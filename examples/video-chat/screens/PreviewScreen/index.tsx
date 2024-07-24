@@ -68,6 +68,8 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     setIsMicrophoneOn(!isMicrophoneOn);
   };
 
+  const [mirrorPreview, setMirrorPreview] = useState(false);
+
   const toggleSwitchCamera = () => {
     const camera =
       availableCameras.current.find(
@@ -131,12 +133,20 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.cameraPreview}>
         {!isIosSimulator && isCameraOn ? (
-          <VideoPreviewView style={styles.cameraPreviewView} />
+          <VideoPreviewView
+            style={styles.cameraPreviewView}
+            mirrorVideo={mirrorPreview}
+          />
         ) : (
           <NoCameraView username={route?.params?.userName || 'RN Mobile'} />
         )}
       </View>
       <View style={styles.mediaButtonsWrapper}>
+        <InCallButton
+          iconName={mirrorPreview ? 'keyboard-tab' : 'keyboard-tab-reverse'}
+          onPress={() => setMirrorPreview((prev) => !prev)}
+          accessibilityLabel={TOGGLE_MICROPHONE_BUTTON}
+        />
         <InCallButton
           iconName={isMicrophoneOn ? 'microphone' : 'microphone-off'}
           onPress={toggleMicrophone}
