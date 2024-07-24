@@ -1,51 +1,33 @@
 package org.membraneframework.reactnative
 
-import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
-import com.fishjamcloud.client.media.CameraCapturer
-import com.fishjamcloud.client.media.LocalVideoTrack
 import com.fishjamcloud.client.media.VideoTrack
-import com.fishjamcloud.client.utils.getEnumerator
 import expo.modules.kotlin.AppContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import org.webrtc.RendererCommon
 
 class VideoRendererView(
   context: Context,
   appContext: AppContext
-) : MirrorableView(context, appContext),
+) : VideoView(context, appContext),
   RNFishjamClient.OnTrackUpdateListener {
   private var activeVideoTrack: VideoTrack? = null
   private var trackId: String? = null
 
-  override val videoView =
-    RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
-      addView(it)
-      RNFishjamClient.onTracksUpdateListeners.add(this)
-    }
+  init {
+    RNFishjamClient.onTracksUpdateListeners.add(this)
+  }
 
   private fun setupTrack(videoTrack: VideoTrack) {
     if (activeVideoTrack == videoTrack) return
 
     activeVideoTrack?.removeRenderer(videoView)
     activeVideoTrack = videoTrack
-    if (videoTrack is LocalVideoTrack && videoTrack.capturer is CameraCapturer) {
-      foreground = ColorDrawable(Color.BLACK)
-      (videoTrack.capturer as CameraCapturer).setMirrorVideo = { isFrontCamera ->
-        setMirrorVideo(isFrontCamera = isFrontCamera, isInitialCall = false)
-      }
-      setMirrorVideo(
-        isFrontCamera = getEnumerator(context).isFrontFacing((videoTrack.capturer as CameraCapturer).cameraName),
-        isInitialCall = true
-      )
-    }
 
     videoTrack.addRenderer(videoView)
+
+    super.setupTrack()
   }
 
   private fun update() {
@@ -59,31 +41,18 @@ class VideoRendererView(
 
   fun init(trackId: String) {
     this.trackId = trackId
-    foreground = ColorDrawable(Color.BLACK)
-    isInitialized = false
     update()
-    isInitialized = true
   }
 
-  fun dispose() {
+  override fun dispose() {
     activeVideoTrack?.removeRenderer(videoView)
-    videoView.release()
     RNFishjamClient.onTracksUpdateListeners.remove(this)
-    coroutineScope.cancel()
+    super.dispose()
   }
 
   override fun onTracksUpdate() {
     update()
   }
 
-  fun setVideoLayout(videoLayout: String) {
-    val scalingType =
-      when (videoLayout) {
-        "FILL" -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-        "FIT" -> RendererCommon.ScalingType.SCALE_ASPECT_FIT
-        else -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-      }
-    videoView.setScalingType(scalingType)
-    videoView.setEnableHardwareScaler(true)
-  }
+  override fun getVideoTrack(): VideoTrack? = activeVideoTrack
 }

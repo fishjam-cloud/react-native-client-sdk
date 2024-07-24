@@ -64,8 +64,15 @@ class RNFishjamClient(
     fun onTracksUpdate()
   }
 
+  interface OnLocalTrackSwitchListener {
+    fun onLocalTrackWillSwitch()
+
+    fun onLocalTrackSwitched()
+  }
+
   companion object {
     var onTracksUpdateListeners: MutableList<OnTrackUpdateListener> = mutableListOf()
+    val onLocalTrackSwitchListener: MutableList<OnLocalTrackSwitchListener> = mutableListOf()
     lateinit var fishjamClient: FishjamClient
 
     fun getAllPeers(): List<Peer> {
@@ -286,14 +293,20 @@ class RNFishjamClient(
     return isCameraOn
   }
 
-  fun flipCamera() {
+  suspend fun flipCamera() {
     ensureVideoTrack()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackWillSwitch() }
     getLocalVideoTrack()?.flipCamera()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackSwitched() }
   }
 
-  fun switchCamera(captureDeviceId: String) {
+  suspend fun switchCamera(captureDeviceId: String) {
     ensureVideoTrack()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackWillSwitch() }
     getLocalVideoTrack()?.switchCamera(captureDeviceId)
+    onLocalTrackSwitchListener.forEach {
+      it.onLocalTrackSwitched()
+    }
   }
 
   suspend fun startMicrophone(config: MicrophoneConfig) {
