@@ -15,6 +15,7 @@ const previewScreenLabels = {
   TOGGLE_MICROPHONE_BUTTON: 'toggle_microphone_button',
   SWITCH_CAMERA_BUTTON: 'switch_camera_button',
   SELECT_AUDIO_OUTPUT: 'select_audio_output_button',
+  MIRROR_PREVIEW_BUTTON: 'mirror_preview_button',
 };
 
 const roomScreenLabels = {

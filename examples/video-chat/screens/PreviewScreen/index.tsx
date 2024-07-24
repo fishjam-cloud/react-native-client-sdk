@@ -36,7 +36,8 @@ import {
 import { useToggleCamera } from '../../hooks/useToggleCamera';
 
 type Props = NativeStackScreenProps<AppRootStackParamList, 'Preview'>;
-const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON } = previewScreenLabels;
+const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON, MIRROR_PREVIEW_BUTTON } =
+  previewScreenLabels;
 
 const PreviewScreen = ({ navigation, route }: Props) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -145,7 +146,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
         <InCallButton
           iconName={mirrorPreview ? 'keyboard-tab' : 'keyboard-tab-reverse'}
           onPress={() => setMirrorPreview((prev) => !prev)}
-          accessibilityLabel={TOGGLE_MICROPHONE_BUTTON}
+          accessibilityLabel={MIRROR_PREVIEW_BUTTON}
         />
         <InCallButton
           iconName={isMicrophoneOn ? 'microphone' : 'microphone-off'}
