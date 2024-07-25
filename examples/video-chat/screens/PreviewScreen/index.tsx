@@ -81,6 +81,9 @@ const PreviewScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     async function setupCamera() {
+      await connect(route.params.fishjamUrl, route.params.peerToken, {
+        name: 'RN mobile',
+      });
       const devices = await getCaptureDevices();
       availableCameras.current = devices;
 
@@ -106,12 +109,17 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     }
 
     setupCamera();
-  }, [getCaptureDevices, startCamera]);
+  }, [
+    getCaptureDevices,
+    startCamera,
+    route.params.fishjamUrl,
+    route.params.peerToken,
+  ]);
 
   const onJoinPressed = async () => {
-    await connect(route.params.fishjamUrl, route.params.peerToken, {
-      name: 'RN mobile',
-    });
+    // await connect(route.params.fishjamUrl, route.params.peerToken, {
+    //   name: 'RN mobile',
+    // });
     navigation.navigate('Room', {
       isCameraOn,
       isMicrophoneOn,
