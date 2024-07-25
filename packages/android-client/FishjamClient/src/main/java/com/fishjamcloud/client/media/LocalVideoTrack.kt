@@ -4,6 +4,8 @@ import android.content.Context
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.VideoParameters
 import com.fishjamcloud.client.utils.getEnumerator
+import kotlinx.coroutines.CompletableJob
+import kotlinx.coroutines.Job
 import org.webrtc.CameraEnumerationAndroid
 import org.webrtc.CameraVideoCapturer
 import org.webrtc.EglBase
@@ -12,12 +14,13 @@ import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoSource
 import timber.log.Timber
+import java.util.concurrent.CancellationException
 
 class LocalVideoTrack(
   mediaTrack: org.webrtc.VideoTrack,
   endpointId: String,
   metadata: Metadata,
-  public val capturer: Capturer,
+  private val capturer: Capturer,
   val videoParameters: VideoParameters
 ) : VideoTrack(mediaTrack, endpointId, rtcEngineId = null, metadata),
   LocalTrack {
@@ -48,13 +51,15 @@ class LocalVideoTrack(
     capturer.stopCapture()
   }
 
-  fun flipCamera() {
+  suspend fun flipCamera() {
     (capturer as? CameraCapturer)?.flipCamera()
   }
 
-  fun switchCamera(deviceName: String) {
+  suspend fun switchCamera(deviceName: String) {
     (capturer as? CameraCapturer)?.switchCamera(deviceName)
   }
+
+  fun isFrontCamera(): Boolean = (capturer as? CameraCapturer)?.isFrontFacingCamera ?: false
 }
 
 interface Capturer {
@@ -70,13 +75,14 @@ class CameraCapturer(
   private val source: VideoSource,
   private val rootEglBase: EglBase,
   private val videoParameters: VideoParameters,
-  var cameraName: String?
+  cameraName: String?
 ) : Capturer,
   CameraVideoCapturer.CameraSwitchHandler {
   private lateinit var cameraCapturer: CameraVideoCapturer
   private lateinit var size: Size
   private var isCapturing = false
-  var setMirrorVideo: (Boolean) -> Unit = { _ -> }
+  private var switchingCameraJob: CompletableJob? = null
+  var isFrontFacingCamera = false
 
   init {
     createCapturer(cameraName)
@@ -86,7 +92,6 @@ class CameraCapturer(
 
   override fun startCapture() {
     isCapturing = true
-    setMirrorVideo(getEnumerator(context).isFrontFacing(cameraName))
     cameraCapturer.startCapture(size.width, size.height, videoParameters.maxFps)
   }
 
@@ -96,25 +101,22 @@ class CameraCapturer(
     cameraCapturer.dispose()
   }
 
-  fun flipCamera() {
-    val enumerator = getEnumerator(context)
-    val wasFrontFacing = if (cameraName != null) enumerator.isFrontFacing(cameraName) else false
-
-    for (name in enumerator.deviceNames) {
-      if ((wasFrontFacing && enumerator.isBackFacing(name)) || (!wasFrontFacing && enumerator.isFrontFacing(name))) {
-        cameraName = name
-        break
-      }
-    }
-    setMirrorVideo(!wasFrontFacing)
-    cameraCapturer.switchCamera(this)
+  suspend fun flipCamera() {
+    switchingCameraJob = Job()
+    val devices = LocalVideoTrack.getCaptureDevices(context)
+    val deviceName =
+      devices
+        .first {
+          (isFrontFacingCamera && it.isBackFacing) || (!isFrontFacingCamera && it.isFrontFacing)
+        }.deviceName
+    cameraCapturer.switchCamera(this, deviceName)
+    switchingCameraJob?.join()
   }
 
-  fun switchCamera(deviceName: String) {
-    val enumerator = getEnumerator(context)
-    cameraName = deviceName
-    setMirrorVideo(enumerator.isFrontFacing(deviceName))
+  suspend fun switchCamera(deviceName: String) {
+    switchingCameraJob = Job()
     cameraCapturer.switchCamera(this, deviceName)
+    switchingCameraJob?.join()
   }
 
   private fun createCapturer(providedDeviceName: String?) {
@@ -131,8 +133,7 @@ class CameraCapturer(
       }
     }
 
-    cameraName = deviceName
-    setMirrorVideo(enumerator.isFrontFacing(deviceName))
+    isFrontFacingCamera = enumerator.isFrontFacing(deviceName)
 
     this.cameraCapturer = enumerator.createCapturer(deviceName, null)
 
@@ -157,10 +158,12 @@ class CameraCapturer(
   }
 
   override fun onCameraSwitchDone(isFrontCamera: Boolean) {
+    isFrontFacingCamera = isFrontCamera
+    switchingCameraJob?.complete()
   }
 
   override fun onCameraSwitchError(errorDescription: String?) {
-    // FIXME flipCamera() should probably return a promise or something
     Timber.e("Failed to switch camera: $errorDescription")
+    switchingCameraJob?.cancel(CancellationException(errorDescription))
   }
 }
