@@ -59,7 +59,7 @@
     "jest-websocket-mock": "^2.4.0",
     "lint-staged": "^15.2.2",
     "pod-install": "^0.2.0",
-    "react": "18.2.0",
+    "react": "18.3.1",
     "react-dom": "18.2.0",
     "react-native": "0.73.4",
     "release-it": "^17.0.3",
