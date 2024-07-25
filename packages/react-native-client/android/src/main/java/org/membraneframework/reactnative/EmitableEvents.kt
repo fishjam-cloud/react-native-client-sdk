@@ -7,6 +7,5 @@ object EmitableEvents {
   const val SimulcastConfigUpdate = "SimulcastConfigUpdate"
   const val EndpointsUpdate = "EndpointsUpdate"
   const val AudioDeviceUpdate = "AudioDeviceUpdate"
-  const val SendMediaEvent = "SendMediaEvent"
   const val BandwidthEstimation = "BandwidthEstimation"
 }

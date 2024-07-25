@@ -87,6 +87,14 @@ public class LocalCameraVideoTrack: LocalVideoTrack {
         return CameraCapturer(videoParameters: videoParameters, delegate: videoSource)
     }
 
+    internal var mirrorVideo: (_ shouldMirror: Bool) -> Void = { _ in } {
+        didSet {
+            if let cap = capturer as? CameraCapturer {
+                cap.mirrorVideo = mirrorVideo
+            }
+        }
+    }
+
     public func switchCamera() {
         guard let capturer = capturer as? CameraCapturer else {
             return
@@ -101,6 +109,7 @@ public class LocalCameraVideoTrack: LocalVideoTrack {
         }
 
         capturer.switchCamera(deviceId: deviceId)
+
     }
 
     public static func getCaptureDevices() -> [AVCaptureDevice] {

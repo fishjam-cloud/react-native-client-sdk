@@ -1,7 +1,41 @@
 package com.fishjamcloud.client
 
-import android.content.Context
-import fishjam.PeerNotifications.PeerMessage
+import android.content.Intent
+import com.fishjamcloud.client.events.OfferData
+import com.fishjamcloud.client.events.TrackData
+import com.fishjamcloud.client.media.LocalAudioTrack
+import com.fishjamcloud.client.media.LocalScreencastTrack
+import com.fishjamcloud.client.media.LocalTrack
+import com.fishjamcloud.client.media.LocalVideoTrack
+import com.fishjamcloud.client.media.RemoteAudioTrack
+import com.fishjamcloud.client.media.RemoteVideoTrack
+import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.EncodingReason
+import com.fishjamcloud.client.models.Endpoint
+import com.fishjamcloud.client.models.EndpointType
+import com.fishjamcloud.client.models.Metadata
+import com.fishjamcloud.client.models.Peer
+import com.fishjamcloud.client.models.RTCStats
+import com.fishjamcloud.client.models.SerializedMediaEvent
+import com.fishjamcloud.client.models.SimulcastConfig
+import com.fishjamcloud.client.models.TrackBandwidthLimit
+import com.fishjamcloud.client.models.TrackEncoding
+import com.fishjamcloud.client.models.VadStatus
+import com.fishjamcloud.client.models.VideoParameters
+import com.fishjamcloud.client.ui.VideoTextureViewRenderer
+import com.fishjamcloud.client.utils.ClosableCoroutineScope
+import com.fishjamcloud.client.utils.TimberDebugTree
+import com.fishjamcloud.client.webrtc.PeerConnectionFactoryWrapper
+import com.fishjamcloud.client.webrtc.PeerConnectionListener
+import com.fishjamcloud.client.webrtc.PeerConnectionManager
+import com.fishjamcloud.client.webrtc.RTCEngineCommunication
+import com.fishjamcloud.client.webrtc.RTCEngineListener
+import com.github.ajalt.timberkt.BuildConfig
+import fishjam.PeerNotifications
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -9,23 +43,28 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
 import okio.ByteString.Companion.toByteString
-import org.membraneframework.rtc.MembraneRTC
-import org.membraneframework.rtc.MembraneRTCListener
-import org.membraneframework.rtc.models.Endpoint
-import org.membraneframework.rtc.models.TrackContext
-import org.membraneframework.rtc.utils.SerializedMediaEvent
-import org.membraneframework.rtc.utils.TimberDebugTree
+import org.webrtc.AudioTrack
+import org.webrtc.IceCandidate
+import org.webrtc.Logging
+import org.webrtc.MediaStreamTrack
+import org.webrtc.VideoTrack
 import timber.log.Timber
 
-typealias Peer = Endpoint
-
 internal class FishjamClientInternal(
-  appContext: Context,
-  private val listener: FishjamClientListener
-) : MembraneRTCListener {
+  private val listener: FishjamClientListener,
+  private val peerConnectionFactoryWrapper: PeerConnectionFactoryWrapper,
+  private val peerConnectionManager: PeerConnectionManager,
+  private val rtcEngineCommunication: RTCEngineCommunication
+) : RTCEngineListener,
+  PeerConnectionListener {
+  private val commandsQueue: CommandsQueue = CommandsQueue()
   private var webSocket: WebSocket? = null
-  val webrtcClient = MembraneRTC.create(appContext, this)
-  private var isAuthenticated = false
+
+  private var localEndpoint: Endpoint = Endpoint(id = "", type = EndpointType.WEBRTC)
+  private var remoteEndpoints: MutableMap<String, Endpoint> = mutableMapOf()
+
+  private val coroutineScope: CoroutineScope =
+    ClosableCoroutineScope(SupervisorJob() + Dispatchers.Default)
 
   init {
     if (BuildConfig.DEBUG) {
@@ -33,143 +72,660 @@ internal class FishjamClientInternal(
     }
   }
 
-  fun connect(config: Config) {
-    val request = Request.Builder().url(config.websocketUrl).build()
-    val webSocket =
-      OkHttpClient().newWebSocket(
-        request,
-        object : WebSocketListener() {
-          override fun onClosed(
-            webSocket: WebSocket,
-            code: Int,
-            reason: String
-          ) {
-            listener.onSocketClose(code, reason)
-          }
-
-          override fun onMessage(
-            webSocket: WebSocket,
-            bytes: ByteString
-          ) {
-            try {
-              val peerMessage = PeerMessage.parseFrom(bytes.toByteArray())
-              if (peerMessage.hasAuthenticated()) {
-                isAuthenticated = true
-                listener.onAuthSuccess()
-              } else if (peerMessage.hasMediaEvent()) {
-                receiveEvent(peerMessage.mediaEvent.data)
-              } else {
-                Timber.w("Received unexpected websocket message: $peerMessage")
-              }
-            } catch (e: Exception) {
-              Timber.e("Received invalid websocket message", e)
-            }
-          }
-
-          override fun onOpen(
-            webSocket: WebSocket,
-            response: Response
-          ) {
-            listener.onSocketOpen()
-            val authRequest =
-              PeerMessage
-                .newBuilder()
-                .setAuthRequest(PeerMessage.AuthRequest.newBuilder().setToken(config.token))
-                .build()
-            sendEvent(authRequest)
-          }
-
-          override fun onFailure(
-            webSocket: WebSocket,
-            t: Throwable,
-            response: Response?
-          ) {
-            listener.onSocketError(t, response)
-          }
-        }
+  private fun getTrack(trackId: String): Track? =
+    localEndpoint.tracks[trackId]
+      ?: remoteEndpoints.values.find { endpoint -> endpoint.tracks[trackId] != null }?.tracks?.get(
+        trackId
       )
 
-    this.webSocket = webSocket
+  private fun getTrackWithRtcEngineId(trackId: String): Track? =
+    localEndpoint.tracks.values.firstOrNull { track -> track.webrtcId() == trackId }
+      ?: remoteEndpoints.values
+        .firstOrNull { endpoint ->
+          endpoint.tracks.values.firstOrNull { track -> track.getRTCEngineId() == trackId } !=
+            null
+        }?.tracks
+        ?.values
+        ?.firstOrNull { track -> track.getRTCEngineId() == trackId }
+
+  fun connect(config: Config) {
+    peerConnectionManager.addListener(this)
+    rtcEngineCommunication.addListener(this)
+    val websocketListener =
+      object : WebSocketListener() {
+        override fun onClosed(
+          webSocket: WebSocket,
+          code: Int,
+          reason: String
+        ) {
+          listener.onSocketClose(code, reason)
+          commandsQueue.clear("Websocket was closed")
+        }
+
+        override fun onMessage(
+          webSocket: WebSocket,
+          bytes: ByteString
+        ) {
+          try {
+            val peerMessage = PeerNotifications.PeerMessage.parseFrom(bytes.toByteArray())
+            if (peerMessage.hasAuthenticated()) {
+              listener.onAuthSuccess()
+              commandsQueue.finishCommand()
+            } else if (peerMessage.hasMediaEvent()) {
+              receiveEvent(peerMessage.mediaEvent.data)
+            } else {
+              Timber.w("Received unexpected websocket message: $peerMessage")
+            }
+          } catch (e: Exception) {
+            Timber.e("Received invalid websocket message", e)
+          }
+        }
+
+        override fun onOpen(
+          webSocket: WebSocket,
+          response: Response
+        ) {
+          listener.onSocketOpen()
+          val authRequest =
+            PeerNotifications.PeerMessage
+              .newBuilder()
+              .setAuthRequest(
+                PeerNotifications.PeerMessage.AuthRequest
+                  .newBuilder()
+                  .setToken(config.token)
+              ).build()
+          sendEvent(authRequest)
+        }
+
+        override fun onFailure(
+          webSocket: WebSocket,
+          t: Throwable,
+          response: Response?
+        ) {
+          listener.onSocketError(t, response)
+          commandsQueue.clear("Socket error")
+        }
+      }
+
+    commandsQueue.addCommand(
+      Command(CommandName.CONNECT, ClientState.CONNECTED) {
+        val request = Request.Builder().url(config.websocketUrl).build()
+        val webSocket =
+          OkHttpClient().newWebSocket(
+            request,
+            websocketListener
+          )
+
+        this.webSocket = webSocket
+      }
+    )
+  }
+
+  fun join(peerMetadata: Metadata = emptyMap()) {
+    commandsQueue.addCommand(
+      Command(CommandName.JOIN, ClientState.JOINED) {
+        localEndpoint = localEndpoint.copy(metadata = peerMetadata)
+        rtcEngineCommunication.connect(peerMetadata)
+      }
+    )
+  }
+
+  override fun onConnected(
+    endpointID: String,
+    otherEndpoints: List<com.fishjamcloud.client.events.Endpoint>
+  ) {
+    localEndpoint = localEndpoint.copy(id = endpointID)
+
+    otherEndpoints.forEach {
+      var endpoint = Endpoint(it.id, EndpointType.fromString(it.type), it.metadata)
+
+      for ((trackId, trackData) in it.tracks) {
+        val track = Track(null, it.id, trackId, trackData.metadata ?: mapOf())
+        endpoint = endpoint.addOrReplaceTrack(track)
+
+        this.listener.onTrackAdded(track)
+      }
+      this.remoteEndpoints[it.id] = (endpoint)
+    }
+    listener.onJoined(endpointID, remoteEndpoints)
+    commandsQueue.finishCommand()
   }
 
   fun leave() {
-    webrtcClient.disconnect()
-    isAuthenticated = false
+    coroutineScope.launch {
+      rtcEngineCommunication.disconnect()
+      localEndpoint.tracks.values.forEach { (it as? LocalTrack)?.stop() }
+      peerConnectionManager.close()
+      localEndpoint = Endpoint(id = "", type = EndpointType.WEBRTC)
+      remoteEndpoints = mutableMapOf()
+      peerConnectionManager.removeListener(this@FishjamClientInternal)
+      rtcEngineCommunication.removeListener(this@FishjamClientInternal)
+      webSocket?.close(1000, null)
+      webSocket = null
+      commandsQueue.clear("Client disconnected")
+    }
   }
 
-  fun cleanUp() {
-    webrtcClient.disconnect()
-    isAuthenticated = false
-    webSocket?.close(1000, null)
-    webSocket = null
-    listener.onDisconnected()
+  suspend fun createVideoTrack(
+    videoParameters: VideoParameters,
+    metadata: Metadata,
+    captureDeviceName: String? = null
+  ): LocalVideoTrack {
+    val videoSource = peerConnectionFactoryWrapper.createVideoSource()
+    val webrtcVideoTrack = peerConnectionFactoryWrapper.createVideoTrack(videoSource)
+    val videoCapturer =
+      peerConnectionFactoryWrapper.createVideoCapturer(
+        videoSource,
+        videoParameters,
+        captureDeviceName
+      )
+
+    val videoTrack =
+      LocalVideoTrack(webrtcVideoTrack, localEndpoint.id, metadata, videoCapturer, videoParameters)
+
+    videoTrack.start()
+
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(videoTrack)
+
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(videoTrack)
+            if (commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
+              rtcEngineCommunication.renegotiateTracks()
+            } else {
+              commandsQueue.finishCommand(CommandName.ADD_TRACK)
+            }
+          }
+        }
+      ).join()
+
+    return videoTrack
   }
 
-  private fun sendEvent(peerMessage: PeerMessage) {
+  override fun onSdpAnswer(
+    type: String,
+    sdp: String,
+    midToTrackId: Map<String, String>
+  ) {
+    coroutineScope.launch {
+      peerConnectionManager.onSdpAnswer(sdp, midToTrackId)
+
+      // temporary workaround, the backend doesn't add ~ in sdp answer
+      localEndpoint.tracks.values.forEach { localTrack ->
+        if (localTrack.mediaTrack?.kind() != "video") return@forEach
+        var config: SimulcastConfig? = null
+        if (localTrack is LocalVideoTrack) {
+          config = localTrack.videoParameters.simulcastConfig
+        } else if (localTrack is LocalScreencastTrack) {
+          config = localTrack.videoParameters.simulcastConfig
+        }
+        listOf(TrackEncoding.L, TrackEncoding.M, TrackEncoding.H).forEach {
+          if (config?.activeEncodings?.contains(it) == false) {
+            peerConnectionManager.setTrackEncoding(localTrack.webrtcId(), it, false)
+          }
+        }
+      }
+
+      commandsQueue.finishCommand(listOf(CommandName.ADD_TRACK, CommandName.REMOVE_TRACK))
+    }
+  }
+
+  suspend fun createAudioTrack(metadata: Metadata): LocalAudioTrack {
+    val audioSource = peerConnectionFactoryWrapper.createAudioSource()
+    val webrtcAudioTrack = peerConnectionFactoryWrapper.createAudioTrack(audioSource)
+    val audioTrack = LocalAudioTrack(webrtcAudioTrack, localEndpoint.id, metadata)
+    audioTrack.start()
+
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(audioTrack)
+
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(audioTrack)
+            if (commandsQueue.clientState == ClientState.CONNECTED || commandsQueue.clientState == ClientState.JOINED) {
+              rtcEngineCommunication.renegotiateTracks()
+            } else {
+              commandsQueue.finishCommand(CommandName.ADD_TRACK)
+            }
+          }
+        }
+      ).join()
+
+    return audioTrack
+  }
+
+  suspend fun createScreencastTrack(
+    mediaProjectionPermission: Intent,
+    videoParameters: VideoParameters,
+    metadata: Metadata,
+    onEnd: (() -> Unit)? = null
+  ): LocalScreencastTrack {
+    val videoSource = peerConnectionFactoryWrapper.createScreencastVideoSource()
+    val webrtcTrack = peerConnectionFactoryWrapper.createVideoTrack(videoSource)
+    val callback = LocalScreencastTrack.ProjectionCallback()
+    val capturer =
+      peerConnectionFactoryWrapper.createScreenCapturer(
+        videoSource,
+        callback,
+        mediaProjectionPermission
+      )
+    val screencastTrack =
+      LocalScreencastTrack(webrtcTrack, localEndpoint.id, metadata, capturer, videoParameters)
+    screencastTrack.start()
+    callback.addCallback {
+      if (onEnd != null) {
+        onEnd()
+      }
+    }
+
+    commandsQueue
+      .addCommand(
+        Command(CommandName.ADD_TRACK) {
+          localEndpoint = localEndpoint.addOrReplaceTrack(screencastTrack)
+
+          coroutineScope.launch {
+            peerConnectionManager.addTrack(screencastTrack)
+            rtcEngineCommunication.renegotiateTracks()
+          }
+        }
+      ).join()
+
+    return screencastTrack
+  }
+
+  suspend fun removeTrack(trackId: String) {
+    commandsQueue
+      .addCommand(
+        Command(CommandName.REMOVE_TRACK) {
+          val track: Track =
+            getTrack(trackId) ?: run {
+              Timber.e("removeTrack: Can't find track to remove")
+              return@Command
+            }
+
+          localEndpoint = localEndpoint.removeTrack(trackId)
+          (track as LocalTrack).stop()
+
+          coroutineScope.launch {
+            peerConnectionManager.removeTrack(track.webrtcId())
+            rtcEngineCommunication.renegotiateTracks()
+          }
+        }
+      ).join()
+  }
+
+  fun setTargetTrackEncoding(
+    trackId: String,
+    encoding: TrackEncoding
+  ) {
+    coroutineScope.launch {
+      val rtcEngineTrackId =
+        getTrack(trackId)?.getRTCEngineId() ?: run {
+          Timber.e("setTargetTrackEncoding: invalid track id")
+          return@launch
+        }
+      rtcEngineCommunication.setTargetTrackEncoding(rtcEngineTrackId, encoding)
+    }
+  }
+
+  fun enableTrackEncoding(
+    trackId: String,
+    encoding: TrackEncoding
+  ) {
+    coroutineScope.launch {
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("enableTrackEncoding: invalid track id")
+          return@launch
+        }
+      peerConnectionManager.setTrackEncoding(webrtcId, encoding, true)
+    }
+  }
+
+  fun disableTrackEncoding(
+    trackId: String,
+    encoding: TrackEncoding
+  ) {
+    coroutineScope.launch {
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("enableTrackEncoding: invalid track id")
+          return@launch
+        }
+      peerConnectionManager.setTrackEncoding(webrtcId, encoding, false)
+    }
+  }
+
+  fun updatePeerMetadata(peerMetadata: Metadata) {
+    coroutineScope.launch {
+      rtcEngineCommunication.updateEndpointMetadata(peerMetadata)
+      localEndpoint = localEndpoint.copy(metadata = peerMetadata)
+    }
+  }
+
+  fun updateTrackMetadata(
+    trackId: String,
+    trackMetadata: Metadata
+  ) {
+    val track =
+      getTrack(trackId) ?: run {
+        Timber.e("updateTrackMetadata: invalid track id")
+        return
+      }
+    track.metadata = trackMetadata
+    localEndpoint = localEndpoint.addOrReplaceTrack(track)
+    coroutineScope.launch {
+      val rtcEngineTrackId = track.getRTCEngineId()
+      if (rtcEngineTrackId != null) {
+        rtcEngineCommunication.updateTrackMetadata(rtcEngineTrackId, trackMetadata)
+      }
+    }
+  }
+
+  fun setTrackBandwidth(
+    trackId: String,
+    bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
+  ) {
+    coroutineScope.launch {
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("setTrackBandwidth: invalid track id")
+          return@launch
+        }
+      peerConnectionManager.setTrackBandwidth(webrtcId, bandwidthLimit)
+    }
+  }
+
+  fun setEncodingBandwidth(
+    trackId: String,
+    encoding: String,
+    bandwidthLimit: TrackBandwidthLimit.BandwidthLimit
+  ) {
+    coroutineScope.launch {
+      val webrtcId =
+        getTrack(trackId)?.webrtcId() ?: run {
+          Timber.e("setEncodingBandwidth: invalid track id")
+          return@launch
+        }
+      peerConnectionManager.setEncodingBandwidth(webrtcId, encoding, bandwidthLimit)
+    }
+  }
+
+  fun changeWebRTCLoggingSeverity(severity: Logging.Severity) {
+    Logging.enableLogToDebugOutput(severity)
+  }
+
+  fun getStats(): Map<String, RTCStats> = peerConnectionManager.getStats()
+
+  fun getRemotePeers(): List<Peer> = remoteEndpoints.values.toList()
+
+  fun getLocalEndpoint(): Endpoint = localEndpoint
+
+  fun createVideoViewRenderer(): VideoTextureViewRenderer = peerConnectionFactoryWrapper.createVideoViewRenderer()
+
+  private fun sendEvent(peerMessage: PeerNotifications.PeerMessage) {
     webSocket?.send(peerMessage.toByteArray().toByteString())
   }
 
   private fun receiveEvent(event: SerializedMediaEvent) {
-    webrtcClient.receiveMediaEvent(event)
-  }
-
-  override fun onEndpointAdded(peer: Peer) {
-    listener.onPeerJoined(peer)
-  }
-
-  override fun onEndpointRemoved(peer: Peer) {
-    listener.onPeerLeft(peer)
-  }
-
-  override fun onEndpointUpdated(peer: Peer) {
-    listener.onPeerUpdated(peer)
+    rtcEngineCommunication.onEvent(event)
   }
 
   override fun onSendMediaEvent(event: SerializedMediaEvent) {
-    if (!isAuthenticated) {
-      Timber.e("Tried to send media event: $event before authentication")
-      return
-    }
     val mediaEvent =
-      PeerMessage
+      PeerNotifications.PeerMessage
         .newBuilder()
-        .setMediaEvent(PeerMessage.MediaEvent.newBuilder().setData(event))
-        .build()
+        .setMediaEvent(
+          PeerNotifications.PeerMessage.MediaEvent
+            .newBuilder()
+            .setData(event)
+        ).build()
     sendEvent(mediaEvent)
   }
 
-  override fun onTrackAdded(ctx: TrackContext) {
-    listener.onTrackAdded(ctx)
+  override fun onEndpointAdded(
+    endpointId: String,
+    type: EndpointType,
+    metadata: Metadata?
+  ) {
+    if (endpointId == this.localEndpoint.id) {
+      return
+    }
+
+    val endpoint = Endpoint(endpointId, type, metadata)
+
+    remoteEndpoints[endpoint.id] = endpoint
+
+    listener.onPeerJoined(endpoint)
   }
 
-  override fun onTrackReady(ctx: TrackContext) {
-    listener.onTrackReady(ctx)
+  override fun onEndpointRemoved(endpointId: String) {
+    if (endpointId == localEndpoint.id) {
+      listener.onDisconnected()
+      return
+    }
+    val endpoint =
+      remoteEndpoints.remove(endpointId) ?: run {
+        Timber.e("Failed to process EndpointLeft event: Endpoint not found: $endpointId")
+        return
+      }
+
+    endpoint.tracks.forEach { (_, track) ->
+      listener.onTrackRemoved(track)
+    }
+
+    listener.onPeerLeft(endpoint)
   }
 
-  override fun onTrackRemoved(ctx: TrackContext) {
-    listener.onTrackRemoved(ctx)
+  override fun onEndpointUpdated(
+    endpointId: String,
+    endpointMetadata: Metadata?
+  ) {
+    val endpoint =
+      remoteEndpoints.remove(endpointId) ?: run {
+        Timber.e("Failed to process EndpointUpdated event: Endpoint not found: $endpointId")
+        return
+      }
+
+    remoteEndpoints[endpoint.id] = endpoint.copy(metadata = endpointMetadata)
   }
 
-  override fun onTrackUpdated(ctx: TrackContext) {
-    listener.onTrackUpdated(ctx)
+  override fun onOfferData(
+    integratedTurnServers: List<OfferData.TurnServer>,
+    tracksTypes: Map<String, Int>
+  ) {
+    coroutineScope.launch {
+      try {
+        val offer =
+          peerConnectionManager.getSdpOffer(
+            integratedTurnServers,
+            tracksTypes,
+            localEndpoint.tracks.values.toList()
+          )
+
+        rtcEngineCommunication.sdpOffer(
+          offer.description,
+          localEndpoint.tracks.map { (_, track) -> track.webrtcId() to track.metadata }.toMap(),
+          offer.midToTrackIdMapping
+        )
+      } catch (e: Exception) {
+        Timber.e(e, "Failed to create an sdp offer")
+      }
+    }
   }
 
-  override fun onBandwidthEstimationChanged(estimation: Long) {
+  override fun onRemoteCandidate(
+    candidate: String,
+    sdpMLineIndex: Int,
+    sdpMid: String?
+  ) {
+    coroutineScope.launch {
+      val iceCandidate =
+        IceCandidate(
+          sdpMid ?: "",
+          sdpMLineIndex,
+          candidate
+        )
+
+      peerConnectionManager.onRemoteCandidate(iceCandidate)
+    }
+  }
+
+  override fun onTracksAdded(
+    endpointId: String,
+    tracks: Map<String, TrackData>
+  ) {
+    if (localEndpoint.id == endpointId) return
+
+    val endpoint =
+      remoteEndpoints.remove(endpointId) ?: run {
+        Timber.e("Failed to process TracksAdded event: Endpoint not found: $endpointId")
+        return
+      }
+
+    val updatedTracks = mutableMapOf<String, Track>()
+
+    for ((trackId, trackData) in tracks) {
+      var track = endpoint.tracks.values.firstOrNull { track -> track.getRTCEngineId() == trackId }
+      if (track != null) {
+        track.metadata = trackData.metadata ?: mapOf()
+      } else {
+        track = Track(null, endpointId, trackId, trackData.metadata ?: mapOf())
+        this.listener.onTrackAdded(track)
+      }
+      updatedTracks[track.id()] = track
+    }
+
+    val updatedEndpoint = endpoint.copy(tracks = updatedTracks)
+
+    remoteEndpoints[updatedEndpoint.id] = updatedEndpoint
+  }
+
+  override fun onTracksRemoved(
+    endpointId: String,
+    trackIds: List<String>
+  ) {
+    var endpoint =
+      remoteEndpoints[endpointId] ?: run {
+        Timber.e("Failed to process TracksRemoved event: Endpoint not found: $endpointId")
+        return
+      }
+
+    trackIds.forEach { trackId ->
+      val track = endpoint.tracks[trackId] ?: return
+      endpoint = endpoint.removeTrack(trackId)
+      this.listener.onTrackRemoved(track)
+    }
+    remoteEndpoints[endpointId] = endpoint
+  }
+
+  override fun onTrackUpdated(
+    endpointId: String,
+    trackId: String,
+    metadata: Metadata?
+  ) {
+    val track =
+      getTrack(trackId) ?: run {
+        Timber.e("Failed to process TrackUpdated event: Track context not found: $trackId")
+        return
+      }
+
+    track.metadata = metadata ?: mapOf()
+
+    this.listener.onTrackUpdated(track)
+  }
+
+  override fun onTrackEncodingChanged(
+    endpointId: String,
+    trackId: String,
+    encoding: String,
+    encodingReason: String
+  ) {
+    val encodingReasonEnum = EncodingReason.fromString(encodingReason)
+    if (encodingReasonEnum == null) {
+      Timber.e("Invalid encoding reason: $encodingReason")
+      return
+    }
+    val track = getTrack(trackId) as? RemoteVideoTrack
+    if (track == null) {
+      Timber.e("Invalid trackId: $trackId")
+      return
+    }
+    val encodingEnum = TrackEncoding.fromString(encoding)
+    if (encodingEnum == null) {
+      Timber.e("Invalid encoding: $encoding")
+      return
+    }
+    track.setEncoding(encodingEnum, encodingReasonEnum)
+  }
+
+  override fun onVadNotification(
+    trackId: String,
+    status: String
+  ) {
+    val track =
+      getTrack(trackId) as? RemoteAudioTrack ?: run {
+        Timber.e("Invalid track id = $trackId")
+        return
+      }
+    val vadStatus = VadStatus.fromString(status)
+    if (vadStatus == null) {
+      Timber.e("Invalid vad status = $status")
+      return
+    }
+    track.vadStatus = vadStatus
+  }
+
+  override fun onBandwidthEstimation(estimation: Long) {
     listener.onBandwidthEstimationChanged(estimation)
   }
 
-  override fun onConnectError(metadata: Any) {
-    listener.onJoinError(metadata)
-  }
-
-  override fun onConnected(
-    peerID: String,
-    peersInRoom: List<Peer>
+  override fun onAddTrack(
+    rtcEngineTrackId: String,
+    webrtcTrack: MediaStreamTrack
   ) {
-    listener.onJoined(peerID, peersInRoom)
+    var track =
+      getTrackWithRtcEngineId(rtcEngineTrackId) ?: run {
+        Timber.e("onAddTrack: Track context with trackId=$rtcEngineTrackId not found")
+        return
+      }
+
+    val trackId = track.id()
+
+    track =
+      when (webrtcTrack) {
+        is VideoTrack ->
+          RemoteVideoTrack(
+            webrtcTrack,
+            track.endpointId,
+            track.getRTCEngineId(),
+            track.metadata,
+            trackId
+          )
+
+        is AudioTrack ->
+          RemoteAudioTrack(
+            webrtcTrack,
+            track.endpointId,
+            track.getRTCEngineId(),
+            track.metadata,
+            trackId
+          )
+
+        else ->
+          throw IllegalStateException("invalid type of incoming track")
+      }
+
+    remoteEndpoints[track.endpointId] = remoteEndpoints[track.endpointId]!!.addOrReplaceTrack(track)
+    listener.onTrackReady(track)
   }
 
-  override fun onDisconnected() {
-    listener.onDisconnected()
+  override fun onLocalIceCandidate(candidate: IceCandidate) {
+    coroutineScope.launch {
+      rtcEngineCommunication.localCandidate(candidate.sdp, candidate.sdpMLineIndex)
+    }
   }
 }

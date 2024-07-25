@@ -9,6 +9,8 @@ import expo.modules.kotlin.records.Record
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 class SimulcastConfig : Record {
@@ -92,6 +94,8 @@ class RNFishjamClientModule : Module() {
           sendEvent(name, data)
         }
 
+      val mutex = Mutex()
+
       OnCreate {
         rnFishjamClient.onModuleCreate(appContext)
       }
@@ -110,7 +114,6 @@ class RNFishjamClientModule : Module() {
 
       AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
         CoroutineScope(Dispatchers.Main).launch {
-          rnFishjamClient.create()
           rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
         }
       }
@@ -154,14 +157,18 @@ class RNFishjamClientModule : Module() {
       }
 
       AsyncFunction("flipCamera") Coroutine { ->
-        withContext(Dispatchers.Main) {
-          rnFishjamClient.flipCamera()
+        mutex.withLock {
+          withContext(Dispatchers.Main) {
+            rnFishjamClient.flipCamera()
+          }
         }
       }
 
       AsyncFunction("switchCamera") Coroutine { captureDeviceId: String ->
-        withContext(Dispatchers.Main) {
-          rnFishjamClient.switchCamera(captureDeviceId)
+        mutex.withLock {
+          withContext(Dispatchers.Main) {
+            rnFishjamClient.switchCamera(captureDeviceId)
+          }
         }
       }
 
@@ -171,9 +178,15 @@ class RNFishjamClientModule : Module() {
         }
       }
 
-      AsyncFunction("toggleScreencast") { screencastOptions: ScreencastOptions, promise: Promise ->
+      AsyncFunction("handleScreencastPermission") { promise: Promise ->
         CoroutineScope(Dispatchers.Main).launch {
-          rnFishjamClient.toggleScreencast(screencastOptions, promise)
+          rnFishjamClient.handleScreencastPermission(promise)
+        }
+      }
+
+      AsyncFunction("toggleScreencast") Coroutine { screencastOptions: ScreencastOptions ->
+        withContext(Dispatchers.Main) {
+          rnFishjamClient.toggleScreencast(screencastOptions)
         }
       }
 

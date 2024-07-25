@@ -8,53 +8,42 @@ import androidx.appcompat.app.AppCompatActivity
 import com.fishjamcloud.client.Config
 import com.fishjamcloud.client.FishjamClient
 import com.fishjamcloud.client.FishjamClientListener
-import com.fishjamcloud.client.Peer
+import com.fishjamcloud.client.media.LocalAudioTrack
+import com.fishjamcloud.client.media.LocalScreencastTrack
+import com.fishjamcloud.client.media.LocalVideoTrack
+import com.fishjamcloud.client.media.RemoteAudioTrack
+import com.fishjamcloud.client.media.RemoteVideoTrack
+import com.fishjamcloud.client.media.Track
+import com.fishjamcloud.client.models.Endpoint
+import com.fishjamcloud.client.models.Metadata
+import com.fishjamcloud.client.models.Peer
+import com.fishjamcloud.client.models.RTCInboundStats
+import com.fishjamcloud.client.models.RTCOutboundStats
+import com.fishjamcloud.client.models.SimulcastConfig
+import com.fishjamcloud.client.models.TrackBandwidthLimit
+import com.fishjamcloud.client.models.VideoParameters
 import com.twilio.audioswitch.AudioDevice
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.CodedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.membraneframework.rtc.SimulcastConfig
-import org.membraneframework.rtc.media.AudioTrack
-import org.membraneframework.rtc.media.LocalAudioTrack
-import org.membraneframework.rtc.media.LocalScreencastTrack
-import org.membraneframework.rtc.media.LocalVideoTrack
-import org.membraneframework.rtc.media.RemoteAudioTrack
-import org.membraneframework.rtc.media.RemoteVideoTrack
-import org.membraneframework.rtc.media.TrackBandwidthLimit
-import org.membraneframework.rtc.media.VideoParameters
-import org.membraneframework.rtc.media.VideoTrack
-import org.membraneframework.rtc.models.RTCInboundStats
-import org.membraneframework.rtc.models.RTCOutboundStats
-import org.membraneframework.rtc.models.TrackContext
-import org.membraneframework.rtc.models.TrackData
-import org.membraneframework.rtc.utils.Metadata
 import org.webrtc.Logging
-import java.util.UUID
 
 class RNFishjamClient(
   val sendEvent: (name: String, data: Map<String, Any?>) -> Unit
 ) : FishjamClientListener {
   private val SCREENCAST_REQUEST = 1
-  private var fishjamClient: FishjamClient? = null
 
-  var localAudioTrack: LocalAudioTrack? = null
-  var localVideoTrack: LocalVideoTrack? = null
-  var localScreencastTrack: LocalScreencastTrack? = null
-  var localEndpointId: String? = null
-
-  private var localScreencastId: String? = null
-
-  var isMicrophoneOn = true
-  var isCameraOn = true
+  var isMicrophoneOn = false
+  var isCameraOn = false
   var isScreencastOn = false
-
-  private val globalToLocalTrackId = HashMap<String, String>()
+  var isConnected = false
 
   private var connectPromise: Promise? = null
-  private var screencastPromise: Promise? = null
+  private var screencastPermissionPromise: Promise? = null
 
   var videoSimulcastConfig: SimulcastConfig = SimulcastConfig()
   private var localUserMetadata: Metadata = mutableMapOf()
@@ -65,7 +54,7 @@ class RNFishjamClient(
 
   var screencastMetadata: Map<String, Any> = mutableMapOf()
 
-  var trackContexts: MutableMap<String, TrackContext> = mutableMapOf()
+  private var mediaProjectionIntent: Intent? = null
 
   var audioSwitchManager: AudioSwitchManager? = null
 
@@ -75,34 +64,54 @@ class RNFishjamClient(
     fun onTracksUpdate()
   }
 
+  interface OnLocalTrackSwitchListener {
+    suspend fun onLocalTrackWillSwitch()
+
+    suspend fun onLocalTrackSwitched()
+  }
+
   companion object {
-    val endpoints = LinkedHashMap<String, RNEndpoint>()
     var onTracksUpdateListeners: MutableList<OnTrackUpdateListener> = mutableListOf()
+    val onLocalTrackSwitchListener: MutableList<OnLocalTrackSwitchListener> = mutableListOf()
+    lateinit var fishjamClient: FishjamClient
+
+    fun getAllPeers(): List<Peer> {
+      val listOfPeers = fishjamClient.getRemotePeers().toMutableList()
+      val localEndpoint = fishjamClient.getLocalEndpoint()
+      listOfPeers.add(localEndpoint)
+      return listOfPeers
+    }
   }
 
   fun onModuleCreate(appContext: AppContext) {
     this.appContext = appContext
     this.audioSwitchManager = AudioSwitchManager(appContext.reactContext!!)
+    create()
   }
 
   fun onModuleDestroy() {
     audioSwitchManager?.stop()
   }
 
+  private val coroutineScope: CoroutineScope =
+    CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
   fun onActivityResult(
     requestCode: Int,
     resultCode: Int,
     data: Intent?
   ) {
-    if (requestCode != SCREENCAST_REQUEST) return
-    if (resultCode != Activity.RESULT_OK) {
-      screencastPromise?.resolve(false)
-      screencastPromise = null
-      return
-    }
+    coroutineScope.launch(Dispatchers.Main) {
+      if (requestCode != SCREENCAST_REQUEST) return@launch
+      if (resultCode != Activity.RESULT_OK) {
+        screencastPermissionPromise?.resolve("denied")
+        screencastPermissionPromise = null
+        return@launch
+      }
 
-    data?.let {
-      startScreencast(it)
+      mediaProjectionIntent = data
+      screencastPermissionPromise?.resolve("granted")
+      screencastPermissionPromise = null
     }
   }
 
@@ -129,37 +138,13 @@ class RNFishjamClient(
     return TrackBandwidthLimit.BandwidthLimit(maxBandwidthInt)
   }
 
-  private fun getGlobalTrackId(localTrackId: String): String? =
-    globalToLocalTrackId
-      .filterValues {
-        it ==
-          localTrackId
-      }.keys
-      .firstOrNull()
-
-  private fun initLocalEndpoint() {
-    val uuid = UUID.randomUUID().toString()
-    localEndpointId = uuid
-    val endpoint =
-      RNEndpoint(
-        id = uuid,
-        metadata = localUserMetadata,
-        type = "webrtc",
-        tracksData = hashMapOf()
-      )
-    endpoints[uuid] = endpoint
-    emitEndpoints()
-  }
-
-  fun create() {
+  private fun create() {
     audioSwitchManager = AudioSwitchManager(appContext?.reactContext!!)
     fishjamClient =
       FishjamClient(
         appContext = appContext?.reactContext!!,
         listener = this
       )
-    ensureCreated()
-    initLocalEndpoint()
   }
 
   private fun getVideoParametersFromOptions(createOptions: CameraConfig): VideoParameters {
@@ -188,41 +173,51 @@ class RNFishjamClient(
     return videoParameters
   }
 
-  private fun ensureCreated() {
-    if (fishjamClient == null) {
-      throw CodedException("Client not created yet. Make sure to call create() first!")
-    }
-  }
+  private fun getLocalVideoTrack(): LocalVideoTrack? =
+    fishjamClient
+      .getLocalEndpoint()
+      .tracks
+      .values
+      .filterIsInstance<LocalVideoTrack>()
+      .firstOrNull()
+
+  private fun getLocalAudioTrack(): LocalAudioTrack? =
+    fishjamClient
+      .getLocalEndpoint()
+      .tracks
+      .values
+      .filterIsInstance<LocalAudioTrack>()
+      .firstOrNull()
+
+  private fun getLocalScreencastTrack(): LocalScreencastTrack? =
+    fishjamClient
+      .getLocalEndpoint()
+      .tracks
+      .values
+      .filterIsInstance<LocalScreencastTrack>()
+      .firstOrNull()
 
   private fun ensureConnected() {
-    if (fishjamClient == null) {
+    if (!isConnected) {
       throw CodedException("Client not connected to server yet. Make sure to call connect() first!")
     }
   }
 
   private fun ensureVideoTrack() {
-    if (localVideoTrack == null) {
+    if (getLocalVideoTrack() == null) {
       throw CodedException("No local video track. Make sure to call connect() first!")
     }
   }
 
   private fun ensureAudioTrack() {
-    if (localAudioTrack == null) {
+    if (getLocalAudioTrack() == null) {
       throw CodedException("No local audio track. Make sure to call connect() first!")
     }
   }
 
   private fun ensureScreencastTrack() {
-    if (localScreencastTrack == null) {
+    if (getLocalScreencastTrack() == null) {
       throw CodedException("No local screencast track. Make sure to toggle screencast on first!")
-    }
-  }
-
-  private fun ensureEndpoints() {
-    if (localEndpointId == null || endpoints.size == 0) {
-      throw CodedException(
-        "No endpoints available. Ensure the connection is established or endpoints are present."
-      )
     }
   }
 
@@ -245,43 +240,36 @@ class RNFishjamClient(
     peerMetadata: Map<String, Any>,
     promise: Promise
   ) {
-    ensureCreated()
     connectPromise = promise
     localUserMetadata = peerMetadata
-    fishjamClient?.connect(Config(url, peerToken))
+    fishjamClient.connect(Config(url, peerToken))
   }
 
   private fun joinRoom() {
-    val id = localEndpointId ?: return
-    val endpoint = endpoints[id] ?: return
-    endpoints[id] = endpoint.copy(metadata = localUserMetadata)
-    fishjamClient?.join(localUserMetadata)
+    fishjamClient.join(localUserMetadata)
   }
 
   fun leaveRoom() {
-    ensureCreated()
     if (isScreencastOn) {
       stopScreencast()
     }
-    fishjamClient?.cleanUp()
-    fishjamClient = null
-    endpoints.clear()
+    isMicrophoneOn = false
+    isCameraOn = false
+    isScreencastOn = false
+    isConnected = false
+    fishjamClient.leave()
   }
 
-  fun startCamera(config: CameraConfig) {
-    ensureConnected()
-    val cameraTrack = createCameraTrack(config) ?: return
-    localVideoTrack = cameraTrack
-    val simulcastConfig = getSimulcastConfigFromOptions(config.simulcastConfig)
-    addTrackToLocalEndpoint(cameraTrack, config.videoTrackMetadata, simulcastConfig)
+  suspend fun startCamera(config: CameraConfig) {
+    val cameraTrack = createCameraTrack(config)
     setCameraTrackState(cameraTrack, config.cameraEnabled)
+    emitEndpoints()
   }
 
-  private fun createCameraTrack(config: CameraConfig): LocalVideoTrack? {
-    ensureConnected()
+  private suspend fun createCameraTrack(config: CameraConfig): LocalVideoTrack {
     val videoParameters = getVideoParametersFromOptions(config)
     videoSimulcastConfig = getSimulcastConfigFromOptions(config.simulcastConfig)
-    return fishjamClient?.createVideoTrack(
+    return fishjamClient.createVideoTrack(
       videoParameters,
       config.videoTrackMetadata,
       config.captureDeviceId
@@ -292,7 +280,6 @@ class RNFishjamClient(
     cameraTrack: LocalVideoTrack,
     isEnabled: Boolean
   ) {
-    ensureConnected()
     cameraTrack.setEnabled(isEnabled)
     isCameraOn = isEnabled
     val eventName = EmitableEvents.IsCameraOn
@@ -300,82 +287,39 @@ class RNFishjamClient(
     emitEvent(eventName, isCameraOnMap)
   }
 
-  private fun addTrackToLocalEndpoint(
-    track: VideoTrack,
-    metadata: Metadata = mapOf(),
-    simulcastConfig: SimulcastConfig?
-  ) {
-    ensureEndpoints()
-    val localEndpoint = endpoints[localEndpointId]
-    localEndpoint?.let {
-      it.addOrUpdateTrack(track, metadata, simulcastConfig)
-      emitEndpoints()
-    }
-  }
-
   fun toggleCamera(): Boolean {
     ensureVideoTrack()
-    localVideoTrack?.let { setCameraTrackState(it, !isCameraOn) }
+    getLocalVideoTrack()?.let { setCameraTrackState(it, !isCameraOn) }
     return isCameraOn
   }
 
-  fun flipCamera() {
+  suspend fun flipCamera() {
     ensureVideoTrack()
-    localVideoTrack?.flipCamera()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackWillSwitch() }
+    getLocalVideoTrack()?.flipCamera()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackSwitched() }
   }
 
-  fun switchCamera(captureDeviceId: String) {
+  suspend fun switchCamera(captureDeviceId: String) {
     ensureVideoTrack()
-    localVideoTrack?.switchCamera(captureDeviceId)
-  }
-
-  private fun addTrackToLocalEndpoint(
-    track: AudioTrack,
-    metadata: Metadata = mapOf()
-  ) {
-    ensureEndpoints()
-    val localEndpoint = endpoints[localEndpointId]
-    localEndpoint?.let {
-      it.addOrUpdateTrack(track, metadata)
-      emitEndpoints()
+    onLocalTrackSwitchListener.forEach { it.onLocalTrackWillSwitch() }
+    getLocalVideoTrack()?.switchCamera(captureDeviceId)
+    onLocalTrackSwitchListener.forEach {
+      it.onLocalTrackSwitched()
     }
   }
 
-  private fun removeTrackFromLocalEndpoint(track: VideoTrack) {
-    ensureEndpoints()
-    val localEndpoint = endpoints[localEndpointId]
-    localEndpoint?.let {
-      it.removeTrack(track)
-      fishjamClient?.removeTrack(track.id())
-      emitEndpoints()
-    }
-  }
-
-  private fun removeTrackFromLocalEndpoint(track: AudioTrack) {
-    ensureEndpoints()
-    val localEndpoint = endpoints[localEndpointId]
-    localEndpoint?.let {
-      it.removeTrack(track)
-      fishjamClient?.removeTrack(track.id())
-      emitEndpoints()
-    }
-  }
-
-  fun startMicrophone(config: MicrophoneConfig) {
-    ensureConnected()
+  suspend fun startMicrophone(config: MicrophoneConfig) {
     val microphoneTrack =
-      fishjamClient?.createAudioTrack(config.audioTrackMetadata)
-        ?: throw CodedException("Failed to Create Track")
-    localAudioTrack = microphoneTrack
-    addTrackToLocalEndpoint(microphoneTrack, config.audioTrackMetadata)
+      fishjamClient.createAudioTrack(config.audioTrackMetadata)
     setMicrophoneTrackState(microphoneTrack, config.microphoneEnabled)
+    emitEndpoints()
   }
 
   private fun setMicrophoneTrackState(
     microphoneTrack: LocalAudioTrack,
     isEnabled: Boolean
   ) {
-    ensureConnected()
     microphoneTrack.setEnabled(isEnabled)
     isMicrophoneOn = isEnabled
     val eventName = EmitableEvents.IsMicrophoneOn
@@ -385,24 +329,12 @@ class RNFishjamClient(
 
   fun toggleMicrophone(): Boolean {
     ensureAudioTrack()
-    localAudioTrack?.let { setMicrophoneTrackState(it, !isMicrophoneOn) }
+    getLocalAudioTrack()?.let { setMicrophoneTrackState(it, !isMicrophoneOn) }
     return isMicrophoneOn
   }
 
-  fun toggleScreencast(
-    screencastOptions: ScreencastOptions,
-    promise: Promise
-  ) {
-    this.screencastMetadata = screencastOptions.screencastMetadata
-    this.screencastQuality = screencastOptions.quality
-    this.screencastSimulcastConfig =
-      getSimulcastConfigFromOptions(screencastOptions.simulcastConfig)
-    this.screencastMaxBandwidth =
-      getMaxBandwidthFromOptions(
-        screencastOptions.maxBandwidthMap,
-        screencastOptions.maxBandwidthInt
-      )
-    screencastPromise = promise
+  fun handleScreencastPermission(promise: Promise) {
+    screencastPermissionPromise = promise
     if (!isScreencastOn) {
       ensureConnected()
       val currentActivity = appContext?.currentActivity ?: throw ActivityNotFoundException()
@@ -413,46 +345,79 @@ class RNFishjamClient(
         ) as MediaProjectionManager
       val intent = mediaProjectionManager.createScreenCaptureIntent()
       currentActivity.startActivityForResult(intent, SCREENCAST_REQUEST)
+    }
+  }
+
+  suspend fun toggleScreencast(screencastOptions: ScreencastOptions) {
+    this.screencastMetadata = screencastOptions.screencastMetadata
+    this.screencastQuality = screencastOptions.quality
+    this.screencastSimulcastConfig =
+      getSimulcastConfigFromOptions(screencastOptions.simulcastConfig)
+    this.screencastMaxBandwidth =
+      getMaxBandwidthFromOptions(
+        screencastOptions.maxBandwidthMap,
+        screencastOptions.maxBandwidthInt
+      )
+    if (!isScreencastOn) {
+      ensureConnected()
+      startScreencast()
     } else {
       stopScreencast()
     }
   }
 
   fun getEndpoints(): List<Map<String, Any?>> =
-    endpoints.values.map { endpoint ->
+    getAllPeers().map { endpoint ->
       mapOf(
         "id" to endpoint.id,
-        "isLocal" to (endpoint.id == localEndpointId),
+        "isLocal" to (endpoint.id == fishjamClient.getLocalEndpoint().id),
         "type" to endpoint.type,
         "metadata" to endpoint.metadata,
-        "tracks" to endpoint.videoTracks.values.map { video ->
-          val videoMap =
-            mutableMapOf(
-              "id" to video.id(),
-              "type" to "Video",
-              "metadata" to (endpoint.tracksData[video.id()]?.metadata ?: emptyMap()),
-              "encoding" to trackContexts[video.id()]?.encoding?.rid,
-              "encodingReason" to trackContexts[video.id()]?.encodingReason?.value
-            )
+        "tracks" to
+          endpoint.tracks.values.mapNotNull { track ->
+            when (track) {
+              is RemoteVideoTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata,
+                  "encoding" to track.encoding?.rid,
+                  "encodingReason" to track.encodingReason?.value
+                )
 
-          val simulcastConfig: SimulcastConfig? = endpoint.tracksData[video.id()]?.simulcastConfig
+              is RemoteAudioTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Audio",
+                  "metadata" to track.metadata,
+                  "vadStatus" to track.vadStatus.value
+                )
 
-          simulcastConfig?.let { config ->
-            videoMap["simulcastConfig"] =
-              mutableMapOf(
-                "enabled" to config.enabled,
-                "activeEncodings" to config.activeEncodings.map { encoding -> encoding.rid }
-              )
-          }
-          videoMap
-        } +
-          endpoint.audioTracks.values.map { audio ->
-            mapOf(
-              "id" to audio.id(),
-              "type" to "Audio",
-              "metadata" to (endpoint.tracksData[audio.id()]?.metadata ?: emptyMap()),
-              "vadStatus" to trackContexts[audio.id()]?.vadStatus?.value
-            )
+              is LocalVideoTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata
+                )
+
+              is LocalScreencastTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Video",
+                  "metadata" to track.metadata
+                )
+
+              is LocalAudioTrack ->
+                mapOf(
+                  "id" to track.id(),
+                  "type" to "Audio",
+                  "metadata" to track.metadata
+                )
+
+              else -> {
+                null
+              }
+            }
           }
       )
     }
@@ -471,45 +436,35 @@ class RNFishjamClient(
 
   fun updateEndpointMetadata(metadata: Metadata) {
     ensureConnected()
-    fishjamClient?.updatePeerMetadata(metadata)
+    fishjamClient.updatePeerMetadata(metadata)
   }
 
   private fun updateTrackMetadata(
     trackId: String,
     metadata: Metadata
   ) {
-    fishjamClient?.updateTrackMetadata(trackId, metadata)
-    localEndpointId?.let {
-      val endpoint = endpoints[it] ?: throw CodedException("Endpoint with id $it not Found")
-      val trackMetadata = endpoint.tracksData[trackId]
-      val newTrackData =
-        TrackData(metadata = metadata, simulcastConfig = trackMetadata?.simulcastConfig)
-      endpoint.tracksData[trackId] = newTrackData
-      emitEndpoints()
-    }
+    fishjamClient.updateTrackMetadata(trackId, metadata)
+    emitEndpoints()
   }
 
   fun updateLocalVideoTrackMetadata(metadata: Metadata) {
     ensureVideoTrack()
-    localVideoTrack?.let {
-      val trackId = it.rtcTrack().id()
-      updateTrackMetadata(trackId, metadata)
+    getLocalVideoTrack()?.let {
+      updateTrackMetadata(it.id(), metadata)
     }
   }
 
   fun updateLocalAudioTrackMetadata(metadata: Metadata) {
     ensureAudioTrack()
-    localAudioTrack?.let {
-      val trackId = it.rtcTrack().id()
-      updateTrackMetadata(trackId, metadata)
+    getLocalAudioTrack()?.let {
+      updateTrackMetadata(it.id(), metadata)
     }
   }
 
   fun updateLocalScreencastTrackMetadata(metadata: Metadata) {
     ensureScreencastTrack()
-    localScreencastTrack?.let {
-      val trackId = it.rtcTrack().id()
-      updateTrackMetadata(trackId, metadata)
+    getLocalScreencastTrack()?.let {
+      updateTrackMetadata(it.id(), metadata)
     }
   }
 
@@ -541,9 +496,9 @@ class RNFishjamClient(
     val isTrackEncodingActive = simulcastConfig.activeEncodings.contains(trackEncoding)
 
     if (isTrackEncodingActive) {
-      fishjamClient?.disableTrackEncoding(trackId, trackEncoding)
+      fishjamClient.disableTrackEncoding(trackId, trackEncoding)
     } else {
-      fishjamClient?.enableTrackEncoding(trackId, trackEncoding)
+      fishjamClient.enableTrackEncoding(trackId, trackEncoding)
     }
 
     val updatedActiveEncodings =
@@ -561,18 +516,16 @@ class RNFishjamClient(
 
   fun toggleScreencastTrackEncoding(encoding: String): Map<String, Any> {
     ensureScreencastTrack()
-    localScreencastTrack?.let {
-      val trackId = it.id()
-      screencastSimulcastConfig = toggleTrackEncoding(encoding, trackId, screencastSimulcastConfig)
+    getLocalScreencastTrack()?.let {
+      screencastSimulcastConfig = toggleTrackEncoding(encoding, it.id(), screencastSimulcastConfig)
     }
     return getSimulcastConfigAsRNMap(screencastSimulcastConfig)
   }
 
   fun setScreencastTrackBandwidth(bandwidth: Int) {
     ensureScreencastTrack()
-    localScreencastTrack?.let {
-      val trackId = it.id()
-      fishjamClient?.setTrackBandwidth(trackId, TrackBandwidthLimit.BandwidthLimit(bandwidth))
+    getLocalScreencastTrack()?.let {
+      fishjamClient.setTrackBandwidth(it.id(), TrackBandwidthLimit.BandwidthLimit(bandwidth))
     }
   }
 
@@ -581,10 +534,9 @@ class RNFishjamClient(
     bandwidth: Int
   ) {
     ensureScreencastTrack()
-    localScreencastTrack?.let {
-      val trackId = it.id()
-      fishjamClient?.setEncodingBandwidth(
-        trackId,
+    getLocalScreencastTrack()?.let {
+      fishjamClient.setEncodingBandwidth(
+        it.id(),
         encoding,
         TrackBandwidthLimit.BandwidthLimit(bandwidth)
       )
@@ -596,15 +548,12 @@ class RNFishjamClient(
     encoding: String
   ) {
     ensureConnected()
-    val globalTrackId =
-      getGlobalTrackId(trackId)
-        ?: throw CodedException("Remote track with id=$trackId not found")
-    fishjamClient?.setTargetTrackEncoding(globalTrackId, encoding.toTrackEncoding())
+    fishjamClient.setTargetTrackEncoding(trackId, encoding.toTrackEncoding())
   }
 
   fun toggleVideoTrackEncoding(encoding: String): Map<String, Any> {
     ensureVideoTrack()
-    val trackId = localVideoTrack?.id() ?: return emptyMap()
+    val trackId = getLocalVideoTrack()?.id() ?: return emptyMap()
     videoSimulcastConfig = toggleTrackEncoding(encoding, trackId, videoSimulcastConfig)
     val eventName = EmitableEvents.SimulcastConfigUpdate
     emitEvent(eventName, getSimulcastConfigAsRNMap(videoSimulcastConfig))
@@ -616,10 +565,9 @@ class RNFishjamClient(
     bandwidth: Int
   ) {
     ensureVideoTrack()
-    localVideoTrack?.let {
-      val trackId = it.id()
-      fishjamClient?.setEncodingBandwidth(
-        trackId,
+    getLocalVideoTrack()?.let {
+      fishjamClient.setEncodingBandwidth(
+        it.id(),
         encoding,
         TrackBandwidthLimit.BandwidthLimit(bandwidth)
       )
@@ -628,23 +576,22 @@ class RNFishjamClient(
 
   fun setVideoTrackBandwidth(bandwidth: Int) {
     ensureVideoTrack()
-    localVideoTrack?.let {
-      val trackId = it.id()
-      fishjamClient?.setTrackBandwidth(trackId, TrackBandwidthLimit.BandwidthLimit(bandwidth))
+    getLocalVideoTrack()?.let {
+      fishjamClient.setTrackBandwidth(it.id(), TrackBandwidthLimit.BandwidthLimit(bandwidth))
     }
   }
 
   fun changeWebRTCLoggingSeverity(severity: String) {
     when (severity) {
-      "verbose" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_VERBOSE)
+      "verbose" -> fishjamClient.changeWebRTCLoggingSeverity(Logging.Severity.LS_VERBOSE)
 
-      "info" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_INFO)
+      "info" -> fishjamClient.changeWebRTCLoggingSeverity(Logging.Severity.LS_INFO)
 
-      "error" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_ERROR)
+      "error" -> fishjamClient.changeWebRTCLoggingSeverity(Logging.Severity.LS_ERROR)
 
-      "warning" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_WARNING)
+      "warning" -> fishjamClient.changeWebRTCLoggingSeverity(Logging.Severity.LS_WARNING)
 
-      "none" -> fishjamClient?.changeWebRTCLoggingSeverity(Logging.Severity.LS_NONE)
+      "none" -> fishjamClient.changeWebRTCLoggingSeverity(Logging.Severity.LS_NONE)
 
       else -> {
         throw CodedException("Severity with name=$severity not found")
@@ -691,9 +638,8 @@ class RNFishjamClient(
   }
 
   fun getStatistics(): MutableMap<String, Map<String, Any?>> {
-    ensureCreated()
     val newMap = mutableMapOf<String, Map<String, Any?>>()
-    fishjamClient?.getStats()?.forEach { entry ->
+    fishjamClient.getStats().forEach { entry ->
       newMap[entry.key] =
         if (entry.value is RTCInboundStats) {
           rtcInboundStatsToRNMap(
@@ -706,21 +652,20 @@ class RNFishjamClient(
     return newMap
   }
 
-  private fun startScreencast(mediaProjectionPermission: Intent) {
-    localScreencastId = UUID.randomUUID().toString()
+  private suspend fun startScreencast() {
     val videoParameters = getScreencastVideoParameters()
-    val screencastTrack =
-      fishjamClient?.createScreencastTrack(
-        mediaProjectionPermission,
-        videoParameters,
-        screencastMetadata
-      ) ?: throw CodedException("Failed to Create ScreenCast Track")
-    localScreencastTrack = screencastTrack
-    addTrackToLocalEndpoint(screencastTrack, screencastMetadata, videoParameters.simulcastConfig)
-    setScreencastTrackState(true)
+    if (mediaProjectionIntent == null) {
+      throw CodedException("No permission to start screencast, call handleScreencastPermission first.")
+    }
+    fishjamClient.createScreencastTrack(
+      mediaProjectionIntent!!,
+      videoParameters,
+      screencastMetadata
+    )
+    mediaProjectionIntent = null
 
-    screencastPromise?.resolve(isScreencastOn)
-    screencastPromise = null
+    setScreencastTrackState(true)
+    emitEndpoints()
   }
 
   private fun getScreencastVideoParameters(): VideoParameters {
@@ -745,20 +690,21 @@ class RNFishjamClient(
     isScreencastOn = isEnabled
     val eventName = EmitableEvents.IsScreencastOn
     emitEvent(eventName, mapOf(eventName to isEnabled))
-    emitEndpoints()
   }
 
   private fun stopScreencast() {
     ensureScreencastTrack()
-    localScreencastTrack?.let {
-      removeTrackFromLocalEndpoint(it)
-      localScreencastTrack = null
+    coroutineScope.launch {
+      val screencastTrack =
+        fishjamClient.getLocalEndpoint().tracks.values.first { track ->
+          track is LocalScreencastTrack
+        } as? LocalScreencastTrack
+      if (screencastTrack != null) {
+        fishjamClient.removeTrack(screencastTrack.id())
+      }
+      setScreencastTrackState(false)
+      emitEndpoints()
     }
-
-    setScreencastTrackState(false)
-
-    screencastPromise?.resolve(isScreencastOn)
-    screencastPromise = null
   }
 
   private fun emitEvent(
@@ -821,14 +767,10 @@ class RNFishjamClient(
 
   override fun onJoined(
     peerID: String,
-    peersInRoom: List<Peer>
+    peersInRoom: MutableMap<String, Endpoint>
   ) {
     CoroutineScope(Dispatchers.Main).launch {
-      endpoints.remove(peerID)
-      peersInRoom.forEach {
-        endpoints[it.id] =
-          RNEndpoint(it.id, it.metadata ?: mapOf(), it.type, tracksData = HashMap(it.tracks))
-      }
+      isConnected = true
       connectPromise?.resolve(null)
       connectPromise = null
       emitEndpoints()
@@ -842,92 +784,39 @@ class RNFishjamClient(
     }
   }
 
-  private fun addOrUpdateTrack(ctx: TrackContext) {
-    val endpoint =
-      endpoints[ctx.endpoint.id]
-        ?: throw IllegalArgumentException("endpoint with id ${ctx.endpoint.id} not found")
-
-    when (ctx.track) {
-      is RemoteVideoTrack -> {
-        val localTrackId = (ctx.track as RemoteVideoTrack).id()
-        globalToLocalTrackId[ctx.trackId] = localTrackId
-        endpoint.addOrUpdateTrack(ctx.track as RemoteVideoTrack, ctx.metadata, null)
-        if (trackContexts[localTrackId] == null) {
-          trackContexts[localTrackId] = ctx
-          ctx.setOnEncodingChangedListener {
-            emitEndpoints()
-          }
-        }
-      }
-
-      is RemoteAudioTrack -> {
-        val localTrackId = (ctx.track as RemoteAudioTrack).id()
-        globalToLocalTrackId[ctx.trackId] = localTrackId
-        endpoint.addOrUpdateTrack(ctx.track as RemoteAudioTrack, ctx.metadata)
-        if (trackContexts[localTrackId] == null) {
-          trackContexts[localTrackId] = ctx
-          ctx.setOnVoiceActivityChangedListener {
-            emitEndpoints()
-          }
-        }
-      }
-
-      else -> throw IllegalArgumentException("invalid type of incoming remote track")
-    }
-
+  private fun addOrUpdateTrack(ctx: Track) {
     emitEndpoints()
     onTracksUpdateListeners.forEach { it.onTracksUpdate() }
   }
 
-  override fun onTrackReady(ctx: TrackContext) {
+  override fun onTrackReady(ctx: Track) {
     CoroutineScope(Dispatchers.Main).launch {
       addOrUpdateTrack(ctx)
     }
   }
 
-  override fun onTrackAdded(ctx: TrackContext) {}
+  override fun onTrackAdded(ctx: Track) {}
 
-  override fun onTrackRemoved(ctx: TrackContext) {
+  override fun onTrackRemoved(ctx: Track) {
     CoroutineScope(Dispatchers.Main).launch {
-      val endpoint =
-        endpoints[ctx.endpoint.id]
-          ?: throw IllegalArgumentException("endpoint with id ${ctx.endpoint.id} not found")
-
-      when (ctx.track) {
-        is RemoteVideoTrack -> endpoint.removeTrack(ctx.track as RemoteVideoTrack)
-        is RemoteAudioTrack -> endpoint.removeTrack(ctx.track as RemoteAudioTrack)
-        else -> throw IllegalArgumentException("invalid type of incoming remote track")
-      }
-
-      globalToLocalTrackId.remove(ctx.trackId)
-      trackContexts.remove(ctx.trackId)
       emitEndpoints()
-      onTracksUpdateListeners.forEach { it.onTracksUpdate() }
     }
   }
 
-  override fun onTrackUpdated(ctx: TrackContext) {
+  override fun onTrackUpdated(ctx: Track) {
     CoroutineScope(Dispatchers.Main).launch {
-      addOrUpdateTrack(ctx)
+      emitEndpoints()
     }
   }
 
   override fun onPeerJoined(peer: Peer) {
     CoroutineScope(Dispatchers.Main).launch {
-      endpoints[peer.id] =
-        RNEndpoint(
-          id = peer.id,
-          metadata = peer.metadata,
-          type = peer.type,
-          tracksData = HashMap(peer.tracks)
-        )
       emitEndpoints()
     }
   }
 
   override fun onPeerLeft(peer: Peer) {
     CoroutineScope(Dispatchers.Main).launch {
-      endpoints.remove(peer.id)
       emitEndpoints()
     }
   }

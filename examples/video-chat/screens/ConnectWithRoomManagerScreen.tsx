@@ -1,4 +1,3 @@
-import { connect } from '@fishjam-cloud/react-native-client';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -71,9 +70,11 @@ const ConnectScreen = ({ navigation }: Props) => {
         userName,
       );
 
-      await connect(fishjamUrl, token, { name: 'RN mobile' });
-
-      navigation.navigate('Preview', { userName });
+      navigation.navigate('Preview', {
+        userName,
+        fishjamUrl,
+        peerToken: token,
+      });
     } catch (e) {
       const message =
         'message' in (e as Error) ? (e as Error).message : 'Unknown error';

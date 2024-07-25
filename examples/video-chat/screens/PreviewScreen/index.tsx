@@ -3,6 +3,8 @@ import {
   TrackEncoding,
   useCamera,
   useMicrophone,
+  connect,
+  VideoPreviewView,
 } from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -23,7 +25,6 @@ import { InCallButton } from '../../components';
 import LetterButton from '../../components/LetterButton';
 import { NoCameraView } from '../../components/NoCameraView';
 import { SoundOutputDevicesBottomSheet } from '../../components/SoundOutputDevicesBottomSheet';
-import VideoPreview from '../../components/VideoPreview';
 import { usePreventBackButton } from '../../hooks/usePreventBackButton';
 import type { AppRootStackParamList } from '../../navigators/AppNavigator';
 import { previewScreenLabels } from '../../types/ComponentLabels';
@@ -32,6 +33,7 @@ import {
   displayIosSimulatorCameraAlert,
   isIosSimulator,
 } from '../../utils/deviceUtils';
+import { useToggleCamera } from '../../hooks/useToggleCamera';
 
 type Props = NativeStackScreenProps<AppRootStackParamList, 'Preview'>;
 const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON } = previewScreenLabels;
@@ -45,16 +47,17 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     null,
   );
   const {
+    startCamera,
     getCaptureDevices,
-    isCameraOn: isCameraAvailable,
+    isCameraOn,
     simulcastConfig,
     toggleVideoTrackEncoding,
+    switchCamera,
   } = useCamera();
   const { isMicrophoneOn: isMicrophoneAvailable } = useMicrophone();
   const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(
     isMicrophoneAvailable,
   );
-  const [isCameraOn, setIsCameraOn] = useState<boolean>(isCameraAvailable);
 
   const encodings: Record<string, TrackEncoding[]> = {
     ios: ['l', 'h'],
@@ -65,27 +68,50 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     setIsMicrophoneOn(!isMicrophoneOn);
   };
 
-  const toggleCamera = () => {
-    setIsCameraOn(!isCameraOn);
-  };
-
   const toggleSwitchCamera = () => {
-    setCurrentCamera(
+    const camera =
       availableCameras.current.find(
         (device) => device.isFrontFacing !== currentCamera?.isFrontFacing,
-      ) || null,
-    );
+      ) || null;
+    if (camera) {
+      switchCamera(camera.id);
+      setCurrentCamera(camera);
+    }
   };
 
   useEffect(() => {
-    getCaptureDevices().then((devices) => {
+    async function setupCamera() {
+      const devices = await getCaptureDevices();
       availableCameras.current = devices;
-      setCurrentCamera(devices.find((device) => device.isFrontFacing) || null);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+      const captureDevice = devices.find((device) => device.isFrontFacing);
+
+      startCamera({
+        simulcastConfig: {
+          enabled: true,
+          activeEncodings:
+            // iOS has a limit of 3 hardware encoders
+            // 3 simulcast layers + 1 screencast layer = 4, which is too much
+            // so we limit simulcast layers to 2
+            Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
+        },
+        quality: 'HD169',
+        maxBandwidth: { l: 150, m: 500, h: 1500 },
+        videoTrackMetadata: { active: true, type: 'camera' },
+        captureDeviceId: captureDevice?.id,
+        cameraEnabled: true,
+      });
+
+      setCurrentCamera(captureDevice || null);
+    }
+
+    setupCamera();
+  }, [getCaptureDevices, startCamera]);
 
   const onJoinPressed = async () => {
+    await connect(route.params.fishjamUrl, route.params.peerToken, {
+      name: 'RN mobile',
+    });
     navigation.navigate('Room', {
       isCameraOn,
       isMicrophoneOn,
@@ -99,11 +125,13 @@ const PreviewScreen = ({ navigation, route }: Props) => {
     }
   }, []);
 
+  const { toggleCamera } = useToggleCamera();
+
   const body = (
     <SafeAreaView style={styles.container}>
       <View style={styles.cameraPreview}>
         {!isIosSimulator && isCameraOn ? (
-          <VideoPreview currentCamera={currentCamera} />
+          <VideoPreviewView style={styles.cameraPreviewView} />
         ) : (
           <NoCameraView username={route?.params?.userName || 'RN Mobile'} />
         )}
@@ -189,5 +217,9 @@ const styles = StyleSheet.create({
   },
   joinButton: {
     flex: 1,
+  },
+  cameraPreviewView: {
+    width: '100%',
+    height: '100%',
   },
 });

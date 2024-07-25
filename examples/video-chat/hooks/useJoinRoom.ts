@@ -1,13 +1,13 @@
-import { useCamera, useMicrophone } from '@fishjam-cloud/react-native-client';
+import { useMicrophone } from '@fishjam-cloud/react-native-client';
 import notifee, {
   AndroidImportance,
   AndroidColor,
+  AndroidForegroundServiceType,
 } from '@notifee/react-native';
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
 
 interface Props {
-  isCameraAvailable: boolean;
   isMicrophoneAvailable: boolean;
 }
 
@@ -24,9 +24,14 @@ async function startForegroundService() {
     await notifee.displayNotification({
       title: 'Your video call is ongoing',
       body: 'Tap to return to the call.',
+      id: 'video_notification',
       android: {
         channelId,
         asForegroundService: true,
+        foregroundServiceTypes: [
+          AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_CAMERA,
+          AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MICROPHONE,
+        ],
         ongoing: true,
         color: AndroidColor.BLUE,
         colorized: true,
@@ -38,41 +43,17 @@ async function startForegroundService() {
   }
 }
 
-export function useJoinRoom({
-  isCameraAvailable,
-  isMicrophoneAvailable,
-}: Props) {
-  const { startCamera, getCaptureDevices } = useCamera();
+export function useJoinRoom({ isMicrophoneAvailable }: Props) {
   const { startMicrophone } = useMicrophone();
 
   const joinRoom = useCallback(async () => {
     await startForegroundService();
-    await startCamera({
-      simulcastConfig: {
-        enabled: true,
-        activeEncodings:
-          Platform.OS === 'android' ? ['l', 'm', 'h'] : ['l', 'h'],
-      },
-      quality: 'HD169',
-      maxBandwidth: { l: 150, m: 500, h: 1500 },
-      videoTrackMetadata: { active: isCameraAvailable, type: 'camera' },
-      captureDeviceId: await getCaptureDevices().then(
-        (devices) => devices.find((device) => device.isFrontFacing)?.id,
-      ),
-      cameraEnabled: isCameraAvailable,
-    });
 
     await startMicrophone({
       audioTrackMetadata: { active: isMicrophoneAvailable, type: 'audio' },
       microphoneEnabled: isMicrophoneAvailable,
     });
-  }, [
-    getCaptureDevices,
-    isCameraAvailable,
-    isMicrophoneAvailable,
-    startCamera,
-    startMicrophone,
-  ]);
+  }, [isMicrophoneAvailable, startMicrophone]);
 
   return { joinRoom };
 }
