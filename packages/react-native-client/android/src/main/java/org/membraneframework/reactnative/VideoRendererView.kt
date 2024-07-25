@@ -3,32 +3,31 @@ package org.membraneframework.reactnative
 import android.content.Context
 import com.fishjamcloud.client.media.VideoTrack
 import expo.modules.kotlin.AppContext
-import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.webrtc.RendererCommon
 
 class VideoRendererView(
   context: Context,
   appContext: AppContext
-) : ExpoView(context, appContext),
+) : VideoView(context, appContext),
   RNFishjamClient.OnTrackUpdateListener {
-  var activeVideoTrack: VideoTrack? = null
-  var trackId: String? = null
+  private var activeVideoTrack: VideoTrack? = null
+  private var trackId: String? = null
 
-  private val videoView =
-    RNFishjamClient.fishjamClient.createVideoViewRenderer().also {
-      addView(it)
-      RNFishjamClient.onTracksUpdateListeners.add(this)
-    }
+  init {
+    RNFishjamClient.onTracksUpdateListeners.add(this)
+  }
 
   private fun setupTrack(videoTrack: VideoTrack) {
     if (activeVideoTrack == videoTrack) return
 
     activeVideoTrack?.removeRenderer(videoView)
-    videoTrack.addRenderer(videoView)
     activeVideoTrack = videoTrack
+
+    videoTrack.addRenderer(videoView)
+
+    super.setupTrack()
   }
 
   private fun update() {
@@ -45,28 +44,15 @@ class VideoRendererView(
     update()
   }
 
-  fun dispose() {
+  override fun dispose() {
     activeVideoTrack?.removeRenderer(videoView)
-    videoView.release()
     RNFishjamClient.onTracksUpdateListeners.remove(this)
+    super.dispose()
   }
 
   override fun onTracksUpdate() {
     update()
   }
 
-  fun setVideoLayout(videoLayout: String) {
-    val scalingType =
-      when (videoLayout) {
-        "FILL" -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-        "FIT" -> RendererCommon.ScalingType.SCALE_ASPECT_FIT
-        else -> RendererCommon.ScalingType.SCALE_ASPECT_FILL
-      }
-    videoView.setScalingType(scalingType)
-    videoView.setEnableHardwareScaler(true)
-  }
-
-  fun setMirrorVideo(mirrorVideo: Boolean) {
-    videoView.setMirror(mirrorVideo)
-  }
+  override fun getVideoTrack(): VideoTrack? = activeVideoTrack
 }

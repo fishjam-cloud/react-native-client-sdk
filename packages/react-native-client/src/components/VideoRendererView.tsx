@@ -16,11 +16,6 @@ export type VideoRendererProps = {
    * @default `FILL`
    */
   videoLayout?: VideoLayout;
-  /**
-   * whether to mirror video
-   * @default false
-   */
-  mirrorVideo?: boolean;
   style?: ViewStyle;
 };
 
