@@ -103,7 +103,13 @@ class CameraCapturer(
 
   suspend fun flipCamera() {
     switchingCameraJob = Job()
-    cameraCapturer.switchCamera(this)
+    val devices = LocalVideoTrack.getCaptureDevices(context)
+    val deviceName =
+      devices
+        .first {
+          (isFrontFacingCamera && it.isBackFacing) || (!isFrontFacingCamera && it.isFrontFacing)
+        }.deviceName
+    cameraCapturer.switchCamera(this, deviceName)
     switchingCameraJob?.join()
   }
 
