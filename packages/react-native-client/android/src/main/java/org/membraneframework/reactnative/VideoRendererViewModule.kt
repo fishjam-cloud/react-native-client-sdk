@@ -20,10 +20,6 @@ class VideoRendererViewModule : Module() {
         Prop("videoLayout") { view: VideoRendererView, videoLayout: String ->
           view.setVideoLayout(videoLayout)
         }
-
-        Prop("mirrorVideo") { view: VideoRendererView, mirrorVideo: Boolean ->
-          view.setMirrorVideo(mirrorVideo)
-        }
       }
     }
 }

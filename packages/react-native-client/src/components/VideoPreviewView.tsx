@@ -12,11 +12,6 @@ export type VideoPreviewViewProps = {
    * @default `FILL`
    */
   videoLayout?: VideoLayout;
-  /**
-   * whether to mirror video
-   * @default false
-   */
-  mirrorVideo?: boolean;
   style?: ViewStyle;
   /**
    * Id of the camera used for preview. Get available cameras with `getCaptureDevices()` function.
