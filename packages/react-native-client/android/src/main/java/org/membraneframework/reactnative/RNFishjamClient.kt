@@ -65,9 +65,9 @@ class RNFishjamClient(
   }
 
   interface OnLocalTrackSwitchListener {
-    fun onLocalTrackWillSwitch()
+    suspend fun onLocalTrackWillSwitch()
 
-    fun onLocalTrackSwitched()
+    suspend fun onLocalTrackSwitched()
   }
 
   companion object {

@@ -12,7 +12,6 @@ import expo.modules.kotlin.views.ExpoView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.webrtc.RendererCommon
 
 abstract class VideoView(
@@ -58,19 +57,17 @@ abstract class VideoView(
 
   protected abstract fun getVideoTrack(): VideoTrack?
 
-  override fun onLocalTrackWillSwitch() {
+  override suspend fun onLocalTrackWillSwitch() {
     if (getVideoTrack() is LocalVideoTrack) {
       fadeAnimation.start()
     }
   }
 
-  override fun onLocalTrackSwitched() {
+  override suspend fun onLocalTrackSwitched() {
     if (getVideoTrack() is LocalVideoTrack) {
-      coroutineScope.launch {
-        videoView.setMirror((getVideoTrack() as? LocalVideoTrack)?.isFrontCamera() ?: false)
-        delay(500)
-        fadeAnimation.reverse()
-      }
+      videoView.setMirror((getVideoTrack() as? LocalVideoTrack)?.isFrontCamera() ?: false)
+      delay(500)
+      fadeAnimation.reverse()
     }
   }
 
