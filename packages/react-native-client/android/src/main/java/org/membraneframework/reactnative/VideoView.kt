@@ -68,7 +68,7 @@ abstract class VideoView(
     if (getVideoTrack() is LocalVideoTrack) {
       coroutineScope.launch {
         videoView.setMirror((getVideoTrack() as? LocalVideoTrack)?.isFrontCamera() ?: false)
-        delay(300)
+        delay(500)
         fadeAnimation.reverse()
       }
     }
