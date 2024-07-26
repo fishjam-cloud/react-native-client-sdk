@@ -55,7 +55,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate, Pe
         webrtcClient?.disconnect()
         localEndpoint.tracks?.values.forEach { ($0 as? LocalTrack)?.stop() }
         localEndpoint = Endpoint.empty()
-        webrtcClient?.removeObserver(<#T##observer: NSObject##NSObject#>, forKeyPath: <#T##String#>)
+//        webrtcClient?.removeObserver(<#T##observer: NSObject##NSObject#>, forKeyPath: <#T##String#>)
         isAuthenticated = false
     }
 
