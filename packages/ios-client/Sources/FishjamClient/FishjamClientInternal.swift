@@ -1,31 +1,78 @@
 import Foundation
 import Starscream
+import WebRTC
 
-internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
+internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate, PeerConnectionListener {
+    var webrtcClient: MembraneRTC?
+    private var peerConnectionFactoryWrapper: PeerConnectionFactoryWrapper
+    private var peerConnectionManager: PeerConnectionManager
+
+    private var localEndpoint: Endpoint = Endpoint.empty()
+    private var remoteEndpoints: [String: Endpoint] = [:]
+
     private var config: Config?
     private var webSocket: FishjamWebsocket?
     private var listener: FishjamClientListener
     private var websocketFactory: (String) -> FishjamWebsocket
-    var webrtcClient: FishjamMembraneRTC?
-    private var isAuthenticated = false
+
+    private var commandsQueue: CommandsQueue = CommandsQueue()
+    private var isAuthenticated: Bool = false
 
     public init(listener: FishjamClientListener, websocketFactory: @escaping (String) -> FishjamWebsocket) {
         self.listener = listener
         self.websocketFactory = websocketFactory
     }
 
-    func connect(config: Config) {
-        self.config = config
+    //    private func getTrackWithRtcEngineId(trackId: String): Track? =
+    //      localEndpoint.tracks.values.firstOrNull { track -> track.webrtcId() == trackId }
+    //        ?: remoteEndpoints.values
+    //          .firstOrNull { endpoint ->
+    //            endpoint.tracks.values.firstOrNull { track -> track.getRTCEngineId() == trackId } !=
+    //              null
+    //          }?.tracks
+    //          ?.values
+    //          ?.firstOrNull { track -> track.getRTCEngineId() == trackId }
 
-        webSocket = websocketFactory(config.websocketUrl)
-        webSocket?.delegate = self
-        webSocket?.connect()
+    func connect(config: Config) {
+        commandsQueue.addCommand(
+            Command(commandName: .connect, clientStateAfterCommand: .connected) {
+                self.config = config
+                self.webSocket = self.websocketFactory(config.websocketUrl)
+                self.webSocket?.delegate = self
+                self.webSocket?.connect()
+            })
+    }
+
+    func join(peerMetadata: Metadata) {
+        commandsQueue.addCommand(
+            Command(commandName: .join, clientStateAfterCommand: .joined) {
+                self.localEndpoint = self.localEndpoint.with(metadata: peerMetadata)
+                self.webrtcClient?.connect(metadata: peerMetadata)
+            })
     }
 
     func leave() {
         webrtcClient?.disconnect()
+        localEndpoint.tracks?.values.forEach { ($0 as? LocalTrack)?.stop() }
+        localEndpoint = Endpoint.empty()
+        webrtcClient?.removeObserver(<#T##observer: NSObject##NSObject#>, forKeyPath: <#T##String#>)
         isAuthenticated = false
     }
+
+    //    fun leave() {
+    //      coroutineScope.launch {
+    //        rtcEngineCommunication.disconnect()
+    //        localEndpoint.tracks.values.forEach { (it as? LocalTrack)?.stop() }
+    //        peerConnectionManager.close()
+    //        localEndpoint = Endpoint(id = "", type = EndpointType.WEBRTC)
+    //        remoteEndpoints = mutableMapOf()
+    //        peerConnectionManager.removeListener(this@FishjamClientInternal)
+    //        rtcEngineCommunication.removeListener(this@FishjamClientInternal)
+    //        webSocket?.close(1000, null)
+    //        webSocket = null
+    //        commandsQueue.clear("Client disconnected")
+    //      }
+    //    }
 
     func cleanUp() {
         webrtcClient?.disconnect()
@@ -37,9 +84,9 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
 
     func didReceive(event: Starscream.WebSocketEvent, client: any Starscream.WebSocketClient) {
         switch event {
-        case .connected(_):
+        case .connected(_):  //done
             websocketDidConnect()
-        case .disconnected(let reason, let code):
+        case .disconnected(let reason, let code):  //done
             onSocketClose(code: code, reason: reason)
         case .text(let message):
             websocketDidReceiveMessage(text: message)
@@ -53,9 +100,9 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
             break
         case .reconnectSuggested(_):
             break
-        case .cancelled:
+        case .cancelled:  //done
             onDisconnected()
-        case .error(_):
+        case .error(_):  // done
             onSocketError()
         default:
             break
@@ -74,6 +121,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
             return
         }
         sendEvent(peerMessage: serializedData)
+        commandsQueue.finishCommand()
     }
 
     func websocketDidReceiveData(data: Data) {
@@ -81,6 +129,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
             let peerMessage = try Fishjam_PeerMessage(serializedData: data)
             if case .authenticated(_) = peerMessage.content {
                 isAuthenticated = true
+                commandsQueue.finishCommand()
                 onAuthSuccess()
             } else if case .mediaEvent(_) = peerMessage.content {
                 receiveEvent(event: peerMessage.mediaEvent.data)
@@ -157,11 +206,13 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
 
     func onSocketClose(code: UInt16, reason: String) {
         listener.onSocketClose(code: code, reason: reason)
+        commandsQueue.clear(cause: "Websocket was closed")
     }
 
     func onSocketError() {
         isAuthenticated = false
         listener.onSocketError()
+        commandsQueue.clear(cause: "Socket error")
     }
 
     func onSocketOpen() {
@@ -179,6 +230,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     func onDisconnected() {
         isAuthenticated = false
         listener.onDisconnected()
+        commandsQueue.clear(cause: "Websocket was closed")
     }
 
     func onConnected(endpointId: String, otherEndpoints: [Endpoint]) {
@@ -190,5 +242,58 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     }
 
     func onTrackEncodingChanged(endpointId: String, trackId: String, encoding: String) {
+    }
+
+    //Peer Conection listener
+    func onAddTrack(trackId: String, track: RTCMediaStreamTrack) {
+        return
+    }
+
+    //    override fun onAddTrack(
+    //      rtcEngineTrackId: String,
+    //      webrtcTrack: MediaStreamTrack
+    //    ) {
+    //      var track =
+    //        getTrackWithRtcEngineId(rtcEngineTrackId) ?: run {
+    //          Timber.e("onAddTrack: Track context with trackId=$rtcEngineTrackId not found")
+    //          return
+    //        }
+    //
+    //      val trackId = track.id()
+    //
+    //      track =
+    //        when (webrtcTrack) {
+    //          is VideoTrack ->
+    //            RemoteVideoTrack(
+    //              webrtcTrack,
+    //              track.endpointId,
+    //              track.getRTCEngineId(),
+    //              track.metadata,
+    //              trackId
+    //            )
+    //
+    //          is AudioTrack ->
+    //            RemoteAudioTrack(
+    //              webrtcTrack,
+    //              track.endpointId,
+    //              track.getRTCEngineId(),
+    //              track.metadata,
+    //              trackId
+    //            )
+    //
+    //          else ->
+    //            throw IllegalStateException("invalid type of incoming track")
+    //        }
+    //
+    //      remoteEndpoints[track.endpointId] = remoteEndpoints[track.endpointId]!!.addOrReplaceTrack(track)
+    //      listener.onTrackReady(track)
+    //    }
+
+    func onLocalIceCandidate(candidate: RTCIceCandidate) {
+        return
+    }
+
+    func onPeerConnectionStateChange(newState: RTCIceConnectionState) {
+        return
     }
 }

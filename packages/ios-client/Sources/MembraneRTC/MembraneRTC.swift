@@ -58,7 +58,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
 
     private var localTracks: [LocalTrack] = []
 
-    private var localEndpoint = Endpoint(id: "", type: "webrtc", metadata: .init([:]), tracks: [:])
+    private var localEndpoint = Endpoint(id: "", type: .WEBRTC, metadata: .init([:]), tracks: [:])
 
     // mapping from peer's id to itself
     private var remoteEndpoints: [String: Endpoint] = [:]
