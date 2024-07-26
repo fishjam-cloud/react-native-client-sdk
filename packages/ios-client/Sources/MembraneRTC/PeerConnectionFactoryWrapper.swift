@@ -13,9 +13,11 @@ internal class PeerConnectionFactoryWrapper {
 
         let simulcastFactory = RTCVideoEncoderFactorySimulcast(
             primary: encoderFactory, fallback: RTCDefaultVideoEncoderFactory())
+        let a: RTCAudioDeviceModule = RTCAudioDeviceModule()
 
         self.factory = RTCPeerConnectionFactory(
             encoderFactory: simulcastFactory, decoderFactory: decoderFactory)
+
     }
 
     func createPeerConnection(_ configuration: RTCConfiguration, constraints: RTCMediaConstraints)

@@ -1,7 +1,7 @@
 import WebRTC
 
 /// Utility wrapper around a local `RTCAudioTrack` managing a local audio session.
-public class LocalAudioTrack: AudioTrack, LocalTrack {
+public class LocalAudioTrack: Track, LocalTrack {
     public let track: RTCAudioTrack
 
     private let config: RTCAudioSessionConfiguration
@@ -45,10 +45,6 @@ public class LocalAudioTrack: AudioTrack, LocalTrack {
 
     public func setEnabled(_ enabled: Bool) {
         track.isEnabled = enabled
-    }
-
-    override func rtcTrack() -> RTCMediaStreamTrack {
-        return track
     }
 
     public func trackId() -> String {
