@@ -200,31 +200,31 @@ class RNFishjamClient(
 
   private fun ensureConnected() {
     if (!isConnected) {
-      throw CodedException("Client not connected to server yet. Make sure to call connect() first!")
+      throw ClientNotConnectedError()
     }
   }
 
   private fun ensureVideoTrack() {
     if (getLocalVideoTrack() == null) {
-      throw CodedException("No local video track. Make sure to call connect() first!")
+      throw NoLocalVideoTrackError()
     }
   }
 
   private fun ensureAudioTrack() {
     if (getLocalAudioTrack() == null) {
-      throw CodedException("No local audio track. Make sure to call connect() first!")
+      throw NoLocalAudioTrackError()
     }
   }
 
   private fun ensureScreencastTrack() {
     if (getLocalScreencastTrack() == null) {
-      throw CodedException("No local screencast track. Make sure to toggle screencast on first!")
+      throw NoScreencastTrackError()
     }
   }
 
   override fun onAuthError(reason: AuthError) {
     CoroutineScope(Dispatchers.Main).launch {
-      connectPromise?.reject(CodedException("Connection error: ${reason.error}"))
+      connectPromise?.reject(ConnectionError(reason))
       connectPromise = null
     }
   }
@@ -656,7 +656,7 @@ class RNFishjamClient(
   private suspend fun startScreencast() {
     val videoParameters = getScreencastVideoParameters()
     if (mediaProjectionIntent == null) {
-      throw CodedException("No permission to start screencast, call handleScreencastPermission first.")
+      throw MissingScreencastPermission()
     }
     fishjamClient.createScreencastTrack(
       mediaProjectionIntent!!,
@@ -780,7 +780,7 @@ class RNFishjamClient(
 
   override fun onJoinError(metadata: Any) {
     CoroutineScope(Dispatchers.Main).launch {
-      connectPromise?.reject(CodedException("Join error: $metadata"))
+      connectPromise?.reject(JoinError(metadata))
       connectPromise = null
     }
   }
@@ -830,4 +830,17 @@ class RNFishjamClient(
   }
 
   override fun onDisconnected() {}
+
+  override fun onSocketClose(
+    code: Int,
+    reason: String
+  ) {
+    connectPromise?.reject(SocketClosedError(code, reason))
+    connectPromise = null
+  }
+
+  override fun onSocketError(t: Throwable) {
+    connectPromise?.reject(SocketError(t.message ?: t.toString()))
+    connectPromise = null
+  }
 }
