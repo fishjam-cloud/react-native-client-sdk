@@ -36,12 +36,17 @@ import {
 import { useToggleCamera } from '../../hooks/useToggleCamera';
 
 type Props = NativeStackScreenProps<AppRootStackParamList, 'Preview'>;
+type BottomSheetRef = Props & {
+  bottomSheetRef: React.RefObject<BottomSheet>;
+};
+
 const { JOIN_BUTTON, TOGGLE_MICROPHONE_BUTTON } = previewScreenLabels;
 
-const PreviewScreen = ({ navigation, route }: Props) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
-  usePreventBackButton();
-
+function PreviewScreen({
+  navigation,
+  route,
+  bottomSheetRef,
+}: Props & BottomSheetRef) {
   const availableCameras = useRef<CaptureDevice[]>([]);
   const [currentCamera, setCurrentCamera] = useState<CaptureDevice | null>(
     null,
@@ -127,7 +132,7 @@ const PreviewScreen = ({ navigation, route }: Props) => {
 
   const { toggleCamera } = useToggleCamera();
 
-  const body = (
+  return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cameraPreview}>
         {!isIosSimulator && isCameraOn ? (
@@ -172,18 +177,31 @@ const PreviewScreen = ({ navigation, route }: Props) => {
       )}
     </SafeAreaView>
   );
+}
+
+export default function PreviewScreenWrapper({ navigation, route }: Props) {
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  usePreventBackButton();
 
   if (Platform.OS === 'android') {
     return (
       <TouchableWithoutFeedback onPress={() => bottomSheetRef.current?.close()}>
-        {body}
+        <PreviewScreen
+          navigation={navigation}
+          route={route}
+          bottomSheetRef={bottomSheetRef}
+        />
       </TouchableWithoutFeedback>
     );
   }
-  return body;
-};
-
-export default PreviewScreen;
+  return (
+    <PreviewScreen
+      navigation={navigation}
+      route={route}
+      bottomSheetRef={bottomSheetRef}
+    />
+  );
+}
 
 const styles = StyleSheet.create({
   callView: { display: 'flex', flexDirection: 'row', gap: 20 },
