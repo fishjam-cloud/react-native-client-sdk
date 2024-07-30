@@ -2936,8 +2936,8 @@ __metadata:
   linkType: hard
 
 "@gorhom/bottom-sheet@npm:^4":
-  version: 4.6.3
-  resolution: "@gorhom/bottom-sheet@npm:4.6.3"
+  version: 4.6.4
+  resolution: "@gorhom/bottom-sheet@npm:4.6.4"
   dependencies:
     "@gorhom/portal": "npm:1.0.14"
     invariant: "npm:^2.2.4"
@@ -2953,7 +2953,7 @@ __metadata:
       optional: true
     "@types/react-native":
       optional: true
-  checksum: 10c0/d8f6eb050f3cbea1b945bfe850e47d94d9b398c80f677658ebeb5f3880cdacbf86eda010b635d8ee1c67ad2724b599432636f0728b58a8dc44dd42a3e719f0f6
+  checksum: 10c0/1e724733e55d200490234b00e034f5ffbf312570469c1431358ef123f52b398e3300588ffef17deba82a37deb980ddf316454429600b778344dfd8c36669ab35
   languageName: node
   linkType: hard
 
