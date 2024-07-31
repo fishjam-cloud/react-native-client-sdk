@@ -52,29 +52,26 @@ const LetterButton = ({
   trackEncoding,
   selected,
 }: LetterButtonProps) => {
-  const stylesForText = () => {
-    return selected
-      ? LetterButtonStyles.textSelected
-      : LetterButtonStyles.textUnselected;
-  };
+  const stylesForText = selected
+    ? LetterButtonStyles.textSelected
+    : LetterButtonStyles.textUnselected;
 
-  const stylesForButton = () => {
-    return selected
-      ? LetterButtonStyles.buttonSelected
-      : LetterButtonStyles.buttonUnSelected;
-  };
+  const stylesForButton = selected
+    ? LetterButtonStyles.buttonSelected
+    : LetterButtonStyles.buttonUnSelected;
+
   return (
     <TouchableHighlight
       onPress={onPress}
-      style={[LetterButtonStyles.common, stylesForButton()]}
+      style={[LetterButtonStyles.common, stylesForButton]}
       key={trackEncoding}>
       <View
         style={[
           LetterButtonStyles.common,
           LetterButtonStyles.button,
-          stylesForButton(),
+          stylesForButton,
         ]}>
-        <Text style={[LetterButtonStyles.text, stylesForText()]}>
+        <Text style={[LetterButtonStyles.text, stylesForText]}>
           {trackEncoding.toUpperCase()}
         </Text>
       </View>

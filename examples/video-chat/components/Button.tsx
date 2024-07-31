@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { Typo } from './Typo';
+import Typo from './Typo';
 import type AccessibilityLabel from '../types/AccessibilityLabel';
 import { AdditionalColors, BrandColors, TextColors } from '../utils/Colors';
 
@@ -37,51 +37,51 @@ type StandardButtonProps = {
   title: string;
 } & AccessibilityLabel;
 
-const Button = ({
+function getBackgroundColorStyle(
+  buttonType: StandardButtonTypeName,
+  isDisabled: boolean,
+) {
+  if (isDisabled) {
+    return StandardButtonStyles.disabled;
+  }
+  switch (buttonType) {
+    case 'primary':
+      return StandardButtonStyles.primary;
+    case 'danger':
+      return StandardButtonStyles.danger;
+    case 'secondary':
+      return StandardButtonStyles.secondary;
+  }
+}
+
+function getTextColorForButtonType(
+  buttonType: StandardButtonTypeName,
+  isDisabled: boolean,
+) {
+  if (isDisabled) {
+    return TextColors.white;
+  }
+  switch (buttonType) {
+    case 'primary':
+      return TextColors.white;
+    case 'danger':
+      return TextColors.white;
+    case 'secondary':
+      return TextColors.darkText;
+  }
+}
+
+export default function Button({
   type = 'primary',
   disabled = false,
   accessibilityLabel,
   onPress,
   title,
-}: StandardButtonProps) => {
-  const getBackgroundColorStyle = (
-    buttonType: StandardButtonTypeName,
-    isDisabled: boolean,
-  ) => {
-    if (isDisabled) {
-      return StandardButtonStyles.disabled;
-    }
-    switch (buttonType) {
-      case 'primary':
-        return StandardButtonStyles.primary;
-      case 'danger':
-        return StandardButtonStyles.danger;
-      case 'secondary':
-        return StandardButtonStyles.secondary;
-    }
-  };
-
+}: StandardButtonProps) {
   const stylesForButtonType = [
     StandardButtonStyles.common,
     getBackgroundColorStyle(type, disabled),
   ];
-
-  const getTextColorForButtonType = (
-    buttonType: StandardButtonTypeName,
-    isDisabled: boolean,
-  ) => {
-    if (isDisabled) {
-      return TextColors.white;
-    }
-    switch (buttonType) {
-      case 'primary':
-        return TextColors.white;
-      case 'danger':
-        return TextColors.white;
-      case 'secondary':
-        return TextColors.darkText;
-    }
-  };
 
   return (
     <TouchableOpacity
@@ -97,6 +97,4 @@ const Button = ({
       </View>
     </TouchableOpacity>
   );
-};
-
-export default Button;
+}

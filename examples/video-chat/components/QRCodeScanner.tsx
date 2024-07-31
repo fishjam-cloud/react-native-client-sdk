@@ -1,6 +1,6 @@
 import { Camera } from 'expo-camera';
 import { CameraView } from 'expo-camera/next';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 
 import Button from './Button';
@@ -23,10 +23,13 @@ export function QRCodeScanner({ onCodeScanned }: Props) {
     }
   };
 
-  const onBarCodeScanned = ({ data }: { data: string }) => {
-    onCodeScanned(data);
-    setIsBarcodeScannerVisible(false);
-  };
+  const onBarCodeScanned = useCallback<({ data }: { data: string }) => void>(
+    ({ data }) => {
+      onCodeScanned(data);
+      setIsBarcodeScannerVisible(false);
+    },
+    [],
+  );
 
   return (
     <>

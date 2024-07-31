@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-import { Typo } from './Typo';
+import Typo from './Typo';
 import type AccessibilityLabel from '../types/AccessibilityLabel';
 import { BrandColors } from '../utils/Colors';
 

@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import React, { useState } from 'react';
 import { StyleSheet, TextInput as RNTextInput, View } from 'react-native';
 
-import { TextInputTextStyle, Typo } from './Typo';
+import Typo, { TextInputTextStyle } from './Typo';
 import type AccessibilityLabel from '../types/AccessibilityLabel';
 import { AdditionalColors, BrandColors, TextColors } from '../utils/Colors';
 
@@ -52,7 +52,7 @@ type TextInputProps = {
   sublabelIconSize?: number;
 } & AccessibilityLabel;
 
-export const TextInput = ({
+export default function TextInput({
   placeholder = '',
   sublabel,
   value,
@@ -61,7 +61,7 @@ export const TextInput = ({
   onChangeText = () => {
     /* empty function */
   },
-}: TextInputProps) => {
+}: TextInputProps) {
   const [focusStyle, setFocusStyle] = useState(TextInputStyles.offFocus);
   const placeholderTextColor = AdditionalColors.grey80;
   const fontStyle = TextInputTextStyle.body;
@@ -74,23 +74,14 @@ export const TextInput = ({
     setFocusStyle(TextInputStyles.offFocus);
   };
 
-  const GetStyleForTextInput = () => {
-    if (editable) {
-      return [
-        TextInputStyles.main,
-        TextInputStyles.active,
-        focusStyle,
-        fontStyle,
-      ];
-    }
-
-    return [TextInputStyles.main, TextInputStyles.notActive, fontStyle];
-  };
+  const styleForTextInput = editable
+    ? [TextInputStyles.main, TextInputStyles.active, focusStyle, fontStyle]
+    : [TextInputStyles.main, TextInputStyles.notActive, fontStyle];
 
   return (
     <View>
       <RNTextInput
-        style={GetStyleForTextInput()}
+        style={styleForTextInput}
         placeholder={placeholder}
         placeholderTextColor={placeholderTextColor}
         value={value}
@@ -113,6 +104,4 @@ export const TextInput = ({
       ) : null}
     </View>
   );
-};
-
-export default TextInput;
+}
