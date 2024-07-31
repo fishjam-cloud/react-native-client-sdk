@@ -39,27 +39,20 @@ type InCallButtonProps = {
   iconName: keyof typeof MaterialCommunityIcons.glyphMap;
 } & AccessibilityLabel;
 
-const InCallButton = ({
+export default function InCallButton({
   type = 'primary',
   onPress,
   iconName,
   accessibilityLabel,
-}: InCallButtonProps) => {
+}: InCallButtonProps) {
   const stylesForButtonType = [
     InCallButtonStyles.common,
     type === 'primary'
       ? InCallButtonStyles.primary
       : InCallButtonStyles.disconnect,
   ];
-
-  const GetIconColorForButtonType = (buttonType: ButtonTypeName) => {
-    switch (buttonType) {
-      case 'primary':
-        return BrandColors.darkBlue100;
-      case 'disconnect':
-        return AdditionalColors.white;
-    }
-  };
+  const buttonColor =
+    type === 'primary' ? BrandColors.darkBlue100 : AdditionalColors.white;
 
   return (
     <TouchableHighlight
@@ -70,11 +63,9 @@ const InCallButton = ({
         <MaterialCommunityIcons
           name={iconName}
           size={IconSize}
-          color={GetIconColorForButtonType(type)}
+          color={buttonColor}
         />
       </View>
     </TouchableHighlight>
   );
-};
-
-export default InCallButton;
+}
