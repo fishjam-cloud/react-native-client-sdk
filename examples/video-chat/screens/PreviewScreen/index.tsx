@@ -21,10 +21,12 @@ import {
 import { SwitchCameraButton } from './SwitchCameraButton';
 import { SwitchOutputDeviceButton } from './SwitchOutputDeviceButton';
 import { ToggleCameraButton } from './ToggleCameraButton';
-import { InCallButton } from '../../components';
-import LetterButton from '../../components/LetterButton';
-import { NoCameraView } from '../../components/NoCameraView';
-import { SoundOutputDevicesBottomSheet } from '../../components/SoundOutputDevicesBottomSheet';
+import {
+  InCallButton,
+  NoCameraView,
+  LetterButton,
+  SoundOutputDevicesBottomSheet,
+} from '../../components';
 import { usePreventBackButton } from '../../hooks/usePreventBackButton';
 import type { AppRootStackParamList } from '../../navigators/AppNavigator';
 import { previewScreenLabels } from '../../types/ComponentLabels';

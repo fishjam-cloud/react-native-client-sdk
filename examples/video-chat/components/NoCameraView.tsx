@@ -10,11 +10,11 @@ type NoCameraViewProps = {
   isSmallTile?: boolean;
 } & AccessibilityLabel;
 
-export const NoCameraView = ({
+export default function NoCameraView({
   username = '',
   isSmallTile = false,
   accessibilityLabel,
-}: NoCameraViewProps) => {
+}: NoCameraViewProps) {
   return (
     <View
       style={styles.noCameraBackground}
@@ -30,7 +30,7 @@ export const NoCameraView = ({
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   noCameraBackground: {

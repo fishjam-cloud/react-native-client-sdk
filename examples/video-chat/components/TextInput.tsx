@@ -6,41 +6,6 @@ import Typo, { TextInputTextStyle } from './Typo';
 import type AccessibilityLabel from '../types/AccessibilityLabel';
 import { AdditionalColors, BrandColors, TextColors } from '../utils/Colors';
 
-const TextInputStyles = StyleSheet.create({
-  main: {
-    width: '100%',
-    height: 56,
-    borderRadius: 40,
-    borderStyle: 'solid',
-    borderWidth: 2,
-    backgroundColor: AdditionalColors.white,
-    paddingLeft: 16,
-  },
-  active: {
-    color: TextColors.darkText,
-  },
-  notActive: {
-    color: AdditionalColors.grey80,
-    borderColor: AdditionalColors.grey60,
-  },
-  offFocus: {
-    borderColor: BrandColors.darkBlue100,
-  },
-  onFocus: {
-    borderColor: BrandColors.seaBlue80,
-  },
-  roomInputSubLabel: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  roomInputSubLabelIcon: {
-    paddingRight: 4,
-  },
-});
-
 type OnChangeTextType = (text: string) => void;
 
 type TextInputProps = {
@@ -105,3 +70,38 @@ export default function TextInput({
     </View>
   );
 }
+
+const TextInputStyles = StyleSheet.create({
+  main: {
+    width: '100%',
+    height: 56,
+    borderRadius: 40,
+    borderStyle: 'solid',
+    borderWidth: 2,
+    backgroundColor: AdditionalColors.white,
+    paddingLeft: 16,
+  },
+  active: {
+    color: TextColors.darkText,
+  },
+  notActive: {
+    color: AdditionalColors.grey80,
+    borderColor: AdditionalColors.grey60,
+  },
+  offFocus: {
+    borderColor: BrandColors.darkBlue100,
+  },
+  onFocus: {
+    borderColor: BrandColors.seaBlue80,
+  },
+  roomInputSubLabel: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  roomInputSubLabelIcon: {
+    paddingRight: 4,
+  },
+});

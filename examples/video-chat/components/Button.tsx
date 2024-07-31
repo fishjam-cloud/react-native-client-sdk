@@ -5,29 +5,6 @@ import Typo from './Typo';
 import type AccessibilityLabel from '../types/AccessibilityLabel';
 import { AdditionalColors, BrandColors, TextColors } from '../utils/Colors';
 
-const StandardButtonStyles = StyleSheet.create({
-  common: {
-    width: '100%',
-    height: 56,
-    borderRadius: 100,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-  },
-  primary: {
-    backgroundColor: BrandColors.darkBlue100,
-  },
-  danger: {
-    backgroundColor: AdditionalColors.red100,
-  },
-  secondary: {
-    backgroundColor: AdditionalColors.white,
-  },
-  disabled: {
-    backgroundColor: AdditionalColors.grey60,
-  },
-});
-
 type StandardButtonTypeName = 'primary' | 'danger' | 'secondary';
 
 type StandardButtonProps = {
@@ -98,3 +75,26 @@ export default function Button({
     </TouchableOpacity>
   );
 }
+
+const StandardButtonStyles = StyleSheet.create({
+  common: {
+    width: '100%',
+    height: 56,
+    borderRadius: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  primary: {
+    backgroundColor: BrandColors.darkBlue100,
+  },
+  danger: {
+    backgroundColor: AdditionalColors.red100,
+  },
+  secondary: {
+    backgroundColor: AdditionalColors.white,
+  },
+  disabled: {
+    backgroundColor: AdditionalColors.grey60,
+  },
+});

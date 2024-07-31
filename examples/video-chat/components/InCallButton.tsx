@@ -12,25 +12,6 @@ import { AdditionalColors, BrandColors } from '../utils/Colors';
 
 const IconSize = 25;
 
-const InCallButtonStyles = StyleSheet.create({
-  common: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  primary: {
-    borderWidth: 1,
-    borderColor: BrandColors.darkBlue80,
-    borderStyle: 'solid',
-    backgroundColor: AdditionalColors.white,
-  },
-  disconnect: {
-    backgroundColor: AdditionalColors.red80,
-  },
-});
-
 type ButtonTypeName = 'primary' | 'disconnect';
 
 type InCallButtonProps = {
@@ -69,3 +50,22 @@ export default function InCallButton({
     </TouchableHighlight>
   );
 }
+
+const InCallButtonStyles = StyleSheet.create({
+  common: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  primary: {
+    borderWidth: 1,
+    borderColor: BrandColors.darkBlue80,
+    borderStyle: 'solid',
+    backgroundColor: AdditionalColors.white,
+  },
+  disconnect: {
+    backgroundColor: AdditionalColors.red80,
+  },
+});

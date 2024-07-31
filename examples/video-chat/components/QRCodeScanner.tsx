@@ -9,7 +9,7 @@ type Props = {
   onCodeScanned: (code: string) => void;
 };
 
-export function QRCodeScanner({ onCodeScanned }: Props) {
+export default function QRCodeScanner({ onCodeScanned }: Props) {
   const [isBarcodeScannerVisible, setIsBarcodeScannerVisible] = useState(false);
 
   const onPress = async () => {
@@ -52,8 +52,6 @@ export function QRCodeScanner({ onCodeScanned }: Props) {
     </>
   );
 }
-
-export default QRCodeScanner;
 
 const styles = StyleSheet.create({
   barcode: {
