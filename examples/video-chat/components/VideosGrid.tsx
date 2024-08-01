@@ -23,7 +23,7 @@ const { VIDEO_CELL } = roomScreenLabels;
 const AnimatedVideoRenderer =
   Animated.createAnimatedComponent(VideoRendererView);
 
-export function VideosGrid({ tracks }: Props) {
+export default function VideosGrid({ tracks }: Props) {
   const videoWidth = (width - 40) / 2;
 
   return (
@@ -117,5 +117,3 @@ const styles = StyleSheet.create({
     right: 0,
   },
 });
-
-export default VideosGrid;

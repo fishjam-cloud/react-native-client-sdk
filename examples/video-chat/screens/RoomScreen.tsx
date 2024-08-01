@@ -15,9 +15,12 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
 
-import { InCallButton, VideosGrid } from '../components';
-import { NoCameraView } from '../components/NoCameraView';
-import { SoundOutputDevicesBottomSheet } from '../components/SoundOutputDevicesBottomSheet';
+import {
+  InCallButton,
+  VideosGrid,
+  NoCameraView,
+  SoundOutputDevicesBottomSheet,
+} from '../components';
 import { useJoinRoom } from '../hooks/useJoinRoom';
 import { usePreventBackButton } from '../hooks/usePreventBackButton';
 import { useToggleCamera } from '../hooks/useToggleCamera';

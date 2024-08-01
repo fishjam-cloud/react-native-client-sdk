@@ -32,7 +32,7 @@ async function getFishjamServer(
     ? roomManagerUrl
     : roomManagerUrl + '/';
   const response = await fetch(
-    `${url}rooms/${roomName.trim()}/users/${userName.trim()}`,
+    `${url}${roomName.trim()}/users/${userName.trim()}`,
   );
   if (!response.ok) {
     throw new Error(JSON.stringify(await response.json()));
