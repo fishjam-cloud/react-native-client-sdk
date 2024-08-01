@@ -18,9 +18,9 @@
     "@wdio/local-runner": "^8.39.1",
     "@wdio/mocha-framework": "^8.39.0",
     "@wdio/spec-reporter": "^8.39.0",
-    "appium-xcuitest-driver": "^7.24.0",
+    "appium-xcuitest-driver": "^7.24.7",
     "ts-node": "^10.9.1",
-    "typescript": "^5.3.2",
+    "typescript": "^5.5.4",
     "webdriverio": "^8.24.2"
   },
   "dependencies": {
