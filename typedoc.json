@@ -1,0 +1,6 @@
+{
+  "entryPoints": ["packages/*"],
+  "name": "Fishjam Cloud",
+  "entryPointStrategy": "packages",
+  "includeVersion": true
+}
