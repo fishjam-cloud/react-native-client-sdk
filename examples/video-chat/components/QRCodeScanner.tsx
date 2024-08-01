@@ -28,7 +28,7 @@ export default function QRCodeScanner({ onCodeScanned }: Props) {
       onCodeScanned(data);
       setIsBarcodeScannerVisible(false);
     },
-    [],
+    [onCodeScanned],
   );
 
   return (
