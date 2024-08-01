@@ -160,7 +160,7 @@ internal class FishjamClientInternal(
       }
 
     coroutineScope.launch {
-      commandsQueue.executeCommand(
+      commandsQueue.addCommand(
         Command(CommandName.CONNECT, ClientState.CONNECTED) {
           val request = Request.Builder().url(config.websocketUrl).build()
           val webSocket =
@@ -177,7 +177,7 @@ internal class FishjamClientInternal(
 
   fun join(peerMetadata: Metadata = emptyMap()) {
     coroutineScope.launch {
-      commandsQueue.executeCommand(
+      commandsQueue.addCommand(
         Command(CommandName.JOIN, ClientState.JOINED) {
           localEndpoint = localEndpoint.copy(metadata = peerMetadata)
           rtcEngineCommunication.connect(peerMetadata)
@@ -242,7 +242,7 @@ internal class FishjamClientInternal(
     videoTrack.start()
 
     commandsQueue
-      .executeCommand(
+      .addCommand(
         Command(CommandName.ADD_TRACK) {
           localEndpoint = localEndpoint.addOrReplaceTrack(videoTrack)
 
@@ -295,7 +295,7 @@ internal class FishjamClientInternal(
     audioTrack.start()
 
     commandsQueue
-      .executeCommand(
+      .addCommand(
         Command(CommandName.ADD_TRACK) {
           localEndpoint = localEndpoint.addOrReplaceTrack(audioTrack)
 
@@ -338,7 +338,7 @@ internal class FishjamClientInternal(
     }
 
     commandsQueue
-      .executeCommand(
+      .addCommand(
         Command(CommandName.ADD_TRACK) {
           localEndpoint = localEndpoint.addOrReplaceTrack(screencastTrack)
 
@@ -354,7 +354,7 @@ internal class FishjamClientInternal(
 
   suspend fun removeTrack(trackId: String) {
     commandsQueue
-      .executeCommand(
+      .addCommand(
         Command(CommandName.REMOVE_TRACK) {
           val track: Track =
             getTrack(trackId) ?: run {

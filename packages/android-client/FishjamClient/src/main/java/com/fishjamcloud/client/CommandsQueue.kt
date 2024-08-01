@@ -7,7 +7,7 @@ internal class CommandsQueue {
   private var commandsQueue: ArrayDeque<Command> = ArrayDeque()
   var clientState: ClientState = ClientState.CREATED
 
-  suspend fun executeCommand(command: Command) {
+  suspend fun addCommand(command: Command) {
     commandsQueue.add(command)
     suspendCoroutine { cont ->
       run {
