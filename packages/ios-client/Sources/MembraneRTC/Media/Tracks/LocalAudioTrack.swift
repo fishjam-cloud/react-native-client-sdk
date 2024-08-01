@@ -1,58 +1,28 @@
+//DONE
+
 import WebRTC
 
 /// Utility wrapper around a local `RTCAudioTrack` managing a local audio session.
-public class LocalAudioTrack: AudioTrack, LocalTrack {
-    public let track: RTCAudioTrack
-
+public class LocalAudioTrack: Track, LocalTrack {
     private let config: RTCAudioSessionConfiguration
 
-    internal init(peerConnectionFactoryWrapper: PeerConnectionFactoryWrapper) {
-        let constraints: [String: String] = [
-            "googEchoCancellation": "true",
-            "googAutoGainControl": "true",
-            "googNoiseSuppression": "true",
-            "googTypingNoiseDetection": "true",
-            "googHighpassFilter": "true",
-        ]
-
-        let audioConstraints = RTCMediaConstraints(
-            mandatoryConstraints: nil, optionalConstraints: constraints)
-
-        config = RTCAudioSessionConfiguration.webRTC()
-        config.category = AVAudioSession.Category.playAndRecord.rawValue
-        config.mode = AVAudioSession.Mode.videoChat.rawValue
-        config.categoryOptions = [.duckOthers, .allowAirPlay, .allowBluetooth, .allowBluetoothA2DP]
-
-        let audioSource = peerConnectionFactoryWrapper.createAudioSource(audioConstraints)
-
-        let track = peerConnectionFactoryWrapper.createAudioTrack(source: audioSource)
-        track.isEnabled = true
-
-        self.track = track
+    internal init(
+        mediaTrack: RTCAudioTrack, endpointId: String, metadata: Metadata = Metadata(), id: String = UUID().uuidString
+    ) {
+        config = AudioUtils.createAudioConfig()
+        super.init(mediaTrack: mediaTrack, endpointId: endpointId, rtcEngineId: nil, metadata: metadata)
     }
 
-    public func start() {
+    internal var audioTrack: RTCAudioTrack {
+        return self.mediaTrack as! RTCAudioTrack
+    }
+
+    func start() {
         configure(setActive: true)
     }
 
-    public func stop() {
+    func stop() {
         configure(setActive: false)
-    }
-
-    public func enabled() -> Bool {
-        return track.isEnabled
-    }
-
-    public func setEnabled(_ enabled: Bool) {
-        track.isEnabled = enabled
-    }
-
-    override func rtcTrack() -> RTCMediaStreamTrack {
-        return track
-    }
-
-    public func trackId() -> String {
-        return track.trackId
     }
 
     private func withAudioSession(callback: ((RTCAudioSession) throws -> Void)) {

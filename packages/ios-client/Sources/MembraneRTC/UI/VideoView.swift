@@ -70,20 +70,17 @@ public class VideoView: UIView {
                 }
             }
             if let oldValue = oldValue,
-                let rendererView = rendererView,
-                let rtcVideoTrack = oldValue.rtcTrack() as? RTCVideoTrack
+                let rendererView = rendererView
             {
-                rtcVideoTrack.remove(rendererView)
+                oldValue.removeRenderer(rendererView)
             }
 
-            if let track = track,
-                let rtcVideoTrack = track.rtcTrack() as? RTCVideoTrack
-            {
+            if let track = track {
                 // create a new renderer view for the new track
                 createAndPrepareRenderView()
 
                 if let rendererView = rendererView {
-                    rtcVideoTrack.add(rendererView)
+                    track.addRenderer(rendererView)
                 }
             }
 
@@ -92,10 +89,8 @@ public class VideoView: UIView {
     }
 
     deinit {
-        if let rendererView = rendererView,
-            let rtcVideoTrack = track?.rtcTrack() as? RTCVideoTrack
-        {
-            rtcVideoTrack.remove(rendererView)
+        if let rendererView = rendererView {
+            track?.removeRenderer(rendererView)
         }
     }
 

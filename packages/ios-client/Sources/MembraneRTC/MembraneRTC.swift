@@ -56,7 +56,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
 
     private var peerConnectionFactoryWrapper: PeerConnectionFactoryWrapper
 
-    private var localTracks: [LocalTrack] = []
+    private var localTracks: [Track] = []
 
     private var localEndpoint = Endpoint(id: "", type: "webrtc", metadata: .init([:]), tracks: [:])
 
@@ -180,13 +180,16 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
         -> LocalVideoTrack
     {
         DispatchQueue.webRTC.sync {
-            let videoTrack = LocalVideoTrack.create(
-                for: .camera, videoParameters: videoParameters,
-                peerConnectionFactoryWrapper: peerConnectionFactoryWrapper)
+            let rtcVideoSource = peerConnectionFactoryWrapper.createVideoSource()
+            let rtcVideoTrack = peerConnectionFactoryWrapper.createVideoTrack(source: rtcVideoSource)
+            let cameraCapturer = CameraCapturer(videoParameters: videoParameters, delegate: rtcVideoSource)
+            let videoTrack = LocalVideoTrack(
+                mediaTrack: rtcVideoTrack, endpointId: localEndpoint.id, videoParameters: videoParameters,
+                capturer: cameraCapturer)
 
             peerConnectionManager.addTrack(track: videoTrack, localStreamId: localStreamId)
 
-            if let captureDeviceId = captureDeviceId, let videoTrack = videoTrack as? LocalCameraVideoTrack {
+            if let captureDeviceId = captureDeviceId {
                 videoTrack.switchCamera(deviceId: captureDeviceId)
             }
 
@@ -194,8 +197,9 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
 
             localTracks.append(videoTrack)
 
+            //todo rename localEndpoint method to addOrReplaceTrack
             localEndpoint = localEndpoint.withTrack(
-                trackId: videoTrack.rtcTrack().trackId, metadata: metadata, simulcastConfig: simulcastConfig)
+                trackId: videoTrack.id, metadata: metadata, simulcastConfig: simulcastConfig)
 
             engineCommunication.renegotiateTracks()
 
@@ -215,16 +219,23 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
      */
     public func createAudioTrack(metadata: Metadata) -> LocalAudioTrack {
         DispatchQueue.webRTC.sync {
-            let audioTrack = LocalAudioTrack(peerConnectionFactoryWrapper: peerConnectionFactoryWrapper)
+            let audioSource = peerConnectionFactoryWrapper.createAudioSource(AudioUtils.audioConstraints)
 
-            peerConnectionManager.addTrack(track: audioTrack, localStreamId: localStreamId)
+            let track = peerConnectionFactoryWrapper.createAudioTrack(source: audioSource)
+            track.isEnabled = true
+
+            let audioTrack = LocalAudioTrack(mediaTrack: track, endpointId: localEndpoint.id, metadata: metadata)
 
             audioTrack.start()
 
+            peerConnectionManager.addTrack(track: audioTrack, localStreamId: localStreamId)
+
             localTracks.append(audioTrack)
 
+            //todo rename localEndpoint method to addOrReplaceTrack
+
             localEndpoint = localEndpoint.withTrack(
-                trackId: audioTrack.rtcTrack().trackId, metadata: metadata, simulcastConfig: nil)
+                trackId: audioTrack.id, metadata: metadata, simulcastConfig: nil)
 
             engineCommunication.renegotiateTracks()
 
@@ -253,6 +264,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
         onStart: @escaping (_ track: LocalScreenBroadcastTrack) -> Void, onStop: @escaping () -> Void
     ) -> LocalScreenBroadcastTrack {
         DispatchQueue.webRTC.sync {
+
             let screensharingTrack = LocalScreenBroadcastTrack(
                 appGroup: appGroup, videoParameters: videoParameters,
                 peerConnectionFactoryWrapper: peerConnectionFactoryWrapper)
@@ -296,7 +308,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
     @discardableResult
     public func removeTrack(trackId: String) -> Bool {
         DispatchQueue.webRTC.sync {
-            guard let index = localTracks.firstIndex(where: { $0.rtcTrack().trackId == trackId }) else {
+            guard let index = localTracks.firstIndex(where: { $0 == trackId }) else {
                 return false
             }
 

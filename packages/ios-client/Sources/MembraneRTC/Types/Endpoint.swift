@@ -31,7 +31,7 @@ public struct Endpoint: Codable {
         return Endpoint(id: self.id, type: self.type, metadata: self.metadata, tracks: newTracks)
     }
 
-    public func withoutTrack(trackId: String) -> Self {
+    public func removeTrack(trackId: String) -> Self {
         var newTracks = self.tracks
         newTracks?.removeValue(forKey: trackId)
 

@@ -1,8 +1,3 @@
-//
-//  types.swift
-//  FishjamCloudClient
-//
-//  Created by Karol Kakol on 29/07/2024.
-//
-
-import Foundation
+public typealias Metadata = AnyJson
+public typealias Payload = AnyJson
+public typealias SerializedMediaEvent = String

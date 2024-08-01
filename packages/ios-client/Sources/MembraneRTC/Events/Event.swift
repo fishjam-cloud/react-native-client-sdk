@@ -1,7 +1,5 @@
 import Foundation
 
-public typealias Payload = AnyJson
-
 /// Protocol for outgoing `MembraneRTC` events
 public protocol SendableEvent {
     func serialize() -> Payload

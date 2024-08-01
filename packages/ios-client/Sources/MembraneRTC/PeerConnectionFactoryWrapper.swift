@@ -7,7 +7,6 @@ internal class PeerConnectionFactoryWrapper {
 
     init(encoder: Encoder) {
         RTCInitializeSSL()
-
         let decoderFactory = RTCDefaultVideoDecoderFactory()
         let encoderFactory = getEncoderFactory(from: encoder)
 
@@ -16,6 +15,7 @@ internal class PeerConnectionFactoryWrapper {
 
         self.factory = RTCPeerConnectionFactory(
             encoderFactory: simulcastFactory, decoderFactory: decoderFactory)
+
     }
 
     func createPeerConnection(_ configuration: RTCConfiguration, constraints: RTCMediaConstraints)

@@ -1,3 +1,5 @@
+//DONE?
+
 import WebRTC
 
 public protocol LocalScreenBroadcastTrackDelegate: AnyObject {
@@ -8,16 +10,30 @@ public protocol LocalScreenBroadcastTrackDelegate: AnyObject {
 }
 
 /// Utility wrapper around a local `RTCVideoTrack` also managing a `BroadcastScreenCapturer`.
-public class LocalScreenBroadcastTrack: LocalVideoTrack, ScreenBroadcastCapturerDelegate {
+public class LocalScreenBroadcastTrack: VideoTrack, LocalTrack, ScreenBroadcastCapturerDelegate {
     private let appGroup: String
+    internal var capturer: ScreenBroadcastCapturer
+    internal var videoParameters: VideoParameters
     public weak var delegate: LocalScreenBroadcastTrackDelegate?
 
     internal init(
-        appGroup: String, videoParameters: VideoParameters,
-        delegate _: LocalScreenBroadcastTrackDelegate? = nil, peerConnectionFactoryWrapper: PeerConnectionFactoryWrapper
+        mediaTrack: RTCVideoTrack, endpointId: String, metadata: Metadata = Metadata(), appGroup: String,
+        videoParameters: VideoParameters, capturer: ScreenBroadcastCapturer,
+        delegate: LocalScreenBroadcastTrackDelegate? = nil
     ) {
         self.appGroup = appGroup
-        super.init(parameters: videoParameters, peerConnectionFactoryWrapper: peerConnectionFactoryWrapper)
+        self.videoParameters = videoParameters
+        self.delegate = delegate
+        self.capturer = capturer
+        super.init(mediaTrack: mediaTrack, endpointId: endpointId, rtcEngineId: nil, metadata: metadata)
+    }
+
+    func start() {
+        capturer.startCapture()
+    }
+
+    func stop() {
+        capturer.startCapture()
     }
 
     internal func started() {
@@ -36,9 +52,8 @@ public class LocalScreenBroadcastTrack: LocalVideoTrack, ScreenBroadcastCapturer
         delegate?.resumed()
     }
 
-    override func createCapturer(videoSource _: RTCVideoSource) -> VideoCapturer {
-        let capturer = ScreenBroadcastCapturer(
-            videoSource, appGroup: appGroup, videoParameters: videoParameters)
+    func createCapturer(videoSource: RTCVideoSource) -> VideoCapturer {
+        let capturer = ScreenBroadcastCapturer(videoSource, appGroup: appGroup, videoParameters: videoParameters)
         capturer.capturerDelegate = self
         return capturer
     }
