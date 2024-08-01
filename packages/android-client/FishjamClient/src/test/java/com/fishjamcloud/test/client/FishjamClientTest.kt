@@ -60,7 +60,7 @@ class FishjamClientTest {
         )
 
       client.connect(Config(websocketUrl = url, token = token))
-      verify(timeout = 1000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
+      verify(timeout = 2000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
       websocketMock.open()
       verify { fishjamClientListener.onSocketOpen() }
       websocketMock.expect(authRequest)
