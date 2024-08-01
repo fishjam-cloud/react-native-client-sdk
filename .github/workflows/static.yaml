@@ -36,7 +36,7 @@ jobs:
       - name: Install node dependencies
         run: yarn
       - name: Run typedoc
-        run: npm docs
+        run: yarn docs
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
