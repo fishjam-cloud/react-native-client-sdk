@@ -5,7 +5,7 @@ import com.fishjamcloud.client.models.AuthError
 import com.fishjamcloud.client.models.Peer
 import timber.log.Timber
 
-interface FishjamClientListener {
+interface FishjamClientListener : ReconnectionManagerListener {
   /**
    * Emitted when the websocket connection is closed
    */

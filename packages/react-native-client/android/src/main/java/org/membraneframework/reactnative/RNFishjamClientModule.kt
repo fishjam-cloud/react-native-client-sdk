@@ -73,6 +73,22 @@ class ScreencastOptions : Record {
   val maxBandwidthInt: Int = 0
 }
 
+class ReconnectConfig : Record {
+  @Field
+  val maxAttempts: Int = 5
+
+  @Field
+  val initialDelayMs: Long = 1000
+
+  @Field
+  val delayMs: Long = 1000
+}
+
+class ConnectConfig : Record {
+  @Field
+  val reconnectConfig: ReconnectConfig = ReconnectConfig()
+}
+
 class RNFishjamClientModule : Module() {
   override fun definition() =
     ModuleDefinition {
@@ -86,7 +102,10 @@ class RNFishjamClientModule : Module() {
         "EndpointsUpdate",
         "AudioDeviceUpdate",
         "SendMediaEvent",
-        "BandwidthEstimation"
+        "BandwidthEstimation",
+        "ReconnectionRetriesLimitReached",
+        "ReconnectionStarted",
+        "Reconnected"
       )
 
       val rnFishjamClient =
@@ -112,9 +131,9 @@ class RNFishjamClientModule : Module() {
         rnFishjamClient.onActivityResult(result.requestCode, result.resultCode, result.data)
       }
 
-      AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, promise: Promise ->
+      AsyncFunction("connect") { url: String, peerToken: String, peerMetadata: Map<String, Any>, config: ConnectConfig, promise: Promise ->
         CoroutineScope(Dispatchers.Main).launch {
-          rnFishjamClient.connect(url, peerToken, peerMetadata, promise)
+          rnFishjamClient.connect(url, peerToken, peerMetadata, config, promise)
         }
       }
 

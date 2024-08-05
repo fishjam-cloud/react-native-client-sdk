@@ -8,4 +8,7 @@ object EmitableEvents {
   const val EndpointsUpdate = "EndpointsUpdate"
   const val AudioDeviceUpdate = "AudioDeviceUpdate"
   const val BandwidthEstimation = "BandwidthEstimation"
+  const val ReconnectionRetriesLimitReached = "ReconnectionRetriesLimitReached"
+  const val ReconnectionStarted = "ReconnectionStarted"
+  const val Reconnected = "Reconnected"
 }

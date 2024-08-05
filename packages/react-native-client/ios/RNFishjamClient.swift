@@ -268,7 +268,6 @@ class RNFishjamClient: FishjamClientListener {
     }
 
     func onAuthSuccess() {
-        joinRoom()
     }
 
     func onAuthError(reason: AuthError) {
@@ -304,21 +303,17 @@ class RNFishjamClient: FishjamClientListener {
         connectPromise = nil
     }
 
-    func connect(url: String, peerToken: String, peerMetadata: [String: Any], promise: Promise) {
+    func connect(url: String, peerToken: String, peerMetadata: [String: Any], config: ConnectConfig, promise: Promise) {
         connectPromise = promise
         localUserMetadata = peerMetadata.toMetadata()
-        fishjamClient?.connect(config: Config(websocketUrl: url, token: peerToken))
-    }
 
-    func joinRoom() {
-        guard let localEndpointId = localEndpointId,
-            var endpoint = MembraneRoom.sharedInstance.endpoints[localEndpointId]
-        else {
-            return
-        }
-
-        endpoint.metadata = localUserMetadata
-        fishjamClient?.join(peerMetadata: localUserMetadata)
+        let reconnectConfig = FishjamCloudClient.ReconnectConfig(
+            maxAttempts: config.reconnectConfig.maxAttempts, initialDelayMs: config.reconnectConfig.initialDelayMs,
+            delayMs: config.reconnectConfig.delayMs)
+        fishjamClient?.connect(
+            config: Config(
+                websocketUrl: url, token: peerToken, peerMetadata: .init(peerMetadata), reconnectConfig: reconnectConfig
+            ))
     }
 
     func leaveRoom() {
@@ -1066,4 +1061,15 @@ class RNFishjamClient: FishjamClientListener {
         emitEvent(name: eventName, data: [eventName: estimation])
     }
 
+    func onReconnectionStarted() {
+        emitEvent(name: EmitableEvents.ReconnectionStarted, data: [:])
+    }
+
+    func onReconnected() {
+        emitEvent(name: EmitableEvents.Reconnected, data: [:])
+    }
+
+    func onReconnectionRetriesLimitReached() {
+        emitEvent(name: EmitableEvents.ReconnectionRetriesLimitReached, data: [:])
+    }
 }

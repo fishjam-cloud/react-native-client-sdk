@@ -4,10 +4,14 @@ import WebRTC
 public struct Config {
     var websocketUrl: String
     var token: String
+    var peerMetadata: Metadata
+    var reconnectConfig: ReconnectConfig
 
-    public init(websocketUrl: String, token: String) {
+    public init(websocketUrl: String, token: String, peerMetadata: Metadata, reconnectConfig: ReconnectConfig) {
         self.websocketUrl = websocketUrl
         self.token = token
+        self.peerMetadata = peerMetadata
+        self.reconnectConfig = reconnectConfig
     }
 }
 
@@ -82,17 +86,6 @@ public class FishjamClient {
     */
     public func cleanUp() {
         client.cleanUp()
-    }
-
-    /**
-    * Tries to join the room. If user is accepted then {@link FishjamClient.onJoinSuccess} will be called.
-    * In other case {@link FishjamClient.onJoinError} is invoked.
-    *
-    * @param peerMetadata - Any information that other peers will receive in onPeerJoined
-    * after accepting this peer
-    */
-    public func join(peerMetadata: Metadata) {
-        webrtcClient.connect(metadata: peerMetadata)
     }
 
     /**

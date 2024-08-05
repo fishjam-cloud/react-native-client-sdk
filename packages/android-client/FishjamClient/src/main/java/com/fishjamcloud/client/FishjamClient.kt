@@ -10,6 +10,7 @@ import com.fishjamcloud.client.models.EncoderOptions
 import com.fishjamcloud.client.models.Metadata
 import com.fishjamcloud.client.models.Peer
 import com.fishjamcloud.client.models.RTCStats
+import com.fishjamcloud.client.models.ReconnectConfig
 import com.fishjamcloud.client.models.TrackBandwidthLimit
 import com.fishjamcloud.client.models.TrackEncoding
 import com.fishjamcloud.client.models.VideoParameters
@@ -21,7 +22,9 @@ import org.webrtc.Logging
 
 data class Config(
   val websocketUrl: String,
-  val token: String
+  val token: String,
+  val peerMetadata: Metadata,
+  val reconnectConfig: ReconnectConfig
 )
 
 class FishjamClient(
@@ -50,17 +53,6 @@ class FishjamClient(
    */
   fun leave() {
     client.leave()
-  }
-
-  /**
-   * Tries to join the room. If user is accepted then {@link FishjamClient.onConnected} will be called.
-   * In other case {@link FishjamClient.onConnectError} is invoked.
-   *
-   * @param peerMetadata - Any information that other peers will receive in onPeerJoined
-   * after accepting this peer
-   */
-  fun join(peerMetadata: Metadata = emptyMap()) {
-    client.join(peerMetadata)
   }
 
   /**

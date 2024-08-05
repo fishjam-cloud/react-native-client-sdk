@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol FishjamClientListener {
+public protocol FishjamClientListener: ReconnectionManagerListener {
     /**
      * Emitted when the websocket connection is closed
      */
