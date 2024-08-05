@@ -12,7 +12,7 @@ import notifee, {
   AndroidForegroundServiceType,
 } from '@notifee/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
 
 import {
@@ -42,14 +42,11 @@ const RoomScreen = ({ navigation, route }: Props) => {
   usePreventBackButton();
   const audioSettings = useAudioSettings();
 
-  const { startForegroundService } = useForegroundService();
   const { isCameraOn, flipCamera } = useCamera();
   const { toggleCamera } = useToggleCamera();
   const { isMicrophoneOn, toggleMicrophone } = useMicrophone();
 
-  useEffect(() => {
-    startForegroundService();
-  }, [startForegroundService]);
+  useForegroundService();
 
   const { peers } = usePeers();
 
@@ -116,12 +113,6 @@ const RoomScreen = ({ navigation, route }: Props) => {
       bottomSheetRef.current?.expand();
     }
   }, [audioSettings]);
-
-  useEffect(() => {
-    return () => {
-      notifee.stopForegroundService();
-    };
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
