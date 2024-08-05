@@ -2,7 +2,6 @@ import {
   CaptureDevice,
   TrackEncoding,
   useCamera,
-  useMicrophone,
   connect,
   VideoPreviewView,
 } from '@fishjam-cloud/react-native-client';
@@ -61,10 +60,7 @@ function PreviewScreen({
     toggleVideoTrackEncoding,
     switchCamera,
   } = useCamera();
-  const { isMicrophoneOn: isMicrophoneAvailable } = useMicrophone();
-  const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(
-    isMicrophoneAvailable,
-  );
+  const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(true);
 
   const encodings: Record<string, TrackEncoding[]> = {
     ios: ['l', 'h'],
