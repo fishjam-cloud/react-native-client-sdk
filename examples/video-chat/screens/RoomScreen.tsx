@@ -39,14 +39,11 @@ const {
 } = roomScreenLabels;
 
 const RoomScreen = ({ navigation, route }: Props) => {
-  const { isMicrophoneOn: isMicrophoneAvailable, userName } =
-    route?.params ?? {};
+  const { userName } = route?.params ?? {};
   usePreventBackButton();
   const audioSettings = useAudioSettings();
 
-  const { joinRoom } = useJoinRoom({
-    isMicrophoneAvailable,
-  });
+  const { joinRoom } = useJoinRoom();
   const { isCameraOn, flipCamera } = useCamera();
   const { toggleCamera } = useToggleCamera();
   const { isMicrophoneOn } = useMicrophone();

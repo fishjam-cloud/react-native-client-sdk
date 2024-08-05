@@ -17,10 +17,6 @@ export type MicrophoneConfig<MetadataType extends Metadata> = {
 };
 export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
 
-type StartMicorphoneConfig = <MicrophoneConfigMetadataType extends Metadata>(
-  config?: Readonly<Partial<MicrophoneConfig<MicrophoneConfigMetadataType>>>,
-) => Promise<void>;
-
 /**
  * This hook can toggle microphone on/off and provides current microphone state.
  */
@@ -46,17 +42,5 @@ export function useMicrophone() {
     setIsMicrophoneOn(state);
   }, []);
 
-  /**
-   * Starts local microphone capturing.
-   * @param config configuration of the microphone capture
-   * @returns A promise that resolves when microphone capturing is started.
-   */
-  const startMicrophone = useCallback<StartMicorphoneConfig>(
-    async (config = {}) => {
-      await RNFishjamClientModule.startMicrophone(config);
-    },
-    [],
-  );
-
-  return { isMicrophoneOn, toggleMicrophone, startMicrophone };
+  return { isMicrophoneOn, toggleMicrophone };
 }
