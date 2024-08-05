@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+import { isConnected, setMicrophoneStatus } from '../common/state';
 
 export type MicrophoneConfig<MetadataType extends Metadata> = {
   /**
@@ -26,6 +27,10 @@ export function useMicrophone() {
   );
 
   useEffect(() => {
+    setMicrophoneStatus(isMicrophoneOn);
+  }, [isMicrophoneOn]);
+
+  useEffect(() => {
     const eventListener = eventEmitter.addListener<IsMicrophoneOnEvent>(
       ReceivableEvents.IsMicrophoneOn,
       (event) => setIsMicrophoneOn(event.IsMicrophoneOn),
@@ -38,8 +43,16 @@ export function useMicrophone() {
    * Function to toggle microphone on/off
    */
   const toggleMicrophone = useCallback(async () => {
-    const state = await RNFishjamClientModule.toggleMicrophone();
-    setIsMicrophoneOn(state);
+    if (isConnected()) {
+      const status = await RNFishjamClientModule.toggleMicrophone();
+      await RNFishjamClientModule.updateAudioTrackMetadata({
+        active: status,
+        type: 'audio',
+      });
+      setIsMicrophoneOn(status);
+    } else {
+      setIsMicrophoneOn((state) => !state);
+    }
   }, []);
 
   return { isMicrophoneOn, toggleMicrophone };

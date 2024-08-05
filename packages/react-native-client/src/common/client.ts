@@ -19,5 +19,5 @@ export async function connect(
 
 export async function leaveRoom() {
   await RNFishjamClientModule.leaveRoom();
-  setConnectionStatus(true);
+  setConnectionStatus(false);
 }

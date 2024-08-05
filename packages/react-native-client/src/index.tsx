@@ -39,7 +39,6 @@ export type {
 export { useScreencast } from './hooks/useScreencast';
 
 export {
-  updateAudioTrackMetadata,
   updatePeerMetadata,
   updateVideoTrackMetadata,
 } from './common/metadata';

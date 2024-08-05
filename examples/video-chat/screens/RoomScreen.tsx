@@ -24,7 +24,6 @@ import {
 import { useJoinRoom } from '../hooks/useJoinRoom';
 import { usePreventBackButton } from '../hooks/usePreventBackButton';
 import { useToggleCamera } from '../hooks/useToggleCamera';
-import { useToggleMicrophone } from '../hooks/useToggleMicrophone';
 import type { AppRootStackParamList } from '../navigators/AppNavigator';
 import { roomScreenLabels } from '../types/ComponentLabels';
 
@@ -46,8 +45,7 @@ const RoomScreen = ({ navigation, route }: Props) => {
   const { joinRoom } = useJoinRoom();
   const { isCameraOn, flipCamera } = useCamera();
   const { toggleCamera } = useToggleCamera();
-  const { isMicrophoneOn } = useMicrophone();
-  const { toggleMicrophone } = useToggleMicrophone();
+  const { isMicrophoneOn, toggleMicrophone } = useMicrophone();
 
   useEffect(() => {
     joinRoom();

@@ -21,7 +21,6 @@ export type AppRootStackParamList = {
   };
   Room: {
     isCameraOn: boolean;
-    isMicrophoneOn: boolean;
     userName?: string;
   };
 };

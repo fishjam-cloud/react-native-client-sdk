@@ -4,6 +4,7 @@ import {
   useCamera,
   connect,
   VideoPreviewView,
+  useMicrophone,
 } from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -60,15 +61,11 @@ function PreviewScreen({
     toggleVideoTrackEncoding,
     switchCamera,
   } = useCamera();
-  const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(true);
+  const { isMicrophoneOn, toggleMicrophone } = useMicrophone();
 
   const encodings: Record<string, TrackEncoding[]> = {
     ios: ['l', 'h'],
     android: ['l', 'm', 'h'],
-  };
-
-  const toggleMicrophone = () => {
-    setIsMicrophoneOn(!isMicrophoneOn);
   };
 
   const toggleSwitchCamera = () => {
@@ -117,7 +114,6 @@ function PreviewScreen({
     });
     navigation.navigate('Room', {
       isCameraOn,
-      isMicrophoneOn,
       userName: route?.params?.userName,
     });
   };
