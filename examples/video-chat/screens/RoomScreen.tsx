@@ -21,7 +21,7 @@ import {
   NoCameraView,
   SoundOutputDevicesBottomSheet,
 } from '../components';
-import { useJoinRoom } from '../hooks/useJoinRoom';
+import { useForegroundService } from '../hooks/useForegroundService';
 import { usePreventBackButton } from '../hooks/usePreventBackButton';
 import { useToggleCamera } from '../hooks/useToggleCamera';
 import type { AppRootStackParamList } from '../navigators/AppNavigator';
@@ -42,14 +42,14 @@ const RoomScreen = ({ navigation, route }: Props) => {
   usePreventBackButton();
   const audioSettings = useAudioSettings();
 
-  const { joinRoom } = useJoinRoom();
+  const { startForegroundService } = useForegroundService();
   const { isCameraOn, flipCamera } = useCamera();
   const { toggleCamera } = useToggleCamera();
   const { isMicrophoneOn, toggleMicrophone } = useMicrophone();
 
   useEffect(() => {
-    joinRoom();
-  }, [joinRoom]);
+    startForegroundService();
+  }, [startForegroundService]);
 
   const { peers } = usePeers();
 

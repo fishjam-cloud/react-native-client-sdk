@@ -6,7 +6,7 @@ import notifee, {
 import { useCallback } from 'react';
 import { Platform } from 'react-native';
 
-async function startForegroundService() {
+async function displayNotification() {
   if (Platform.OS === 'android') {
     const channelId = await notifee.createChannel({
       id: 'video_call',
@@ -38,10 +38,10 @@ async function startForegroundService() {
   }
 }
 
-export function useJoinRoom() {
-  const joinRoom = useCallback(async () => {
-    await startForegroundService();
+export function useForegroundService() {
+  const startForegroundService = useCallback(async () => {
+    await displayNotification();
   }, []);
 
-  return { joinRoom };
+  return { startForegroundService };
 }
