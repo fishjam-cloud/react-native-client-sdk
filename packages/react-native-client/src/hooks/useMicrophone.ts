@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Metadata } from '../types';
+import type { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
-import { isConnected, setMicrophoneStatus } from '../common/state';
+import {
+  isConnected,
+  setMicrophoneStatus,
+  isMicrophoneSetToOn,
+} from '../common/state';
 
 export type MicrophoneConfig<MetadataType extends Metadata> = {
   /**
@@ -16,7 +20,15 @@ export type MicrophoneConfig<MetadataType extends Metadata> = {
    */
   microphoneEnabled?: boolean;
 };
-export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
+
+type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
+
+export async function startMicrophone() {
+  await RNFishjamClientModule.startMicrophone({
+    audioTrackMetadata: { active: isMicrophoneSetToOn(), type: 'audio' },
+    microphoneEnabled: isMicrophoneSetToOn(),
+  });
+}
 
 /**
  * This hook can toggle microphone on/off and provides current microphone state.

@@ -1,6 +1,7 @@
 import { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
-import { setConnectionStatus, isMicrophoneSetToOn } from './state';
+import { setConnectionStatus } from './state';
+import { startMicrophone } from '../hooks/useMicrophone';
 
 export async function connect(
   url: string,
@@ -11,10 +12,7 @@ export async function connect(
 
   setConnectionStatus(true);
 
-  await RNFishjamClientModule.startMicrophone({
-    audioTrackMetadata: { active: isMicrophoneSetToOn(), type: 'audio' },
-    microphoneEnabled: isMicrophoneSetToOn(),
-  });
+  await startMicrophone();
 }
 
 export async function leaveRoom() {
