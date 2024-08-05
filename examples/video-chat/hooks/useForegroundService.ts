@@ -6,7 +6,7 @@ import notifee, {
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
-async function displayNotification() {
+async function displayCallNotification() {
   const channelId = await notifee.createChannel({
     id: 'video_call',
     name: 'Video call',
@@ -36,10 +36,33 @@ async function displayNotification() {
   });
 }
 
+export async function displayScreencastNotification() {
+  await notifee.displayNotification({
+    title: 'Your video call is ongoing',
+    body: 'Tap to return to the call.',
+    id: 'video_notification',
+    android: {
+      channelId: 'video_call',
+      asForegroundService: true,
+      foregroundServiceTypes: [
+        AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_CAMERA,
+        AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MICROPHONE,
+        AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
+      ],
+      ongoing: true,
+      color: AndroidColor.BLUE,
+      colorized: true,
+      pressAction: {
+        id: 'default',
+      },
+    },
+  });
+}
+
 export function useForegroundService() {
   useEffect(() => {
     if (Platform.OS === 'android') {
-      displayNotification();
+      displayCallNotification();
       return () => {
         notifee.stopForegroundService();
       };

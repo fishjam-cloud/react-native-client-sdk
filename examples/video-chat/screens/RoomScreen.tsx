@@ -7,10 +7,6 @@ import {
   useAudioSettings,
 } from '@fishjam-cloud/react-native-client';
 import BottomSheet from '@gorhom/bottom-sheet';
-import notifee, {
-  AndroidColor,
-  AndroidForegroundServiceType,
-} from '@notifee/react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { Platform, SafeAreaView, StyleSheet, View } from 'react-native';
@@ -21,7 +17,10 @@ import {
   NoCameraView,
   SoundOutputDevicesBottomSheet,
 } from '../components';
-import { useForegroundService } from '../hooks/useForegroundService';
+import {
+  displayScreencastNotification,
+  useForegroundService,
+} from '../hooks/useForegroundService';
 import { usePreventBackButton } from '../hooks/usePreventBackButton';
 import { useToggleCamera } from '../hooks/useToggleCamera';
 import type { AppRootStackParamList } from '../navigators/AppNavigator';
@@ -69,30 +68,11 @@ const RoomScreen = ({ navigation, route }: Props) => {
   }, [navigation]);
 
   const onToggleScreenCast = useCallback(async () => {
-    if (!isScreencastOn && Platform.OS == 'android') {
+    if (!isScreencastOn && Platform.OS === 'android') {
       if ((await handleScreencastPermission()) != 'granted') {
         return;
       }
-      await notifee.displayNotification({
-        title: 'Your video call is ongoing',
-        body: 'Tap to return to the call.',
-        id: 'video_notification',
-        android: {
-          channelId: 'video_call',
-          asForegroundService: true,
-          foregroundServiceTypes: [
-            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_CAMERA,
-            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MICROPHONE,
-            AndroidForegroundServiceType.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
-          ],
-          ongoing: true,
-          color: AndroidColor.BLUE,
-          colorized: true,
-          pressAction: {
-            id: 'default',
-          },
-        },
-      });
+      await displayScreencastNotification();
     }
     await toggleScreencast({
       screencastMetadata: {
