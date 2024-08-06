@@ -4,7 +4,9 @@ import com.fishjamcloud.client.Config
 import com.fishjamcloud.client.FishjamClientInternal
 import com.fishjamcloud.client.FishjamClientListener
 import com.fishjamcloud.client.media.createAudioDeviceModule
+import com.fishjamcloud.client.models.ReconnectConfig
 import fishjam.PeerNotifications
+import io.mockk.coVerify
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -59,10 +61,12 @@ class FishjamClientTest {
           mockk(relaxed = true)
         )
 
-      client.connect(Config(websocketUrl = url, token = token))
-      verify(timeout = 2000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
+      client.connect(
+        Config(websocketUrl = url, token = token, peerMetadata = emptyMap(), reconnectConfig = ReconnectConfig(maxAttempts = 0))
+      )
+      coVerify(timeout = 2000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
       websocketMock.open()
-      verify { fishjamClientListener.onSocketOpen() }
+      coVerify { fishjamClientListener.onSocketOpen() }
       websocketMock.expect(authRequest)
     }
   }
@@ -77,6 +81,8 @@ class FishjamClientTest {
   fun callsOnSocketError() {
     websocketMock.error()
     verify { fishjamClientListener.onSocketError(any()) }
+    verify { fishjamClientListener.onReconnectionRetriesLimitReached() }
+    websocketMock.expectClosed()
   }
 
   @Test

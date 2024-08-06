@@ -1,3 +1,5 @@
+import Foundation
+
 enum ReconnectionStatus {
     case IDLE
     case RECONNECTING
