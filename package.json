@@ -21,7 +21,8 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "patch-package": "8.0.0",
     "prettier": "^3.3.3",
-    "typedoc": "^0.26.5"
+    "typedoc": "^0.26.5",
+    "typedoc-material-theme": "^1.1.0"
   },
   "scripts": {
     "setup": "sh ./scripts/init.sh",

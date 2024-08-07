@@ -3797,6 +3797,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@material/material-color-utilities@npm:^0.2.7":
+  version: 0.2.7
+  resolution: "@material/material-color-utilities@npm:0.2.7"
+  checksum: 10c0/7734f8d7cffe6a92d47fcca82b4846e39ffd79be9c057f3299466696dcdee5379b8a8a3aa6a9692d40bd6900905f689105d9a8ce47882ab22348df10621f70cd
+  languageName: node
+  linkType: hard
+
 "@nicolo-ribaudo/chokidar-2@npm:2.1.8-no-fsevents.3":
   version: 2.1.8-no-fsevents.3
   resolution: "@nicolo-ribaudo/chokidar-2@npm:2.1.8-no-fsevents.3"
@@ -10597,6 +10604,7 @@ __metadata:
     patch-package: "npm:8.0.0"
     prettier: "npm:^3.3.3"
     typedoc: "npm:^0.26.5"
+    typedoc-material-theme: "npm:^1.1.0"
   languageName: unknown
   linkType: soft
 
@@ -19310,6 +19318,17 @@ __metadata:
     typed-array-buffer: "npm:^1.0.2"
     typed-array-byte-offset: "npm:^1.0.2"
   checksum: 10c0/6ac110a8b58a1ccb086242f09d1ce9c7ba2885924e816364a7879083b983d4096f19aab6f9aa8c0ce5ddd3d8ae3f3ba5581e10fa6838880f296a0c54c26f424b
+  languageName: node
+  linkType: hard
+
+"typedoc-material-theme@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "typedoc-material-theme@npm:1.1.0"
+  dependencies:
+    "@material/material-color-utilities": "npm:^0.2.7"
+  peerDependencies:
+    typedoc: ^0.25.13 || ^0.26.3
+  checksum: 10c0/523bd30b3a13b47e29d20d2f72abdde80f1b15bbd9c6012777edc29e4c0fc8b76fdfdece8c543d5942f6ac7db62c14d90e4872c31490a98815c3919771104527
   languageName: node
   linkType: hard
 
