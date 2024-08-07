@@ -83,7 +83,6 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     }
 
     func websocketDidConnect() {
-        onSocketOpen()
         let authRequest = Fishjam_PeerMessage.with({
             $0.authRequest = Fishjam_PeerMessage.AuthRequest.with({
                 $0.token = self.config?.token ?? ""
@@ -101,7 +100,6 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
             let peerMessage = try Fishjam_PeerMessage(serializedData: data)
             if case .authenticated(_) = peerMessage.content {
                 isAuthenticated = true
-                onAuthSuccess()
                 if reconnectionManager?.reconnectionStatus == .RECONNECTING {
                     webrtcClient?.reconnect()
                 } else {
@@ -190,14 +188,6 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     func onSocketError() {
         isAuthenticated = false
         listener.onSocketError()
-    }
-
-    func onSocketOpen() {
-        listener.onSocketOpen()
-    }
-
-    func onAuthSuccess() {
-        listener.onAuthSuccess()
     }
 
     func onAuthError(reason: AuthError) {

@@ -24,18 +24,6 @@ interface FishjamClientListener : ReconnectionManagerListener {
   }
 
   /**
-   * Emitted when the websocket connection is opened
-   */
-  fun onSocketOpen() {
-    Timber.i("Socket opened")
-  }
-
-  /**
-   * Emitted when authentication is successful
-   */
-  fun onAuthSuccess()
-
-  /**
    * Emitted when authentication fails
    */
   fun onAuthError(reason: AuthError)

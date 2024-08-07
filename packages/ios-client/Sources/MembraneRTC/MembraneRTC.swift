@@ -721,7 +721,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
     func onDisconnected() {
         DispatchQueue.webRTC.sync {
             peerConnectionManager.close()
-            prevLocalTracks = Array((prevLocalTracks + localTracks))
+            prevLocalTracks = localTracks
             localTracks = []
             let metadata = localEndpoint.metadata
             localEndpoint = Endpoint(id: "", type: "webrtc", metadata: metadata, tracks: [:])

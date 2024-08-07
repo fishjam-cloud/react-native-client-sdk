@@ -66,15 +66,8 @@ class FishjamClientTest {
       )
       coVerify(timeout = 2000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
       websocketMock.open()
-      coVerify { fishjamClientListener.onSocketOpen() }
       websocketMock.expect(authRequest)
     }
-  }
-
-  @Test
-  fun authenticates() {
-    websocketMock.sendToClient(authenticated)
-    verify { fishjamClientListener.onAuthSuccess() }
   }
 
   @Test

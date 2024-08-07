@@ -263,13 +263,6 @@ class RNFishjamClient: FishjamClientListener {
         connectPromise = nil
     }
 
-    func onSocketOpen() {
-
-    }
-
-    func onAuthSuccess() {
-    }
-
     func onAuthError(reason: AuthError) {
         if let connectPromise = connectPromise {
             connectPromise.reject("E_MEMBRANE_CONNECT", "Failed to connect: \(reason.rawValue)")

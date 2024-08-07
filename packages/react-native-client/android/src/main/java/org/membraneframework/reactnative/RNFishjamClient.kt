@@ -230,9 +230,6 @@ class RNFishjamClient(
     }
   }
 
-  override fun onAuthSuccess() {
-  }
-
   fun connect(
     url: String,
     peerToken: String,

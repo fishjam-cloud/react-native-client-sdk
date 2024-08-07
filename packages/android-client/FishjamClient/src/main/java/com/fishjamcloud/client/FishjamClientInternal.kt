@@ -102,15 +102,15 @@ internal class FishjamClientInternal(
     peerConnectionManager.addListener(this)
     rtcEngineCommunication.addListener(this)
     reconnectionManager.addListener(listener)
-    setupWebsocket(config)
+    setupWebSocket(config)
   }
 
   private fun reconnect(config: Config) {
     recreateTracks()
-    setupWebsocket(config)
+    setupWebSocket(config)
   }
 
-  private fun setupWebsocket(config: Config) {
+  private fun setupWebSocket(config: Config) {
     val websocketListener =
       object : WebSocketListener() {
         override fun onClosed(
@@ -141,7 +141,6 @@ internal class FishjamClientInternal(
           try {
             val peerMessage = PeerNotifications.PeerMessage.parseFrom(bytes.toByteArray())
             if (peerMessage.hasAuthenticated()) {
-              listener.onAuthSuccess()
               commandsQueue.finishCommand()
               join()
             } else if (peerMessage.hasMediaEvent()) {
@@ -158,7 +157,6 @@ internal class FishjamClientInternal(
           webSocket: WebSocket,
           response: Response
         ) {
-          listener.onSocketOpen()
           val authRequest =
             PeerNotifications.PeerMessage
               .newBuilder()

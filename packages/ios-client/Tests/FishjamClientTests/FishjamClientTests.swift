@@ -84,11 +84,6 @@ final class FishjamClientTests: XCTestCase {
         verify(self.mockedWebSocket.write(data: data)).wasCalled()
     }
 
-    func testConnectAndAuthenticate() throws {
-        connect()
-        verify(self.fishjamClientListener.onAuthSuccess()).wasCalled()
-    }
-
     func testCleansUp() throws {
         connect()
         fishjamClient?.cleanUp()
