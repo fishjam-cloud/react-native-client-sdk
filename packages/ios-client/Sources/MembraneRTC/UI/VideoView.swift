@@ -202,10 +202,6 @@ public class VideoView: UIView {
         }
     }
 
-    public static func isMetalAvailable() -> Bool {
-        MTLCreateSystemDefaultDevice() != nil
-    }
-
     private static func createNativeRendererView(delegate: RTCVideoViewDelegate) -> RTCVideoRenderer {
         DispatchQueue.webRTC.sync {
             let mtlView = RTCMTLVideoView()
