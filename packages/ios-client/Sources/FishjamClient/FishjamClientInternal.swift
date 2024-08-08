@@ -2,7 +2,7 @@ import Foundation
 import Starscream
 
 internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
-    private var config: Config?
+    private var config: ConnectConfig?
     private var webSocket: FishjamWebsocket?
     private var listener: FishjamClientListener
     private var websocketFactory: (String) -> FishjamWebsocket
@@ -15,7 +15,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
         self.websocketFactory = websocketFactory
     }
 
-    func connect(config: Config) {
+    func connect(config: ConnectConfig) {
         self.config = config
         self.reconnectionManager = ReconnectionManager(
             reconnectConfig: config.reconnectConfig, connect: { self.reconnect() }, listener: listener)
@@ -197,7 +197,7 @@ internal class FishjamClientInternal: MembraneRTCDelegate, WebSocketDelegate {
     func onDisconnected() {
         isAuthenticated = false
         webSocket?.disconnect()
-        webrtcClient?.onDisconnected()
+        webrtcClient?.prepareToReconnect()
         listener.onDisconnected()
         reconnectionManager?.onDisconnected()
     }

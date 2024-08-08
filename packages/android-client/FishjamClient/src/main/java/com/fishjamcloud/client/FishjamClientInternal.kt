@@ -67,7 +67,7 @@ internal class FishjamClientInternal(
 
   private val coroutineScope: CoroutineScope =
     ClosableCoroutineScope(SupervisorJob() + Dispatchers.Default)
-  private var config: Config? = null
+  private var connectConfig: ConnectConfig? = null
 
   private lateinit var reconnectionManager: ReconnectionManager
 
@@ -93,24 +93,24 @@ internal class FishjamClientInternal(
         ?.values
         ?.firstOrNull { track -> track.getRTCEngineId() == trackId }
 
-  fun connect(config: Config) {
-    this.config = config
+  fun connect(connectConfig: ConnectConfig) {
+    this.connectConfig = connectConfig
     this.reconnectionManager =
-      ReconnectionManager(config.reconnectConfig) {
-        reconnect(config)
+      ReconnectionManager(connectConfig.reconnectConfig) {
+        reconnect(connectConfig)
       }
     peerConnectionManager.addListener(this)
     rtcEngineCommunication.addListener(this)
     reconnectionManager.addListener(listener)
-    setupWebSocket(config)
+    setupWebSocket(connectConfig)
   }
 
-  private fun reconnect(config: Config) {
+  private fun reconnect(connectConfig: ConnectConfig) {
     recreateTracks()
-    setupWebSocket(config)
+    setupWebSocket(connectConfig)
   }
 
-  private fun setupWebSocket(config: Config) {
+  private fun setupWebSocket(connectConfig: ConnectConfig) {
     val websocketListener =
       object : WebSocketListener() {
         override fun onClosed(
@@ -163,7 +163,7 @@ internal class FishjamClientInternal(
               .setAuthRequest(
                 PeerNotifications.PeerMessage.AuthRequest
                   .newBuilder()
-                  .setToken(config.token)
+                  .setToken(connectConfig.token)
               ).build()
           sendEvent(authRequest)
         }
@@ -176,7 +176,7 @@ internal class FishjamClientInternal(
           listener.onSocketError(t)
           commandsQueue.onDisconnected()
           coroutineScope.launch {
-            onDisconnected()
+            prepareToReconnect()
             reconnectionManager.onDisconnected()
           }
         }
@@ -185,7 +185,7 @@ internal class FishjamClientInternal(
     coroutineScope.launch {
       commandsQueue.addCommand(
         Command(CommandName.CONNECT, ClientState.CONNECTED) {
-          val request = Request.Builder().url(config.websocketUrl).build()
+          val request = Request.Builder().url(connectConfig.websocketUrl).build()
           val webSocket =
             OkHttpClient().newWebSocket(
               request,
@@ -198,7 +198,7 @@ internal class FishjamClientInternal(
     }
   }
 
-  private suspend fun onDisconnected() {
+  private suspend fun prepareToReconnect() {
     peerConnectionManager.close()
     webSocket?.close(1000, null)
     webSocket = null
@@ -211,8 +211,8 @@ internal class FishjamClientInternal(
     coroutineScope.launch {
       commandsQueue.addCommand(
         Command(CommandName.JOIN, ClientState.JOINED) {
-          localEndpoint = localEndpoint.copy(metadata = config?.peerMetadata)
-          rtcEngineCommunication.connect(config?.peerMetadata ?: emptyMap())
+          localEndpoint = localEndpoint.copy(metadata = connectConfig?.peerMetadata)
+          rtcEngineCommunication.connect(connectConfig?.peerMetadata ?: emptyMap())
         }
       )
     }

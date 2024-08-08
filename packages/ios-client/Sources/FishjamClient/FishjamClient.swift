@@ -1,7 +1,7 @@
 import Starscream
 import WebRTC
 
-public struct Config {
+public struct ConnectConfig {
     var websocketUrl: String
     var token: String
     var peerMetadata: Metadata
@@ -67,7 +67,7 @@ public class FishjamClient {
     *
     * @param config - Configuration object for the client
     */
-    public func connect(config: Config) {
+    public func connect(config: ConnectConfig) {
         client.connect(config: config)
     }
 

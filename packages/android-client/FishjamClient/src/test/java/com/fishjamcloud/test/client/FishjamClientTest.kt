@@ -1,6 +1,6 @@
 package com.fishjamcloud.test.client
 
-import com.fishjamcloud.client.Config
+import com.fishjamcloud.client.ConnectConfig
 import com.fishjamcloud.client.FishjamClientInternal
 import com.fishjamcloud.client.FishjamClientListener
 import com.fishjamcloud.client.media.createAudioDeviceModule
@@ -62,7 +62,7 @@ class FishjamClientTest {
         )
 
       client.connect(
-        Config(websocketUrl = url, token = token, peerMetadata = emptyMap(), reconnectConfig = ReconnectConfig(maxAttempts = 0))
+        ConnectConfig(websocketUrl = url, token = token, peerMetadata = emptyMap(), reconnectConfig = ReconnectConfig(maxAttempts = 0))
       )
       coVerify(timeout = 2000) { anyConstructed<OkHttpClient>().newWebSocket(any(), any()) }
       websocketMock.open()

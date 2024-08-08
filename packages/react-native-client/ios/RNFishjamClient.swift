@@ -304,7 +304,7 @@ class RNFishjamClient: FishjamClientListener {
             maxAttempts: config.reconnectConfig.maxAttempts, initialDelayMs: config.reconnectConfig.initialDelayMs,
             delayMs: config.reconnectConfig.delayMs)
         fishjamClient?.connect(
-            config: Config(
+            config: FishjamCloudClient.ConnectConfig(
                 websocketUrl: url, token: peerToken, peerMetadata: .init(peerMetadata), reconnectConfig: reconnectConfig
             ))
     }

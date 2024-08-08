@@ -718,7 +718,7 @@ public class MembraneRTC: MulticastDelegate<MembraneRTCDelegate>, ObservableObje
         }
     }
 
-    func onDisconnected() {
+    func prepareToReconnect() {
         DispatchQueue.webRTC.sync {
             peerConnectionManager.close()
             prevLocalTracks = localTracks

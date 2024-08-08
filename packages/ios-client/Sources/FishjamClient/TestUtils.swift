@@ -5,7 +5,7 @@ internal protocol FishjamMembraneRTC {
     func disconnect()
     func connect(metadata: Metadata)
     func receiveMediaEvent(mediaEvent: SerializedMediaEvent)
-    func onDisconnected()
+    func prepareToReconnect()
     func reconnect()
 }
 

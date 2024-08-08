@@ -20,7 +20,7 @@ import com.fishjamcloud.client.webrtc.PeerConnectionManager
 import com.fishjamcloud.client.webrtc.RTCEngineCommunication
 import org.webrtc.Logging
 
-data class Config(
+data class ConnectConfig(
   val websocketUrl: String,
   val token: String,
   val peerMetadata: Metadata,
@@ -40,10 +40,10 @@ class FishjamClient(
   /**
    * Connects to the server using the WebSocket connection
    *
-   * @param config - Configuration object for the client
+   * @param connectConfig - Configuration object for the client
    */
-  fun connect(config: Config) {
-    client.connect(config)
+  fun connect(connectConfig: ConnectConfig) {
+    client.connect(connectConfig)
   }
 
   /**
