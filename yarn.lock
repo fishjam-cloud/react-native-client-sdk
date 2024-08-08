@@ -3106,13 +3106,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fishjam-cloud/js-server-sdk@npm:^0.1.0":
-  version: 0.1.0
-  resolution: "@fishjam-cloud/js-server-sdk@npm:0.1.0"
-  dependencies:
-    axios: "npm:^1.6.8"
-    protobufjs: "npm:^7.2.6"
-  checksum: 10c0/b3a1c74bb7f792dfea6f9e07fa9e52436d4ad51f18e7fb45254a86377635911c049d55bd2be32b166b3eeddd9866e0b4e5c6c7bb96b75117fcc63f6c67617499
+"@fishjam-cloud/fishjam-openapi@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "@fishjam-cloud/fishjam-openapi@npm:0.1.1"
+  checksum: 10c0/f4203c196683018af390c8fff84e713555f4c62c666650b70b24c0044470d0019597b573dfceadd47b31a1fa7985a6703351c2abd01e48133a976dbbd7339695
   languageName: node
   linkType: hard
 
@@ -7034,7 +7031,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.2, axios@npm:^1.4.0, axios@npm:^1.6.7, axios@npm:^1.6.8":
+"axios@npm:1.7.2, axios@npm:^1.4.0, axios@npm:^1.6.7":
   version: 1.7.2
   resolution: "axios@npm:1.7.2"
   dependencies:
@@ -16293,7 +16290,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"protobufjs@npm:^7.2.4, protobufjs@npm:^7.2.6":
+"protobufjs@npm:^7.2.4":
   version: 7.3.2
   resolution: "protobufjs@npm:7.3.2"
   dependencies:
@@ -19962,7 +19959,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "webdriverio-test@workspace:examples/webdriverio-test"
   dependencies:
-    "@fishjam-cloud/js-server-sdk": "npm:^0.1.0"
+    "@fishjam-cloud/fishjam-openapi": "npm:^0.1.1"
     "@wdio/appium-service": "npm:^8.39.1"
     "@wdio/cli": "npm:^8.39.1"
     "@wdio/local-runner": "npm:^8.39.1"
