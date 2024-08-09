@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { Metadata } from '../types';
+import type { Metadata } from '../types';
 import RNFishjamClientModule from '../RNFishjamClientModule';
 import { ReceivableEvents, eventEmitter } from '../common/eventEmitter';
+import {
+  isConnected,
+  setMicrophoneStatus,
+  isMicrophoneSetToOn,
+} from '../common/state';
 
 export type MicrophoneConfig<MetadataType extends Metadata> = {
   /**
@@ -15,11 +20,15 @@ export type MicrophoneConfig<MetadataType extends Metadata> = {
    */
   microphoneEnabled?: boolean;
 };
-export type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
 
-type StartMicorphoneConfig = <MicrophoneConfigMetadataType extends Metadata>(
-  config?: Readonly<Partial<MicrophoneConfig<MicrophoneConfigMetadataType>>>,
-) => Promise<void>;
+type IsMicrophoneOnEvent = { IsMicrophoneOn: boolean };
+
+export async function startMicrophone() {
+  await RNFishjamClientModule.startMicrophone({
+    audioTrackMetadata: { active: isMicrophoneSetToOn(), type: 'audio' },
+    microphoneEnabled: isMicrophoneSetToOn(),
+  });
+}
 
 /**
  * This hook can toggle microphone on/off and provides current microphone state.
@@ -28,6 +37,10 @@ export function useMicrophone() {
   const [isMicrophoneOn, setIsMicrophoneOn] = useState<boolean>(
     RNFishjamClientModule.isMicrophoneOn,
   );
+
+  useEffect(() => {
+    setMicrophoneStatus(isMicrophoneOn);
+  }, [isMicrophoneOn]);
 
   useEffect(() => {
     const eventListener = eventEmitter.addListener<IsMicrophoneOnEvent>(
@@ -42,21 +55,17 @@ export function useMicrophone() {
    * Function to toggle microphone on/off
    */
   const toggleMicrophone = useCallback(async () => {
-    const state = await RNFishjamClientModule.toggleMicrophone();
-    setIsMicrophoneOn(state);
+    if (isConnected()) {
+      const status = await RNFishjamClientModule.toggleMicrophone();
+      await RNFishjamClientModule.updateAudioTrackMetadata({
+        active: status,
+        type: 'audio',
+      });
+      setIsMicrophoneOn(status);
+    } else {
+      setIsMicrophoneOn((state) => !state);
+    }
   }, []);
 
-  /**
-   * Starts local microphone capturing.
-   * @param config configuration of the microphone capture
-   * @returns A promise that resolves when microphone capturing is started.
-   */
-  const startMicrophone = useCallback<StartMicorphoneConfig>(
-    async (config = {}) => {
-      await RNFishjamClientModule.startMicrophone(config);
-    },
-    [],
-  );
-
-  return { isMicrophoneOn, toggleMicrophone, startMicrophone };
+  return { isMicrophoneOn, toggleMicrophone };
 }
