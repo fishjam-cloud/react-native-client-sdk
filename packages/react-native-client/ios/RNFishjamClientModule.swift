@@ -53,6 +53,22 @@ struct ScreencastOptions: Record {
     var maxBandwidth: RNTrackBandwidthLimit = RNTrackBandwidthLimit(0)
 }
 
+struct ReconnectConfig: Record {
+    @Field
+    var maxAttempts: Int = 5
+
+    @Field
+    var initialDelayMs: Int = 1000
+
+    @Field
+    var delayMs: Int = 1000
+}
+
+struct ConnectConfig: Record {
+    @Field
+    var reconnectConfig: ReconnectConfig = ReconnectConfig()
+}
+
 typealias RNTrackBandwidthLimit = Either<Int, [String: Int]>
 
 public class RNFishjamClientModule: Module {
@@ -67,16 +83,21 @@ public class RNFishjamClientModule: Module {
             "PeersUpdate",
             "AudioDeviceUpdate",
             "SendMediaEvent",
-            "BandwidthEstimation")
+            "BandwidthEstimation",
+            "ReconnectionRetriesLimitReached",
+            "ReconnectionStarted",
+            "Reconnected")
 
         let rnFishjamClient: RNFishjamClient = RNFishjamClient {
             (eventName: String, data: [String: Any]) in
             self.sendEvent(eventName, data)
         }
 
-        AsyncFunction("connect") { (url: String, peerToken: String, peerMetadata: [String: Any], promise: Promise) in
+        AsyncFunction("connect") {
+            (url: String, peerToken: String, peerMetadata: [String: Any], config: ConnectConfig, promise: Promise) in
             try rnFishjamClient.create()
-            rnFishjamClient.connect(url: url, peerToken: peerToken, peerMetadata: peerMetadata, promise: promise)
+            rnFishjamClient.connect(
+                url: url, peerToken: peerToken, peerMetadata: peerMetadata, config: config, promise: promise)
         }
 
         AsyncFunction("leaveRoom") {
